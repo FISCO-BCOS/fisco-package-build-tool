@@ -7,3 +7,4 @@
 * Update:  
 1. 添加fisco-solc的安装, 安装目录为/user/local/bin/。  
 2. 解决非root用户执行安装时, 安装ethconsole失败的问题。 
+3. 添加README.me文件。
