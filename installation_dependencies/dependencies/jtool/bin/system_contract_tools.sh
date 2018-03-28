@@ -42,14 +42,14 @@ fi
 case "$1" in
 	#deploy system contract
 	$COMMAND_DDEPOY_SYSTEM_CONTACT)
-        java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.InitSystemContract
+        java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.InitSystemContract
         ;;
 		#print system contract proxy info
     $COMMAND_SYSTEM_PROXY)
-        java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $COMMAND_SYSTEM_PROXY
+        java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $COMMAND_SYSTEM_PROXY
         ;;
     $COMMAND_AUTH_FILTER)
-        java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $COMMAND_AUTH_FILTER 
+        java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $COMMAND_AUTH_FILTER 
         ;;
 	#node manager
     $COMMAND_NODE_ACTION)
@@ -58,19 +58,19 @@ case "$1" in
 				if [ $# -lt 2 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2
 				;;
 			$COMMAND_NODE_ACTION_REGISTER_NODE)
 				if [ $# -lt 3 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2 $3
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2 $3
 				;;
 			$COMMAND_NODE_ACTION_DELETE_NODE)
 				if [ $# -lt 3 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2 $3
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2 $3
 				;;
 			*)
 				Usage
@@ -83,19 +83,19 @@ case "$1" in
 				if [ $# -lt 2 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2
 				;;
 			$COMMAND_CA_ACTION_UPDATE)
 				if [ $# -lt 3 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2 $3
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2 $3
 				;;
 			$COMMAND_CA_ACTION_UPDATE_STATUS)
 				if [ $# -lt 3 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2 $3
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2 $3
 				;;
 			*)
 				Usage
@@ -108,13 +108,13 @@ case "$1" in
 				if [ $# -lt 3 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2 $3
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2 $3
 				;;
 			$COMMAND_CONFIG_ACTION_SET)
 				if [ $# -lt 3 ];then
 					Usage
 				fi
-				java -cp '../conf/:../apps/*:../lib/*' cn.webank.contract.tools.SystemContractTools $1 $2 $3
+				java -cp '../conf/:../apps/*:../lib/*' org.bcos.contract.tools.SystemContractTools $1 $2 $3
 				;;
 			*)
 				Usage
