@@ -148,8 +148,8 @@ function install_dependencies()
         sudo apt-get install -y nodejs
 
         wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O $DEPENENCIES_DIR/tool/fisco-solc
-        sudo mv $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
-        sudo cp a+x /usr/local/bin/fisco-solc
+        sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
+        sudo chmod a+x /usr/local/bin/fisco-solc
 
         #sudo npm install -g cnpm --registry=https://registry.npm.taobao.org
         #sudo cnpm install -g babel-cli babel-preset-es2017
@@ -169,8 +169,8 @@ function install_dependencies()
         sudo yum -y install nodejs
 
         wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O $DEPENENCIES_DIR/tool/fisco-solc
-        sudo mv $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
-        sudo cp a+x /usr/local/bin/fisco-solc
+        sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
+        sudo chmod a+x /usr/local/bin/fisco-solc
 
         #sudo npm install -g cnpm --registry=https://registry.npm.taobao.org
         #sudo cnpm install -g babel-cli babel-preset-es2017
