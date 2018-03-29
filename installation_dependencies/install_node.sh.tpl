@@ -50,9 +50,11 @@ function build_node_sh()
     "
     echo $node_str > $buildPWD/node.sh
     echo "source $buildPWD/node.sh" >> ~/.bashrc
+    echo "source nodesh result is $?"
     source ~/.bashrc
-    #echo $NODE_PATH
-    #echo $NODE_HOME
+    echo "source ~/.bashrc $?"
+    echo $NODE_PATH
+    echo $NODE_HOME
 }
 
 function install_nodejs()
@@ -62,8 +64,6 @@ function install_nodejs()
     mkdir -p $buildPWD/nodejs/bin/
     cd $installPWD/dependencies/nodejs/
     tar --strip-components 1 -xzvf node-v*tar.gz -C $buildPWD/nodejs/ 1>>/dev/null
-
-    build_node_sh
 
     cd $installPWD
     return 0
@@ -234,7 +234,7 @@ function install_node_dependencies()
     # install ethereum-console
     type ethconsole >/dev/null 2>&1
     ret=$?
-    if [ $ret -nq 0  ];then
+    if [ ! $ret -eq 0  ];then
         install_ethconsole
     else
         print_install_result "ethconsole"
@@ -244,12 +244,14 @@ function install_node_dependencies()
     # install babel
     type babel-node >/dev/null 2>&1
     ret=$?
-    if [ $ret -nq 0 ]; then
+    if [ ! $ret -eq 0 ]; then
         install_babel
     else
         print_install_result "babel.js"
         print_install_info "babel already exist"
     fi
+    
+    build_node_sh
 
     return
 
