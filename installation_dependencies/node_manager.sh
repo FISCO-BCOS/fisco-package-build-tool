@@ -6,6 +6,8 @@ COMMAND_DELETE_NODE='cancelNode'
 
 cd dependencies/jtool/bin
 
+chmod a+x system_contract_tools.sh
+
 function redirect_request_to() 
 {
     command_name=$1
