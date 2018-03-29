@@ -49,12 +49,13 @@ function build_node_sh()
     export NODE_PATH=\$NODE_HOME/lib/node_modules:\$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
     "
     echo $node_str > $buildPWD/node.sh
+    sudo chmod a+x $buildPWD/node.sh
     echo "source $buildPWD/node.sh" >> ~/.bashrc
     echo "source nodesh result is $?"
     source ~/.bashrc
     echo "source ~/.bashrc $?"
-    echo $NODE_PATH
-    echo $NODE_HOME
+    echo "NODE_PATH is "$NODE_PATH
+    echo "NODE_HOME is "$NODE_HOME
 }
 
 function install_nodejs()
@@ -225,7 +226,6 @@ function install_node_dependencies()
     if [ $ret -eq 0  ]
     then
         ret=`node --version`
-        print_install_result "nodejs"
         print_install_info "node already exist, nodejs version $ret"
     else
         install_nodejs
@@ -237,7 +237,6 @@ function install_node_dependencies()
     if [ ! $ret -eq 0  ];then
         install_ethconsole
     else
-        print_install_result "ethconsole"
         print_install_info "ethereum-console already exist"
     fi
 
@@ -247,7 +246,6 @@ function install_node_dependencies()
     if [ ! $ret -eq 0 ]; then
         install_babel
     else
-        print_install_result "babel.js"
         print_install_info "babel already exist"
     fi
     
@@ -440,7 +438,7 @@ function install()
     echo "    Installing fisco-bcos environment success!"
 
     install_node_dependencies
-    nodejs_env_check
+    #nodejs_env_check
 
     return 0
 }
