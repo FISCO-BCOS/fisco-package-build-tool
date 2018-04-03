@@ -16,7 +16,7 @@
   * 步骤见( [5. 从零开始搭建区块链步骤](#buildblockchain) )
 - [x] 从零开始搭建区块链后, 创建出所有节点的安装包后, 又需要对这条区块链进行扩容, 生成扩容节点的安装包。
   * 步骤见( [附录一：区块链扩容节点](#expand_node) )
-- [x] 指定给定的创世节点的相关文件，生成非创世节点的安装包。对以前的已经在跑的区块链, 可以提供其创世节点的相关文件, 创建出一个非创世节点, 使其可以连接到这条区块链。
+- [x] 指定给定的创世节点的相关文件，生成非创世节点的安装包。对以前的已经在跑的区块链, 可以提供其创世节点的相关文件, 创建出非创世节点, 使其可以连接到这条区块链。
   * 步骤见( [附录二：指定给定的创世节点,扩容节点](#specific_genesis_node_expand) )
 
 # 4. 安装依赖  
@@ -102,8 +102,6 @@ weth_host_2[@]
 )
 ```
 
-- **注意：创建过程中工具会启动一个temp节点, 用于系统合约的部署, 生成新链的genesis.json等文件**。
-
 **配置项：**
 * FISCO_BCOS_GIT  
   获取FISCO-BCOS的github路径,也可以不填写,默认从https://github.com/FISCO-BCOS/FISCO-BCOS.git获取。 
@@ -148,7 +146,7 @@ ls build/
 ***REMOVED***_with_0.0.0.0_genesis_installation_package
 temp
 ```
-其中temp目录为临时节点的目录,不关心, 其余的几个包分别为对应服务器上节点的安装包。  
+其中temp目录为临时节点的目录,不需要关心, 其余的几个包分别为对应服务器上节点的安装包。  
 安装包的目录结构：
 
 ```shell
@@ -166,7 +164,7 @@ nodeactioninfo_***REMOVED***_0.json  nodeactioninfo_***REMOVED***_1.json
 nodeactioninfo_***REMOVED***_0.json  nodeactioninfo_***REMOVED***_1.json 
 nodeactioninfo_***REMOVED***_0.json  nodeactioninfo_***REMOVED***_1.json 
 ```
-* 节点信息文件名的格式为nodeactioninfo_IP_IDX, IDX从0开始, 表示该服务器上生成的第几个节点。
+* 节点信息文件名的格式为nodeactioninfo_IP_IDX, IDX从0开始, 表示该服务器生成的第几个节点。
 
 * install_node.sh脚本用来生成本机的数据目录、启动、停止脚本, 每个目录下都存在。
 
