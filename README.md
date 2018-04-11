@@ -116,7 +116,7 @@ weth_host_2[@]
 * field 0(p2p_network_ip)： p2p连接的网段ip, 根据p2p网络的网段配置。
 * field 1(listen_network_ip)： 监听网段, 用来接收rpc、channel、ssl连接请求, 建议配置为"0.0.0.0"。
 * field 2(node number on this host)：在该服务器上面需要创建的节点数目。  
-* field 3(identity type)：节点类型, "0"：观察节点,  "1"：记账节点 。 
+* field 3(identity type)：节点类型, "1"：记账节点,  "0"：观察节点 。 
 * field 4(crypto mode)： 落盘加密开关: "0":关闭,  "1":开启。  
 * field 5(ssl)：节点之间连接是否使用ssl连接, "0":关闭 , "1":开启。
 * field 6(super key)： 落盘加密的秘钥, 一般情况不用修改。  
