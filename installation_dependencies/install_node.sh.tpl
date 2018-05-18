@@ -50,7 +50,7 @@ function build_node_sh()
     "
     echo $node_str > $buildPWD/node.sh
     sudo chmod a+x $buildPWD/node.sh
-    #echo "source $buildPWD/node.sh" >> ~/.bashrc
+    echo "source $buildPWD/node.sh" >> ~/.bashrc
     #echo "source nodesh result is $?"
     source ~/.bashrc >/dev/null 2>&1
     #echo "source ~/.bashrc $?"
