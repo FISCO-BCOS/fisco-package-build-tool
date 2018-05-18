@@ -116,12 +116,12 @@ weth_host_2[@]
 * field 0(p2p_network_ip)： p2p连接的网段ip, 根据p2p网络的网段配置。
 * field 1(listen_network_ip)： 监听网段, 用来接收rpc、channel、ssl连接请求, 建议配置为"0.0.0.0"。
 * field 2(node number on this host)：在该服务器上面需要创建的节点数目。  
-* field 3(identity type)：节点类型, "1"：记账节点,  "0"：观察节点 。 
-* field 4(crypto mode)： 落盘加密开关: "0":关闭,  "1":开启。  
-* field 5(ssl)：节点之间连接是否使用ssl连接, "0":关闭 , "1":开启。
+* field 3(identity type)：节点类型, "1"：记账节点,  "0"：观察节点 , 推荐默认值：1。 
+* field 4(crypto mode)： 落盘加密开关: "0":关闭,  "1":开启 , 推荐默认值 0。  
+* field 5(ssl)：节点之间连接是否使用ssl连接, "0":关闭 , "1":开启, 推荐默认值 0。
 * field 6(super key)： 落盘加密的秘钥, 一般情况不用修改。  
 * field 7(agency info)： 机构名称, 如果不需要区分机构时,值随意。  
-比如：weth_host_0=("***REMOVED***" "0.0.0.0" "2" "1" "1" "null" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_0") 是第一台服务器上面的配置, 说明需要在***REMOVED***这台服务器上面启动两个节点。
+比如：weth_host_0=("***REMOVED***" "0.0.0.0" "2" "1" "0" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_0") 是第一台服务器上面的配置, 说明需要在***REMOVED***这台服务器上面启动两个节点。
 
 **配置说明：**  
 1. 工具在构建安装包(非扩容流程)过程中会启动一个temp节点, 用于系统合约的部署, 注册创世节点信息到节点管理合约, 生成genesis.json文件。  
@@ -219,13 +219,13 @@ nodeactioninfo_172_20_245_42_0.json  nodeactioninfo_172_20_245_43_0.json  nodeac
 nodeactioninfo_172_20_245_42_1.json  nodeactioninfo_172_20_245_43_1.json  nodeactioninfo_172_20_245_44_1.json
 ```
 
-  使用`node_manager.sh`脚本进行添加  
+  使用`node_manager.sh`脚本进行添加, 格式为 ：   ./node_manager.sh registerNode 节点信息文件路径（绝对路径）
   例如,如果需要添加这台服务器上的第0个节点：
 
   ```sh
-  $ ./node_manager.sh registerNode `pwd`/node_action_info_dir/nodeactioninfo_172_20_245_42_0.json 
+  $ ./node_manager.sh registerNode /root/***REMOVED***_with_0.0.0.0_genesis_installation_package/node_action_info_dir/nodeactioninfo_172_20_245_42_0.json
     ===================================================================
-    node.json=file:/root/test/node_action_info_dir/nodeactioninfo_172_20_245_42_0.json
+    node.json=file:/root/***REMOVED***_with_0.0.0.0_genesis_installation_package/node_action_info_dir/nodeactioninfo_172_20_245_42_0.json
     NodeIdsLength= 1
     ----------node 0---------
     id=d418e60ebc87c1b982e8571b46367a3f99bc798f942bc36bfa558db481111aaee3b463d13594758384b6407520b43ce9e7e95dd01cd40da08b85ff4277c447ae
@@ -241,6 +241,7 @@ nodeactioninfo_172_20_245_42_1.json  nodeactioninfo_172_20_245_43_1.json  nodeac
 
 * 每个节点的节点信息文件的文件名都包含了ip信息和index信息, 用于区分, 例如`nodeactioninfo_172_20_245_42_0.json`, 最后的那个"0"字符就是表示这是172_20_245_42这台服务器上面的第0个节点node0的节点信息文件。
 * 建议每个节点在启动之后, 然后再执行node_manager.sh进行添加。 
+* ./node_manager.sh registerNode xxx 过程中如果命令被卡主, 一直不返回, 说明链可能出现错误, 参考FAQ里面的内容解决。
 
 验证  
     每注册一个节点可以在对应服务器的安装目录下执行：
@@ -257,10 +258,7 @@ INFO|2018-04-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona9878
 #### 6.6 部署成功
 可以通过发送交易是否成功判断链是否搭建成功。 
 在创世节点安装根目录下执行 ：  
-cd dependencies/web3lib/  
-npm install  
-cd ../../dependencies/tool  
-npm install  
+cd dependencies/tool/   
 然后测试合约部署是否正常： 
 babel-node deploy.js Ok  
 
@@ -365,7 +363,12 @@ $ ./generate_installation_packages.sh expand
 
 # FAQ
 
-- 一定要确保安装的机器上面的各个节点的端口都没有被占用, 当前服务器上面的端口配置可以查看安装目录下的 build/nodedirN/config.json 文件。
+- 重要的目录说明   
+安装完成之后FISCO-BCOS/tool FISCO-BCOS/systemcontractv2对应的路径为：
+dependencies/tool/  
+dependencies/systemcontractv2   
+
+- 一定要确保安装的机器上面的各个节点的端口都没有被占用, 当前服务器上面的端口配置可以查看安装目录下的 build/nodedirN/config.json 文件, 可以使用 netstat -anp | egrep 端口号 , 查看端口是否被占用。
  	```sh
 	    "rpcport":"8546",
         "p2pport":"30304",
@@ -385,4 +388,55 @@ $ ./generate_installation_packages.sh expand
 	$ bash -x install_node.sh install
 	```
 	
-- 如果执行启动脚本start_node0.sh后，ps发现进程不存在, 可以查看./build/nodedir0/log/log文件的内容, 查看是什么报错。
+- 执行启动脚本start_node0.sh后, ps -aux | egrep fisco发现进程不存在, 可以查看./build/nodedir0/log/log文件的内容, 里面会有具体的报错内容。  
+常见的一些报错如下：  
+a. 
+```
+terminate called after throwing an instance of 'boost::exception_detail::clone_impl<dev::eth::DatabaseAlreadyOpen>'
+  what():  DatabaseAlreadyOpen  
+```
+进程已经启动, 使用ps -aux | egrep fisco-bcos查看。  
+
+b.
+```
+./fisco-bcos: error while loading shared libraries: libleveldb.so.1: cannot open shared object file: No such file or directory 
+```
+
+leveldb动态库缺失, 安装脚本里面默认使用 yum/apt 对依赖组件进行安装, 可能是 yum/apt 源缺失该组件。  
+可以使用下面命令手动安装leveldb, 若leveldb安装不成功可以尝试替换yum/apt的源。
+```
+[CentOS]sudo yum -y install leveldb-devel
+[Ubuntu]sudo apt-get -y install libleveldb-dev
+
+```  
+c.
+```
+terminate called after throwing an instance of 'boost::exception_detail::clone_impl<dev::FileError>' what():  FileError
+```
+
+操作文件失败抛出异常, 原因可能是当前登录的用户没有安装包目录的权限, 可以通过ls -lt查看当前文件夹对应的user/group/other以及对应的权限, 一般可以将安装包的user改为当前用户或者切换登录用户为安装包的user用户即可。  
+
+-- Not Found xx 这种打印说明, 安装工具自动安装对应的安装包失败, 可以使用对应的yum/apt工具进行手动安装, 手动安装失败则说明对应的源没有改软件, 建议更换yum/apt源。  
+安装的命令列表如下：
+
+```
+ Utuntu安装命令：
+        [OpenSSL] sudo apt-get -y install openssl libssl-dev libkrb5-dev
+        [leveldb] sudo apt-get -y install libleveldb-dev
+        [CURL]    sudo apt-get -y install libcurl4-openssl-dev
+        [mhd]     sudo apt-get -y install libmicrohttpd-dev
+        [gmp]     sudo apt-get -y install libgmp-dev 
+        
+CentOS安装命令：
+        [OpenSSL] sudo yum -y install openssl openssl-devel
+        [leveldb] sudo yum -y install leveldb-devel
+        [CURL]    sudo yum -y install curl-devel 
+        [mhd]     sudo yum -y install libmicrohttpd-devel
+        [gmp]     sudo yum -y install gmp-devel
+```
+
+
+
+
+
+
