@@ -21,19 +21,23 @@
 		</property>
     </bean>
 
-	<bean id="toolConf" class="cn.webank.contract.tools.ToolConf">
+	<bean id="toolConf" class="org.bcos.contract.tools.ToolConf">
 		<property name="systemProxyAddress" value="${JTOOL_SYSTEM_CONTRACT_ADDR}" />
 		<property name="outPutpath" value="./output/" />
 	</bean>
 
-	<bean id="channelService" class="cn.webank.channel.client.Service">
+	<bean id="channelService" class="org.bcos.channel.client.Service">
 		<property name="orgID" value="WB" />
 		<property name="connectSeconds" value="10" />
-		<property name="connectSleepPerSeconds" value="10" />
+		<property name="connectSleepPerMillis" value="10" />
 		<property name="allChannelConnections">
 			<map>
 				<entry key="WB">
-					<bean class="cn.webank.channel.handler.ChannelConnections">
+					<bean class="org.bcos.channel.handler.ChannelConnections">
+						<property name="caCertPath" value="classpath:ca.crt" />
+						<property name="clientKeystorePath" value="classpath:client.keystore" />
+						<property name="keystorePassWord" value="123456" />
+						<property name="clientCertPassWord" value="123456" />
                         <property name="connectionsStr">
 							<list>
 								<value>node1@127.0.0.1:${JTOOL_CONFIG_PORT}</value>

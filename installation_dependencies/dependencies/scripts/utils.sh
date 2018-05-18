@@ -1,5 +1,30 @@
 #!/bin/bash
 
+#check ubuntu os or not
+function is_ubuntu_os()
+{
+    if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+#check if $1 install
+function check_if_install()
+{
+    echo " ===>> $1 checking >>"
+    type $1 >/dev/null 2>&1
+    ret=$?
+    if [ $ret -eq 0  ];then
+        echo "       $1 installed."
+        return 1
+    else
+        echo "      XXXXXXX $1 not installed."
+        return 0
+    fi
+}
+
 #check if the port is used
 function check_port() 
 {

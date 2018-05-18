@@ -574,19 +574,19 @@ function check_config_validation()
     #port checkcheck
     check_port $RPC_PORT_FOR_TEMP_NODE
     if [ $? -ne 0 ];then
-        error_msg "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."
+        echo "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."
         return 4
     fi
 
     check_port $RPC_SSL_PORT_FOR_TEMP_NODE
     if [ $? -ne 0 ];then
-        error_msg "temp node ssl port check, $RPC_SSL_PORT_FOR_TEMP_NODE is in use."
+        echo "temp node ssl port check, $RPC_SSL_PORT_FOR_TEMP_NODE is in use."
         return 4
     fi
 
     check_port $CHANNEL_PORT_FOR_TEMP_NODE
     if [ $? -ne 0 ];then
-        error_msg "temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."
+        echo "temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."
         return 4
     fi
 
@@ -612,8 +612,8 @@ function install_dependencies()
         sudo apt-get -y install libleveldb-dev  libmicrohttpd-dev
         sudo apt-get -y install libminiupnpc-dev
         sudo apt-get -y install libssl-dev libkrb5-dev
-        sudo apt-get -y install nodejs-legacy
-        sudo apt-get -y install npm
+        #sudo apt-get -y install nodejs-legacy
+        #sudo apt-get -y install npm
         sudo apt-get -y install lsof
         #sudo npm install -g cnpm --registry=https://registry.npm.taobao.org
         #sudo cnpm install -g babel-cli babel-preset-es2017
@@ -626,8 +626,8 @@ function install_dependencies()
         sudo yum -y install openssl openssl-devel
         sudo yum -y install boost-devel leveldb-devel curl-devel 
         sudo yum -y install libmicrohttpd-devel gmp-devel 
-        sudo yum -y install nodejs
-        sudo yum -y install npm
+        #sudo yum -y install nodejs
+        #sudo yum -y install npm
         sudo yum -y install lsof
         #sudo npm install -g cnpm --registry=https://registry.npm.taobao.org
         #sudo cnpm install -g babel-cli babel-preset-es2017
@@ -712,7 +712,7 @@ function main()
         return 2
     fi
 
-    echo "" > $BUILD_ERROR_LOG
+    echo -n "" > $BUILD_ERROR_LOG
 
     #init all global variable
     init_global_variable

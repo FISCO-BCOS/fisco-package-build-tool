@@ -49,10 +49,13 @@ function build_node_sh()
     export NODE_PATH=\$NODE_HOME/lib/node_modules:\$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
     "
     echo $node_str > $buildPWD/node.sh
-    echo "source $buildPWD/node.sh" >> ~/.bashrc
-    source ~/.bashrc
-    #echo $NODE_PATH
-    #echo $NODE_HOME
+    sudo chmod a+x $buildPWD/node.sh
+    #echo "source $buildPWD/node.sh" >> ~/.bashrc
+    #echo "source nodesh result is $?"
+    source ~/.bashrc >/dev/null 2>&1
+    #echo "source ~/.bashrc $?"
+    #echo "NODE_PATH is "$NODE_PATH
+    #echo "NODE_HOME is "$NODE_HOME
 }
 
 function install_nodejs()
@@ -63,7 +66,18 @@ function install_nodejs()
     cd $installPWD/dependencies/nodejs/
     tar --strip-components 1 -xzvf node-v*tar.gz -C $buildPWD/nodejs/ 1>>/dev/null
 
-    build_node_sh
+    export NODE_HOME=$buildPWD/nodejs
+    export PATH=$PATH:$NODE_HOME/bin
+    #echo "NODE_PATH = "$NODE_PATH
+    #echo "NODE_HOME = "$NODE_HOME
+
+    #在web3lib tool systemcontractv2目录
+    cd ../web3lib
+    npm install
+    cd ../tool
+    npm install
+    cd ../systemcontractv2
+    npm install
 
     cd $installPWD
     return 0
@@ -136,16 +150,16 @@ function install_dependencies()
         #sudo apt-get -y install cmake
         sudo apt-get -y install git
         sudo apt-get -y install openssl
-        sudo apt-get -y install build-essential libboost-all-dev
+        sudo apt-get -y install build-essential
         sudo apt-get -y install libcurl4-openssl-dev libgmp-dev
         sudo apt-get -y install libleveldb-dev  libmicrohttpd-dev
         sudo apt-get -y install libminiupnpc-dev
         sudo apt-get -y install libssl-dev libkrb5-dev
+        sudo apt-get -y install lsof
         #sudo apt-get -y install nodejs-legacy
         #sudo apt-get -y install npm
-        sudo apt-get -y install lsof
-        curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-        sudo apt-get install -y nodejs
+        #curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+        #sudo apt-get install -y nodejs
 
         wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O $DEPENENCIES_DIR/tool/fisco-solc
         sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
@@ -160,13 +174,13 @@ function install_dependencies()
         #sudo yum -y install cmake3
         sudo yum -y install git gcc-c++
         sudo yum -y install openssl openssl-devel
-        sudo yum -y install boost-devel leveldb-devel curl-devel 
+        sudo yum -y install leveldb-devel curl-devel 
         sudo yum -y install libmicrohttpd-devel gmp-devel 
+        sudo yum -y install lsof
         #sudo yum -y install nodejs
         #sudo yum -y install npm
-        sudo yum -y install lsof
-        curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
-        sudo yum -y install nodejs
+        #curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
+        #sudo yum -y install nodejs
 
         wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O $DEPENENCIES_DIR/tool/fisco-solc
         sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
@@ -179,8 +193,81 @@ function install_dependencies()
     fi
 }
 
-function install_npm_dependencies()
+function nodejs_env_check()
 {
+    echo "Checking nodejs enviroment beginning."
+    #check nodejs enviroment
+    type npm >/dev/null 2>&1
+    if [ $? -eq 0 ];then
+        ret=`npm -v`
+        print_install_info "npm install success , npm versoin $ret."
+    else
+        echo "Error, install [npm] failed, you should install manually."
+    fi
+
+    #type cnpm >/dev/null 2>&1
+    #if [ $? -eq 0 ];then
+    #    ret=`cnpm -v`
+    #    print_install_info "Success, cnpm versoin $ret."
+    #else
+    #    echo "Error, install [cnpm] failed, you should install manually."
+    #fi
+
+    type ethconsole >/dev/null 2>&1
+    if [ $? -eq 0 ];then
+        print_install_info "ethconsole install success."
+    else
+        echo "Error, install [ethconsole] failed, you should install manually."
+    fi
+
+    type babel-node >/dev/null 2>&1
+    if [ $? -eq 0 ];then
+        ret=`babel-node -V`
+        print_install_info "babel-node install success , babel-node versoin $ret"
+    else
+        echo "Error, install [babel-node] failed, you should install manually."
+    fi
+
+    echo "Checking nodejs enviroment end."
+}
+
+function install_node_dependencies()
+{
+    #install nodejs
+    #type node >/dev/null 2>&1
+    #ret=$?
+    #if [ $ret -eq 0  ]
+    #then
+    #    ret=`node --version`
+    #    print_install_info "node already exist, nodejs version $ret"
+    #else
+    #    install_nodejs
+    #fi
+    # 单独安装nodejs,用户之前如果已经安装,这里也不会有什么影响。
+    install_nodejs
+
+    # install ethereum-console
+    type ethconsole >/dev/null 2>&1
+    ret=$?
+    if [ ! $ret -eq 0  ];then
+        install_ethconsole
+    else
+        print_install_info "ethereum-console already exist"
+    fi
+
+    # install babel
+    type babel-node >/dev/null 2>&1
+    ret=$?
+    if [ ! $ret -eq 0 ]; then
+        install_babel
+    else
+        print_install_info "babel already exist"
+    fi
+    
+    build_node_sh
+
+    return
+
     #CentOS
     # curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
     # curl --silent --location https://rpm.nodesource.com/setup_9.x | sudo bash -
@@ -209,10 +296,10 @@ function install_npm_dependencies()
         sudo npm install -g --unsafe-perm ethereum-console
     fi
 
-    if [ ! -d /usr/lib/node_modules/secp256k1 ];then
-        #install secp256k1
-        sudo npm install -g  --unsafe-perm secp256k1
-    fi
+    #if [ ! -d /usr/lib/node_modules/secp256k1 ];then
+    #    #install secp256k1
+    #    sudo npm install -g  --unsafe-perm secp256k1
+    #fi
 
     #install babel
     type babel-node >/dev/null 2>&1
@@ -223,41 +310,6 @@ function install_npm_dependencies()
         sudo cnpm install -g babel-cli babel-preset-es2017
         echo '{ "presets": ["es2017"] }' > ~/.babelrc
     fi
-
-    echo "Checking nodejs enviroment beginning."
-    #check nodejs enviroment
-    type npm >/dev/null 2>&1
-    if [ $? -eq 0 ];then
-        ret=`npm -v`
-        print_install_info "npm install success , npm versoin $ret."
-    else
-        echo "Error, install [npm] failed, you should install manually."
-    fi
-
-    type cnpm >/dev/null 2>&1
-    if [ $? -eq 0 ];then
-        ret=`cnpm -v`
-        print_install_info "Success, cnpm versoin $ret."
-    else
-        echo "Error, install [cnpm] failed, you should install manually."
-    fi
-
-    type ethconsole >/dev/null 2>&1
-    if [ $? -eq 0 ];then
-        print_install_info "Success, ethconsole install success."
-    else
-        echo "Error, install [ethconsole] failed, you should install manually."
-    fi
-
-    type babel-node >/dev/null 2>&1
-    if [ $? -eq 0 ];then
-        ret=`babel-node -V`
-        print_install_info "Success, babel-node versoin $ret"
-    else
-        echo "Error, install [babel-node] failed, you should install manually."
-    fi
-
-    echo "Checking nodejs enviroment end."
 }
 
 function build_tools()
@@ -291,34 +343,6 @@ function install()
     install_dependencies
     #chmod 777 $installPWD/* -R
     
-    ##install nodejs
-    #type node >/dev/null 2>&1
-    #ret=$?
-    #if [ $ret -eq 0  ]
-    #then
-    #    ret=`node --version`
-    #    print_install_result "nodejs"
-    #    print_install_info "node already exist, nodejs version $ret"
-    #else
-    #    install_nodejs
-    #fi
-
-    # install ethereum-console
-    #if [ ! -d "$NODE_MODULES_DIR/ethereum-console" ]; then
-    #    install_ethconsole
-    #else
-    #    print_install_result "ethconsole"
-    #    print_install_info "ethereum-console already exist"
-    #fi
-
-    # install babel
-    #if [ ! -d "$NODE_MODULES_DIR/babel-cli" ]; then
-    #    install_babel
-    #else
-    #    print_install_result "babel.js"
-    #    print_install_info "babel already exist"
-    #fi
-
     i=0
     while [ $i -lt $nodecount ]
     do
@@ -329,7 +353,7 @@ function install()
         mkdir -p $buildPWD/nodedir${Idx[$index]}/fisco-data/
         cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/network.rlp $buildPWD/nodedir${Idx[$index]}/fisco-data/
         cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/network.rlp.pub $buildPWD/nodedir${Idx[$index]}/fisco-data/
-        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/datakey $buildPWD/nodedir${Idx[$index]}/fisco-data/
+        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/datakey $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
         cp $DEPENDENCIES_RLP_DIR/cryptomod.json $buildPWD/nodedir${Idx[$index]}/fisco-data/
         cp $KEYSTORE_FILE_DIR/*.json $buildPWD/nodedir${Idx[$index]}/keystore/
 
@@ -420,15 +444,20 @@ function install()
     echo "JTOOL_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_DIR/syaddress.txt)"
     envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $installPWD/dependencies/jtool/conf/applicationContext.xml
     echo "envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $installPWD/dependencies/jtool/conf/applicationContext.xml"
+
+    #systemcontractv2系统目录系统合约地址
+    cp $DEPENENCIES_DIR/syaddress.txt $DEPENENCIES_DIR/systemcontractv2/output/SystemProxy.address
+
     build_tools
 
     cd $installPWD
 
     print_dash
 
-    echo "    Installing fisco-bcos environment success!"
+    echo "    Installing fisco-bcos success!"
 
-    install_npm_dependencies
+    install_node_dependencies
+    #nodejs_env_check
 
     return 0
 }
