@@ -13,8 +13,8 @@ RPC_SSL_PORT_FOR_TEMP_NODE=18545
 
 # config for the blockchain node
 # the first node is the genesis node
-# field 0 : external_ip
-# field 1 : internal_ip
+# field 0 : p2pnetworkip
+# field 1 : listennetworkip
 # field 2 : node number on this host
 # field 3 : identity type
 # field 4 : crypto mode

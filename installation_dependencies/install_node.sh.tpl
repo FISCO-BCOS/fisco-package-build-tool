@@ -50,12 +50,12 @@ function build_node_sh()
     "
     echo $node_str > $buildPWD/node.sh
     sudo chmod a+x $buildPWD/node.sh
-    echo "source $buildPWD/node.sh" >> ~/.bashrc
-    echo "source nodesh result is $?"
-    source ~/.bashrc
-    echo "source ~/.bashrc $?"
-    echo "NODE_PATH is "$NODE_PATH
-    echo "NODE_HOME is "$NODE_HOME
+    #echo "source $buildPWD/node.sh" >> ~/.bashrc
+    #echo "source nodesh result is $?"
+    source ~/.bashrc >/dev/null 2>&1
+    #echo "source ~/.bashrc $?"
+    #echo "NODE_PATH is "$NODE_PATH
+    #echo "NODE_HOME is "$NODE_HOME
 }
 
 function install_nodejs()
@@ -65,6 +65,19 @@ function install_nodejs()
     mkdir -p $buildPWD/nodejs/bin/
     cd $installPWD/dependencies/nodejs/
     tar --strip-components 1 -xzvf node-v*tar.gz -C $buildPWD/nodejs/ 1>>/dev/null
+
+    export NODE_HOME=$buildPWD/nodejs
+    export PATH=$PATH:$NODE_HOME/bin
+    #echo "NODE_PATH = "$NODE_PATH
+    #echo "NODE_HOME = "$NODE_HOME
+
+    #在web3lib tool systemcontractv2目录
+    cd ../web3lib
+    npm install
+    cd ../tool
+    npm install
+    cd ../systemcontractv2
+    npm install
 
     cd $installPWD
     return 0
@@ -137,7 +150,7 @@ function install_dependencies()
         #sudo apt-get -y install cmake
         sudo apt-get -y install git
         sudo apt-get -y install openssl
-        sudo apt-get -y install build-essential libboost-all-dev
+        sudo apt-get -y install build-essential
         sudo apt-get -y install libcurl4-openssl-dev libgmp-dev
         sudo apt-get -y install libleveldb-dev  libmicrohttpd-dev
         sudo apt-get -y install libminiupnpc-dev
@@ -161,7 +174,7 @@ function install_dependencies()
         #sudo yum -y install cmake3
         sudo yum -y install git gcc-c++
         sudo yum -y install openssl openssl-devel
-        sudo yum -y install boost-devel leveldb-devel curl-devel 
+        sudo yum -y install leveldb-devel curl-devel 
         sudo yum -y install libmicrohttpd-devel gmp-devel 
         sudo yum -y install lsof
         #sudo yum -y install nodejs
@@ -221,15 +234,17 @@ function nodejs_env_check()
 function install_node_dependencies()
 {
     #install nodejs
-    type node >/dev/null 2>&1
-    ret=$?
-    if [ $ret -eq 0  ]
-    then
-        ret=`node --version`
-        print_install_info "node already exist, nodejs version $ret"
-    else
-        install_nodejs
-    fi
+    #type node >/dev/null 2>&1
+    #ret=$?
+    #if [ $ret -eq 0  ]
+    #then
+    #    ret=`node --version`
+    #    print_install_info "node already exist, nodejs version $ret"
+    #else
+    #    install_nodejs
+    #fi
+    # 单独安装nodejs,用户之前如果已经安装,这里也不会有什么影响。
+    install_nodejs
 
     # install ethereum-console
     type ethconsole >/dev/null 2>&1
@@ -429,13 +444,17 @@ function install()
     echo "JTOOL_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_DIR/syaddress.txt)"
     envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $installPWD/dependencies/jtool/conf/applicationContext.xml
     echo "envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $installPWD/dependencies/jtool/conf/applicationContext.xml"
+
+    #systemcontractv2系统目录系统合约地址
+    cp $DEPENENCIES_DIR/syaddress.txt $DEPENENCIES_DIR/systemcontractv2/output/SystemProxy.address
+
     build_tools
 
     cd $installPWD
 
     print_dash
 
-    echo "    Installing fisco-bcos environment success!"
+    echo "    Installing fisco-bcos success!"
 
     install_node_dependencies
     #nodejs_env_check
