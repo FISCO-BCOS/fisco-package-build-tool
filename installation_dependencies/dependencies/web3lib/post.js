@@ -67,7 +67,6 @@ async function post(method,params) {
         
       req.on('error', function (e) {  
           console.log('problem with request: ' + e.message);  
-	  //是否要保留？？？
           resolve(response);
       });  
         

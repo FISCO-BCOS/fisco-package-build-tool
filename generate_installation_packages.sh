@@ -574,19 +574,19 @@ function check_config_validation()
     #port checkcheck
     check_port $RPC_PORT_FOR_TEMP_NODE
     if [ $? -ne 0 ];then
-        error_msg "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."
+        echo "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."
         return 4
     fi
 
     check_port $RPC_SSL_PORT_FOR_TEMP_NODE
     if [ $? -ne 0 ];then
-        error_msg "temp node ssl port check, $RPC_SSL_PORT_FOR_TEMP_NODE is in use."
+        echo "temp node ssl port check, $RPC_SSL_PORT_FOR_TEMP_NODE is in use."
         return 4
     fi
 
     check_port $CHANNEL_PORT_FOR_TEMP_NODE
     if [ $? -ne 0 ];then
-        error_msg "temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."
+        echo "temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."
         return 4
     fi
 
