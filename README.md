@@ -7,16 +7,16 @@
 * 使用本工具, 进行一些简单配置后, 可以创建区块链节点的安装包。例如：如果配置了3台服务器每台启动3个区块链节点, 则将生成3个安装包, 分别对应3台服务器, 将安装包上传到对应的服务器上, 继续按照指引安装, 就可以在每台机器上启动区块链节点, 并组成一个区块链网络。
 
 # 2. 术语  
-* 区块链有两种节点：创世节点, 非创世节点。
-* 创世节点：配置文件配置的第一台服务器上的第一个节点为创世节点, 这个节点是第一个加入节点管理合约的节点，所以需要作为第一个节点启动，当有新的节点有加入组网的请求，需要通过该节点，把新节点信息写入到节点管理合约。(参考FISCO-BCOS系统合约介绍[[节点管理合约]](https://github.com/FISCO-BCOS/Wiki/tree/master/FISCO-BCOS%E7%B3%BB%E7%BB%9F%E5%90%88%E7%BA%A6%E4%BB%8B%E7%BB%8D#%E8%8A%82%E7%82%B9%E7%AE%A1%E7%90%86%E5%90%88%E7%BA%A6))。
-* 非创世节点：除去创世节点的区块链的其它节点。
+* 区块链有两种节点：**创世节点, 非创世节点**。
+* **创世节点**：配置文件配置的第一台服务器上的第一个节点为创世节点, 创世节点是第一个加入节点管理合约的节点，所以需要作为第一个节点启动，当有新的节点有加入组网的请求，需要通过该节点，把新节点信息写入到节点管理合约。(参考FISCO-BCOS系统合约介绍[[节点管理合约]](https://github.com/FISCO-BCOS/Wiki/tree/master/FISCO-BCOS%E7%B3%BB%E7%BB%9F%E5%90%88%E7%BA%A6%E4%BB%8B%E7%BB%8D#%E8%8A%82%E7%82%B9%E7%AE%A1%E7%90%86%E5%90%88%E7%BA%A6))。
+* **非创世节点**：除去创世节点的区块链的其它节点。
 
 # 3. 工具提供的功能
 - [x] 从零开始搭建区块链：可以搭建出一条区块链的所有节点的安装包。
   * 步骤见( [5. 从零开始搭建区块链步骤](#buildblockchain) )
 - [x] 从零开始搭建区块链后, 创建出所有节点的安装包后, 又需要对这条区块链进行扩容, 生成扩容节点的安装包。
   * 步骤见( [附录一：区块链扩容节点](#expand_node) )
-- [x] 指定给定的创世节点的相关文件，生成非创世节点的安装包。对以前的已经在跑的区块链, 可以提供其创世节点的相关文件, 创建出非创世节点, 使其可以连接到这条区块链。
+- [x] 指定给定的创世节点的相关文件，生成非创世节点的安装包。对以前的已经在跑的区块链, 可以提供其创世节点的相关文件, 创建出非创世节点, 并连接到这条区块链。
   * 步骤见( [附录二：指定给定的创世节点,扩容节点](#specific_genesis_node_expand) )
 
 # 4. 安装依赖  
@@ -78,7 +78,6 @@ FISCO_BCOS_LOCAL_PATH="../"
 P2P_PORT_FOR_TEMP_NODE=30303
 RPC_PORT_FOR_TEMP_NODE=8545
 CHANNEL_PORT_FOR_TEMP_NODE=8821
-RPC_SSL_PORT_FOR_TEMP_NODE=18545
 
 # config for the blockchain node
 # the first node is the genesis node
@@ -87,13 +86,12 @@ RPC_SSL_PORT_FOR_TEMP_NODE=18545
 # field 2 : node number on this host
 # field 3 : identity type
 # field 4 : crypto mode
-# field 5 : ssl 
-# field 6 : super key
-# filed 7 : agency info
+# field 5 : super key
+# filed 6 : agency info
 
-weth_host_0=("***REMOVED***" "0.0.0.0" "2" "1" "1" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_0")
-weth_host_1=("***REMOVED***" "0.0.0.0" "2" "1" "1" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_1")
-weth_host_2=("***REMOVED***" "0.0.0.0" "2" "1" "1" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_2")
+weth_host_0=("***REMOVED***" "***REMOVED***" "2" "1" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_0")
+weth_host_1=("***REMOVED***" "***REMOVED***" "2" "1" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_1")
+weth_host_2=("***REMOVED***" "***REMOVED***" "2" "1" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_2")
 
 MAIN_ARRAY=(
 weth_host_0[@]
@@ -110,26 +108,24 @@ weth_host_2[@]
 * P2P\_PORT\_FOR\_TEMP\_NODE  
   RPC\_PORT\_FOR\_TEMP_NODE  
   CHANNEL\_PORT\_FOR\_TEMP\_NODE  
-  RPC\_SSL\_PORT\_FOR\_TEMP\_NODE  
-  在构建安装包时, 会启动一个临时的temp节点(详见配置说明 1), 用来进行系统合约的部署, 创世节点信息的添加。这几个配置端口分别表示: p2p端口、rpc端口、  channel端口、ssl端口, 是启动的temp节点需要用到的临时端口, <span style="color:red">一般不需要改动, 但是要确保这些端口不要被占用</span>。
+  在构建安装包时, 会启动一个临时的temp节点(详见配置说明 1), 用来进行系统合约的部署, 创世节点信息的添加。这几个配置端口分别表示: p2p端口、rpc端口、  channel端口, 是启动的temp节点需要用到的临时端口, <span style="color:red">一般不需要改动, 但是要确保这些端口不要被占用</span>。
 * weth\_host\_n是第n台服务器的配置。  
 * field 0(p2p_network_ip)： p2p连接的网段ip, 根据p2p网络的网段配置。
-* field 1(listen_network_ip)： 监听网段, 用来接收rpc、channel、ssl连接请求, 建议配置为"0.0.0.0"。
+* field 1(listen_network_ip)： 监听网段, 用来接收rpc、channel连接请求, 注意这里填写实际的网段的ip, 不要填写0.0.0.0。
 * field 2(node number on this host)：在该服务器上面需要创建的节点数目。  
 * field 3(identity type)：节点类型, "1"：记账节点,  "0"：观察节点 , 推荐默认值：1。 
 * field 4(crypto mode)： 落盘加密开关: "0":关闭,  "1":开启 , 推荐默认值 0。  
-* field 5(ssl)：节点之间连接是否使用ssl连接, "0":关闭 , "1":开启, 推荐默认值 0。
-* field 6(super key)： 落盘加密的秘钥, 一般情况不用修改。  
-* field 7(agency info)： 机构名称, 如果不需要区分机构时,值随意。  
-比如：weth_host_0=("***REMOVED***" "0.0.0.0" "2" "1" "0" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_0") 是第一台服务器上面的配置, 说明需要在***REMOVED***这台服务器上面启动两个节点。
+* field 5(super key)： 落盘加密相关, 无特殊情况不用修改。  
+* field 6(agency info)： 机构名称, 不关心机构则可以随意值, 但不能为空。  
+比如：weth_host_0=("***REMOVED***" "***REMOVED***" "2" "1" "0" "d4f2ba36f0434c0a8c1d01b9df1c2bce" "agent_0") 是第一台服务器上面的配置, 说明需要在***REMOVED***这台服务器上面启动两个节点。
 
 **配置说明：**  
 1. 工具在构建安装包(非扩容流程)过程中会启动一个temp节点, 用于系统合约的部署, 注册创世节点信息到节点管理合约, 生成genesis.json文件。  
-2. 每个节点需要占用四个端口:p2p port、rpc port、channel port、ssl port, 对于单台服务器上的节点端口使用规则, 默认从temp节点的端口+1开始, 依次增长。例如temp节点的端口配置为了p2p port 30303、rpc port 8545、channel port 8821、ssl port 18821, 则每台服务器上的第0个节点默认使用p2p port 30304、rpc port 8546、channel port 8822、ssl port 18822端口，第1个节点默认使用p2p port 30305、rpc port 8547、channel port 8823、ssl port 18823, 以此类推, 要确保这些端口没有被占用。  
+2. 每个节点需要占用三个端口:p2p port、rpc port、channel port, 对于单台服务器上的节点端口使用规则, 默认从temp节点的端口+1开始, 依次增长。例如temp节点的端口配置为了p2p port 30303、rpc port 8545、channel port 8821, 则每台服务器上的第0个节点默认使用p2p port 30304、rpc port 8546、channel port 8822，第1个节点默认使用p2p port 30305、rpc port 8547、channel port 8823, 以此类推, 要确保这些端口没有被占用。  
 3. 工具构建安装包过程中会涉及到从github上面拉取FISCO BCOS、编译FISCO BCOS流程, 具体规则如下：  
   a、首先检查/usr/local/bin目录下是否存在fisco-bcos文件,  若存在则说明fisco-bcos已经被编译安装, 不存在则继续流程b 。   
   b、判断配置文件中FISCO_BCOS_LOCAL_PATH的路径是否存在名为FISCO-BCOS的文件夹, 存在则说明FISCO-BCOS源码已经存在, 直接进入FISCO-BCOS目录进行编译、安装流程, 否则进行流程c。  
-  c、从FISCO_BCOS_GIT配置的github地址拉取FISCO-BCOS源码, 拉取完成之后进入FISCO-BCOS目录, 进行FISCO BCOS的编译安装流程。  
+  c、从FISCO_BCOS_GIT配置的github地址拉取FISCO-BCOS源码, 拉取完成之后进入FISCO-BCOS目录, 进行FISCO BCOS的编译安装流程, 编译生成的文件为fisco-bcos, 安装目录为/usr/local/bin。  
 
 #### 5.3 创建安装包
 
@@ -141,19 +137,19 @@ $ ./generate_installation_packages.sh build
 按照示例配置, 会生成下面的四个文件：
 ```
 ls build/
-***REMOVED***_with_0.0.0.0_installation_package
-***REMOVED***_with_0.0.0.0_installation_package
-***REMOVED***_with_0.0.0.0_genesis_installation_package
+***REMOVED***_with_***REMOVED***_installation_package
+***REMOVED***_with_***REMOVED***_installation_package
+***REMOVED***_with_***REMOVED***_genesis_installation_package
 temp
 ```
 其中temp目录为临时节点的目录,不需要关心, 其余的几个包分别为对应服务器上节点的安装包。  
 安装包的目录结构：
 
 ```shell
-创世节点所在安装包目录内容：
+创世节点服务器安装包目录内容：
 dependencies  fisco-bcos  install_node.sh  node_action_info_dir  node_manager.sh  
 
-非创世节点安装包目录内容：
+非创世节点服务器安装包目录内容：
 dependencies  fisco-bcos  install_node.sh   
 ```
 创世节点跟非创世节点相比多了node_manager.sh脚本跟node_action_info_dir目录。  
@@ -169,8 +165,8 @@ nodeactioninfo_***REMOVED***_0.json  nodeactioninfo_***REMOVED***_1.json
 * install_node.sh脚本用来生成本机的数据目录、启动、停止脚本, 每个目录下都存在。
 
 **注意**：
-- [x]  1. 执行./generate_installation_packages.sh build如果出错, 解决问题重新执行之前, 需要将错误执行生成的build目录删除, 才能重新执行。
-- [x]  2. 生成的安装包最好不要部署在build目录内, 部署在build目录时, 启动的fisco-bcos进程也会在build目录下启动, 会导致build目录无法删除, 下次想重新生成其他安装包时会有问题。
+- [x]  1. 执行./generate_installation_packages.sh build 如果出错, 解决问题重新执行之前, 需要将错误执行生成的build目录删除, 才能重新执行。
+- [x]  2. 生成的安装包最好不要部署在build目录内, 部署在build目录时, 启动的fisco-bcos进程也会在build目录下启动, 会导致build目录无法删除, 下次想重新生成其他安装包时可能引发一些问题。
 
 #### 5.4 上传安装包  
 将安装包上传到对应的服务器, 注意上传的安装包必须与服务器相对应, 否则搭链过程会出错。
@@ -223,20 +219,7 @@ nodeactioninfo_172_20_245_42_1.json  nodeactioninfo_172_20_245_43_1.json  nodeac
   例如,如果需要添加这台服务器上的第0个节点：
 
   ```sh
-  $ ./node_manager.sh registerNode /root/***REMOVED***_with_0.0.0.0_genesis_installation_package/node_action_info_dir/nodeactioninfo_172_20_245_42_0.json
-    ===================================================================
-    node.json=file:/root/***REMOVED***_with_0.0.0.0_genesis_installation_package/node_action_info_dir/nodeactioninfo_172_20_245_42_0.json
-    NodeIdsLength= 1
-    ----------node 0---------
-    id=d418e60ebc87c1b982e8571b46367a3f99bc798f942bc36bfa558db481111aaee3b463d13594758384b6407520b43ce9e7e95dd01cd40da08b85ff4277c447ae
-    ip=***REMOVED***
-    port=30304
-    category=1
-    desc=***REMOVED***_0
-    CAhash=
-    agencyinfo=agent_0
-    blocknumber=1
-    Idx=0
+  $ ./node_manager.sh registerNode /root/***REMOVED***_with_***REMOVED***_genesis_installation_package/node_action_info_dir/nodeactioninfo_172_20_245_42_0.json
   ```
 
 * 每个节点的节点信息文件的文件名都包含了ip信息和index信息, 用于区分, 例如`nodeactioninfo_172_20_245_42_0.json`, 最后的那个"0"字符就是表示这是172_20_245_42这台服务器上面的第0个节点node0的节点信息文件。
@@ -253,7 +236,7 @@ INFO|2018-04-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona9878
     可看到周期性的出现上面的日志，表示节点间在周期性的进行共识，节点注册正常。
 
 #### 6.5 重新登录  
-每个安装服务器都会安装nodejs、babel-node、ethconsole, 环境变量写入当前安装用户的.bashrc文件, 需要使用这些工具需要重新退出当前登录用户, 重新登录一次。
+每个安装服务器都会安装nodejs、babel-node、ethconsole, 环境变量写入当前安装用户的.bashrc文件, 使用这些工具需要重新退出当前登录用户, 重新登录一次。
 
 #### 6.6 部署成功
 可以通过发送交易是否成功判断链是否搭建成功。 
@@ -283,8 +266,11 @@ cns add operation => cns_name = Ok
 发送交易成功: 0x268daabbf8591c4ee93c59ea0e881b6dcdf56316ebae5f4078279f6859c39ffb
 ```
 
-
-
+# <a name="private_key_and_ca_manager" id="private_key_and_ca_manager">7. 私钥证书生成</a>
+#### 7.1 god账号  
+创建安装包时, 会重新生成新的god账号, 公私钥信息保存在创世节点安装目录的dependencies/cert/godInfo.txt文件中。
+#### 7.2 机构节点证书  
+链的根证书、机构证书、节点证书在构建安装包过程中创建, 其中节点证书在各个节点单独保存, 链的根证书、机构证书保存在创世节点的dependencies/cert/目录下。
 
 # <a name="expand_node" id="expand_node">附录1. 区块链扩容节点</a>
 使用场景： build出所有节点的安装包后, 又需要在新添加的机器上面进行扩容, 生成扩容节点的安装包。**这种场景只适合扩容的节点在新的机器上**, 这个时候只需要在原来配置的基础上增加相应的机器的配置，然后重新执行一次下面的命令，扩容的安装包就生成好了, 然后将生成的安装包上传至对应服务器, 然后按照非创世节点的安装包的部署方式进行部署[参考章节：6.部署节点](#deploy_genesis_host_node)。
@@ -299,7 +285,7 @@ $ ./generate_installation_packages.sh build
 对以前的已经在跑的区块链, 可以提供其创世节点的相关文件, 创建出一个非创世节点, 使其可以连接到这条区块链。
 #### 1. 从创世节点的机器上拷贝下面的的3个文件，放到区块链安装包创建工具所在的机器：
   * genesis.json
-  * genesis_node_info.json : 创世节点的节点信息文件的json。
+  * bootstrapnodes.json : 创世节点的连接ip信息。
   * syaddress.txt : 系统合约的地址。  
 - [x]   这几个文件位于创世节点所在机器的安装目录下的dependencies子目录。
 - [x]   区块链安装包创建工具所在的服务器如果之前没有编译、安装FISCO BCOS时, 也可以把创世节点上的fisco-bcos文件拿下来，放入/usr/local/bin目录下, 这样就可以不用重新编译FISCO BCOS.
@@ -313,34 +299,32 @@ vim specific_genesis_node_scale_config.sh
 参考的demo配置如下：
 
 ```shell
-external_ip="127.0.0.1"
-internal_ip="127.0.0.1"
+p2p_network_ip="127.0.0.1"
+listen_network_ip="127.0.0.1"
 node_number=2
 identity_type=1
 crypto_mode=0
-ssl="0"
 super_key="d4f2ba36f0434c0a8c1d01b9df1c2bce"
 agency_info="agent_test"
 
 genesis_json_file_path=/fisco-bcos/fisco-package-build-tool/build/test/dependencies/genesis.json
-genesis_node_info_file_path=/fisco-bcos/fisco-package-build-tool/build/test/dependencies/genesis_node_info.json
+genesis_node_info_file_path=/fisco-bcos/fisco-package-build-tool/build/test/dependencies/bootstrapnodes.json
 genesis_system_address_file_path=/fisco-bcos/fisco-package-build-tool/build/test/dependencies/syaddress.txt
-
+genesis_ca_dir_path=/fisco-bcos/fisco-package-build-tool/build/test/dependencies/cert/
 ```
 配置解释：
-* external_ip：   p2p连接的网段ip, 根据p2p网络的网段配置。
-* internal_ip：   监听网段ip, 用来接收rpc、channel、ssl连接请求, 建议配置为"0.0.0.0"。
+* p2p_network_ip：   p2p连接的网段ip, 根据p2p网络的网段配置。
+* listen_network_ip：   监听网段ip, 用来接收rpc、channel、ssl连接请求, 建议配置为"0.0.0.0"。
 * node_number：   在该服务器上面需要创建的节点数目。  
 * identity_type： 节点类型, "1"：记账节点,  "0"：观察节点。 
 * crypto_mode：   落盘加密开关: "0":关闭,  "1":开启。  
-* ssl：           是否使用ssl连接, "0":关闭 "1"开启。
 * super_key：     落盘加密的秘钥, 一般情况不用修改。
 * agency_info：   机构名称, 如果不区分机构, 值随意。
   
 * genesis_json_file_path   genesis.json的路径
-* genesis_node_info.json   genesis_node_info.json的路径
-* syaddress.txt            syaddress.txt的路径
-
+* genesis_node_info_file_path   bootstrapnodes.json的路径
+* genesis_system_address_file_path            syaddress.txt的路径
+* genesis_ca_dir_path  链的相关证书目录
 #### 3. 生成安装包
 
 ```shell
@@ -364,15 +348,14 @@ $ ./generate_installation_packages.sh expand
 # FAQ
 
 - 重要的目录说明   
-安装完成之后FISCO-BCOS/tool FISCO-BCOS/systemcontractv2对应的路径为：
+安装完成之后FISCO-BCOS/tool FISCO-BCOS/systemcontractv对应的路径为：
 dependencies/tool/  
-dependencies/systemcontractv2   
+dependencies/systemcontract
 
 - 一定要确保安装的机器上面的各个节点的端口都没有被占用, 当前服务器上面的端口配置可以查看安装目录下的 build/nodedirN/config.json 文件, 可以使用 netstat -anp | egrep 端口号 , 查看端口是否被占用。
  	```sh
 	    "rpcport":"8546",
         "p2pport":"30304",
-        "rpcsslport":"18546",
         "channelPort":"8822",
 	```
 
@@ -434,9 +417,3 @@ CentOS安装命令：
         [mhd]     sudo yum -y install libmicrohttpd-devel
         [gmp]     sudo yum -y install gmp-devel
 ```
-
-
-
-
-
-
