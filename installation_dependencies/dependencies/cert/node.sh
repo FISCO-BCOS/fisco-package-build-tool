@@ -28,8 +28,8 @@ else
     openssl ecparam -out node.param -name secp256k1
     openssl genpkey -paramfile node.param -out node.key
     openssl pkey -in node.key -pubout -out node.pubkey
-    openssl req -new -key agency.key -config cert.cnf  -out node.csr -subj $NODE_SUBJECT
-    openssl x509 -req -in node.csr -CAkey agency.key -CA agency.crt -force_pubkey node.pubkey -out node.crt -CAcreateserial -extensions v3_req -extfile cert.cnf
+    openssl req -new -key node.key -config cert.cnf  -out node.csr -subj $NODE_SUBJECT
+    openssl x509 -req -days 3650 -in node.csr -CAkey agency.key -CA agency.crt -force_pubkey node.pubkey -out node.crt -CAcreateserial -extensions v3_req -extfile cert.cnf
     openssl ec -in node.key -outform DER |tail -c +8 | head -c 32 | xxd -p -c 32 | cat >node.private
     openssl ec -in node.key -text -noout | sed -n '7,11p' | sed 's/://g' | tr "\n" " " | sed 's/ //g' | awk '{print substr($0,3);}'  | cat >node.nodeid
 

@@ -65,7 +65,6 @@ default_bits		= 2048
 default_md		= sm3
 default_keyfile 	= privkey.pem
 distinguished_name	= req_distinguished_name
-attributes		= req_attributes
 x509_extensions	= v3_ca	# The extentions to add to the self signed cert
 
 string_mask = utf8only
@@ -73,35 +72,17 @@ string_mask = utf8only
 # req_extensions = v3_req # The extensions to add to a certificate request
 
 [ req_distinguished_name ]
-countryName			= Country Name (2 letter code)
-countryName_default		= XX
-countryName_min			= 2
-countryName_max			= 2
-
-stateOrProvinceName		= State or Province Name (full name)
-#stateOrProvinceName_default	= Default Province
-
-localityName			= Locality Name (eg, city)
-localityName_default	= Default City
-
-0.organizationName		= Organization Name (eg, company)
-0.organizationName_default	= Default Company Ltd
-
-
-organizationalUnitName		= Organizational Unit Name (eg, section)
-
-commonName			= Common Name (eg, your name or your server\'s hostname)
-commonName_max			= 64
-
-emailAddress			= Email Address
-emailAddress_max		= 64
-
-[ req_attributes ]
-challengePassword		= A challenge password
-challengePassword_min		= 4
-challengePassword_max		= 20
-
-unstructuredName		= An optional company name
+countryName = CN
+countryName_default = CN
+stateOrProvinceName = State or Province Name (full name)
+stateOrProvinceName_default =GuangDong
+localityName = Locality Name (eg, city)
+localityName_default = ShenZhen
+organizationalUnitName = Organizational Unit Name (eg, section)
+organizationalUnitName_default = webank
+commonName =  Organizational  commonName (eg, webank)
+commonName_default =  webank
+commonName_max = 64
 
 [ usr_cert ]
 
@@ -139,4 +120,3 @@ subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid:always,issuer
 basicConstraints = CA:true
 keyUsage = cRLSign, keyCertSign
-

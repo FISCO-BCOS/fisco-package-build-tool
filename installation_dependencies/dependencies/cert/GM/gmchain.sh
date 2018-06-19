@@ -54,7 +54,7 @@ function download_and_install()
         #cd ${PKG_PATH}
         execute_cmd "${install_cmd}"
 
-        #execute_cmd "rm -rf ${PKG_PATH}"
+        execute_cmd "rm -rf ${PKG_PATH}"
         cd "${CUR_DIR}"
     fi
 }
@@ -77,6 +77,19 @@ function install_deps_ubuntu()
     execute_cmd "sudo apt-get install -y g++"
 }
 
+function ca_exists()
+{
+    if [  -f "gmca.key" ]; then
+        LOG_ERROR "gmca.key exist! please clean all old file!"
+        exit 1
+    elif [  -f "gmca.crt" ]; then
+        LOG_ERROR "gmca.crt exist! please clean all old file!"
+        exit 1
+    fi
+}
+
+ca_exists
+
 ###install pre-packages
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
     install_deps_ubuntu
@@ -88,23 +101,23 @@ tassl_name="TASSL"
 tassl_url=" https://github.com/jntass"
 tassl_install_cmd="bash config --prefix=${TARGET_DIR} no-shared && make -j2 && make install"
 download_and_install "${tassl_url}" "${tassl_name}" "${tassl_install_cmd}"
-
-
 OPENSSL_CMD=${TARGET_DIR}/bin/openssl
-#CA_CURVE=SM2
-if [ "" = "`$OPENSSL_CMD ecparam -list_curves | grep SM2`" ];
-then
-    echo "Current Openssl Don't Support SM2 ! Please Upgrade tassl"
-    exit;
-fi
 
-if [  -f "gmca.key" ]; then
-    echo "gmca.key exist! please clean all old file!"
-elif [  -f "ca.crt" ]; then
-    echo "gmca.crt exist! please clean all old file!"
-else
-	#$OPENSSL_CMD ecparam -name $CA_CURVE -out gmsm2.param
+function openssl_check()
+{
+    if [ "" = "`$OPENSSL_CMD ecparam -list_curves | grep SM2`" ];
+    then
+        echo "Current Openssl Don't Support SM2 ! Please Upgrade tassl"
+        exit;
+    fi
+}
+
+function gen_ca()
+{
 	$OPENSSL_CMD genpkey -paramfile gmsm2.param -out gmca.key
 	$OPENSSL_CMD req -config cert.cnf -x509 -days 3650 -key gmca.key -extensions v3_ca -out gmca.crt
-	echo "Build gmca suc!!!"
-fi
+    LOG_INFO "GENERATE ca SUCC!"
+}
+
+openssl_check
+gen_ca
