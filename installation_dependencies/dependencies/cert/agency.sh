@@ -13,7 +13,7 @@ else
 
     openssl genrsa -out agency.key 2048
     openssl req -new -key agency.key -config cert.cnf -out agency.csr -subj $AGENT_SUBJECT
-    openssl x509 -req -CA ca.crt -CAkey ca.key -CAcreateserial -in agency.csr -out agency.crt  -extensions v4_req -extfile cert.cnf
+    openssl x509 -req -days 3650 -CA ca.crt -CAkey ca.key -CAcreateserial -in agency.csr -out agency.crt  -extensions v4_req -extfile cert.cnf
 
     cp ca.crt cert.cnf $name/
     mv agency.key agency.csr agency.crt  $name/
