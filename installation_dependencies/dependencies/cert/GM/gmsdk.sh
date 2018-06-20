@@ -51,15 +51,13 @@ EOT
 	echo "----------------------gen sdk root ca------------------------------------"
 	mkdir $agency/$sdk
 	openssl genrsa -out ca.key 2048
-	openssl req -new -x509 -days 3650 -key ca.key -out ca.crt
+	openssl req -config cert.cnf -new -x509 -days 3650 -key ca.key -out ca.crt
 	echo "----------------------gen sdk server ca----------------------------------"
 	openssl genrsa -out server.key 2048
 	openssl req -new -key server.key -config cert.cnf -out server.csr
 	openssl x509 -req -days 3650 -CA ca.crt -CAkey ca.key -CAcreateserial -in server.csr -out server.crt -extensions v3_req -extfile RSA.cnf
-	echo "-------------------client.keystore password must 123456------------------"
-	keytool -import -trustcacerts -alias ca -file ca.crt -keystore client.keystore
-	openssl pkcs12 -export -name client -in server.crt -inkey server.key -out keystore.p12
-	keytool -importkeystore -destkeystore client.keystore -srckeystore keystore.p12 -srcstoretype pkcs12 -alias client
+	openssl pkcs12 -export -name client -in server.crt -inkey server.key -password pass:123456 -out keystore.p12
+	keytool -importkeystore -srcstorepass 123456 -storepass 123456 -destkeystore client.keystore -srckeystore keystore.p12 -srcstoretype pkcs12 -alias client
 	rm -rf ca.srl server.csr RSA.cnf keystore.p12
 	mv ca.crt ca.key server.crt server.key client.keystore $agency/$sdk
 fi
