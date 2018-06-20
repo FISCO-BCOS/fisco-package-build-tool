@@ -443,7 +443,7 @@ function deploy_system_contract_for_initialization()
 {
     cd $installation_build_dir/$TEMP_NODE_NAME/
     ./start_node0.sh
-    sleep 4
+    sleep 24
     # check if temp node is running
     check_port $CHANNEL_PORT_FOR_TEMP_NODE
     if [ $? -eq 0 ];then
