@@ -55,7 +55,7 @@ function download_and_install()
         #cd ${PKG_PATH}
         execute_cmd "${install_cmd}"
 
-        #execute_cmd "rm -rf ${PKG_PATH}"
+        execute_cmd "rm -rf ${PKG_PATH}"
         cd "${CUR_DIR}"
     fi
 }
@@ -78,6 +78,106 @@ function install_deps_ubuntu()
     execute_cmd "sudo apt-get install -y g++"
 }
 
+
+function openssl_check()
+{
+    if [ "" = "`$OPENSSL_CMD ecparam -list_curves | grep SM2`" ];
+    then
+        echo "Current Openssl Don't Support SM2 ! Please Upgrade tassl"
+        exit;
+    fi
+}
+
+function usage()
+{
+    if [ $# -lt 2 ];then
+        LOG_ERROR "Usage: bash gmnode agency_name node_name"
+        exit 1
+    fi
+}
+
+function prepare_check()
+{
+   local agency_name="${1}"
+   ##check existance of agency
+   if [ ! -f "gmca.crt" ];then
+       LOG_ERROR "Must create ca certificate gmca.crt first!"
+       exit 1
+   fi
+   ##check existance of agency
+   if [ ! -d "${agency_name}" ];then
+       LOG_ERROR "Must create certificates for ${agency_name} first!"
+       exit 1
+   fi 
+}
+
+function node_exists()
+{
+    local node_path="${1}/${2}"
+    if [ -d "$node_path" ];then
+        LOG_ERROR "node ${2} already Exist, please clean the old data first!"
+        exit 1
+    fi
+}
+
+
+OPENSSL_CMD=${TARGET_DIR}/bin/openssl
+function gen_node_cert()
+{
+    local agency="${1}"
+    local node="${2}"
+    
+    execute_cmd "mkdir -p ${agency}/${node}"
+    LOG_INFO "--------------Gen Signature certificate with Guomi Algorithm---------------"
+    execute_cmd "${OPENSSL_CMD} genpkey -paramfile gmsm2.param -out gmnode.key"
+    execute_cmd "$OPENSSL_CMD genpkey -paramfile gmsm2.param -out gmnode.key"
+    execute_cmd "$OPENSSL_CMD req -new -key gmnode.key -config cert.cnf -out gmnode.csr"
+    execute_cmd "$OPENSSL_CMD x509 -req -CA $agency/gmagency.crt -CAkey $agency/gmagency.key -days 3650 -CAcreateserial -in gmnode.csr -out gmnode.crt -extfile cert.cnf -extensions v3_req"
+
+    LOG_INFO "-----------------Gen Encryption certificate with Guomi Algorithm-------------"
+    execute_cmd "$OPENSSL_CMD genpkey -paramfile gmsm2.param -out gmennode.key"
+    execute_cmd "$OPENSSL_CMD req -new -key gmennode.key -config cert.cnf -out gmennode.csr"
+    execute_cmd "$OPENSSL_CMD x509 -req -CA $agency/gmagency.crt -CAkey $agency/gmagency.key -days 3650 -CAcreateserial -in gmennode.csr -out gmennode.crt -extfile cert.cnf -extensions v3enc_req"
+    $OPENSSL_CMD ec -in gmnode.key -outform DER |tail -c +8 | head -c 32 | xxd -p -c 32 | cat >gmnode.private
+    $OPENSSL_CMD ec -in gmnode.key -text -noout | sed -n '7,11p' | sed 's/://g' | tr "\n" " " | sed 's/ //g' | awk '{print substr($0,3);}'  | cat >gmnode.nodeid
+
+    if [ "" != "`$OPENSSL_CMD version | grep 1.0.2`" ];
+    then
+        $OPENSSL_CMD x509  -text -in gmnode.crt | sed -n '5p' |  sed 's/://g' | tr "\n" " " | sed 's/ //g' | sed 's/[a-z]/\u&/g' | cat >gmnode.serial
+    else
+        $OPENSSL_CMD x509  -text -in gmnode.crt | sed -n '4p' |  sed 's/ //g' | sed 's/.*(0x//g' | sed 's/)//g' |sed 's/[a-z]/\u&/g' | cat >gmnode.serial
+    fi
+    cp $agency/gmca.crt $agency/gmagency.crt $agency/$node
+	rm -rf gmnode.csr gmennode.csr $agency/gmagency.srl
+    mv gmnode.key gmnode.crt gmnode.private gmnode.nodeid gmnode.serial gmennode.key gmennode.crt $agency/$node
+    cd $agency/$node
+    nodeid=`cat gmnode.nodeid | head`
+    serial=`cat gmnode.serial | head`
+    
+    cat>gmnode.json <<EOF
+ {
+ "id":"$nodeid",
+ "name":"$node",
+ "agency":"$agency",
+ "caHash":"$serial"
+}
+EOF
+
+	cat>gmnode.ca <<EOF
+	{
+	"serial":"$serial",
+	"pubkey":"$nodeid",
+	"name":"$node"
+	}
+EOF
+    echo "Build  $node Crt suc!!!"
+}
+
+
+usage "$@"
+prepare_check "$@"
+node_exists "$@"
+
 ###install pre-packages
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
     install_deps_ubuntu
@@ -90,76 +190,5 @@ tassl_url=" https://github.com/jntass"
 tassl_install_cmd="bash config --prefix=${TARGET_DIR} no-shared && make -j2 && make install"
 download_and_install "${tassl_url}" "${tassl_name}" "${tassl_install_cmd}"
 
-
-OPENSSL_CMD=${TARGET_DIR}/bin/openssl
-if [ "" = "`$OPENSSL_CMD ecparam -list_curves | grep SM2`" ];
-then
-    echo "Current Openssl Don't Support SM2 ! Please Upgrade tassl"
-    exit;
-fi
-
-
-agency=$1
-node=$2
-
-if [ -z "$agency" ];  then
-    echo "Usage:gmnode.sh agency_name node_name "
-elif [ -z "$node" ];  then
-    echo "Usage:gmnode.sh   agency_name node_name "
-elif [ ! -d "$agency" ]; then
-    echo "$agency DIR Don't exist! please Check DIR!"
-elif [ ! -f "$agency/gmagency.key" ]; then
-    echo "$agency/gmagency.key  Don't exist! please Check DIR!"
-elif [  -d "$agency/$node" ]; then
-    echo "$agency/$node DIR exist! please clean all old DIR!"
-else
-    mkdir -p $agency/$node
-	echo "---------------------------生成国密签名证书---------------------------------------------"
-    $OPENSSL_CMD genpkey -paramfile gmsm2.param -out gmnode.key
-    $OPENSSL_CMD req -new -key gmnode.key -out gmnode.csr
-	$OPENSSL_CMD x509 -req -CA $agency/gmagency.crt -CAkey $agency/gmagency.key -days 3650 -CAcreateserial -in gmnode.csr -out gmnode.crt -extfile cert.cnf -extensions v3_req
-	echo "---------------------------生成国密加密证书---------------------------------------------"
-	$OPENSSL_CMD genpkey -paramfile gmsm2.param -out gmennode.key
-    $OPENSSL_CMD req -new -key gmennode.key -out gmennode.csr
-	$OPENSSL_CMD x509 -req -CA $agency/gmagency.crt -CAkey $agency/gmagency.key -days 3650 -CAcreateserial -in gmennode.csr -out gmennode.crt -extfile cert.cnf -extensions v3enc_req
-	
-    $OPENSSL_CMD ec -in gmnode.key -outform DER |tail -c +8 | head -c 32 | xxd -p -c 32 | cat >gmnode.private
-    $OPENSSL_CMD ec -in gmnode.key -text -noout | sed -n '7,11p' | sed 's/://g' | tr "\n" " " | sed 's/ //g' | awk '{print substr($0,3);}'  | cat >gmnode.nodeid
-
-    if [ "" != "`$OPENSSL_CMD version | grep 1.0.2`" ];
-    then
-        $OPENSSL_CMD x509  -text -in gmnode.crt | sed -n '5p' |  sed 's/://g' | tr "\n" " " | sed 's/ //g' | sed 's/[a-z]/\u&/g' | cat >gmnode.serial
-    else
-        $OPENSSL_CMD x509  -text -in gmnode.crt | sed -n '4p' |  sed 's/ //g' | sed 's/.*(0x//g' | sed 's/)//g' |sed 's/[a-z]/\u&/g' | cat >gmnode.serial
-    fi
-
-    
-
-    cp $agency/gmca.crt $agency/gmagency.crt $agency/$node
-	rm -rf gmnode.csr gmennode.csr $agency/gmagency.srl
-    mv gmnode.key gmnode.crt gmnode.private gmnode.nodeid gmnode.serial gmennode.key gmennode.crt $agency/$node
-	
-    cd $agency/$node
-    
-
-    nodeid=`cat gmnode.nodeid | head`
-    serial=`cat gmnode.serial | head`
-    
-    cat>node.json <<EOF
- {
- "id":"$nodeid",
- "name":"$node",
- "agency":"$agency",
- "caHash":"$serial"
-}
-EOF
-
-	cat>node.ca <<EOF
-	{
-	"serial":"$serial",
-	"pubkey":"$nodeid",
-	"name":"$node"
-	}
-EOF
-    echo "Build  $node Crt suc!!!"
-fi
+openssl_check
+gen_node_cert "$@"
