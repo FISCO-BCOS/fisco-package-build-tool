@@ -217,11 +217,18 @@ function install_dependencies()
 #god address generator
 function generatorGod()
 {
-    install_nodejs
-    cd $installPWD/dependencies/tool/
-    node accountManager.js > godInfo.txt
+    #install_nodejs
+    #cd $installPWD/dependencies/tool/
+    #node accountManager.js > godInfo.txt
+    #mv godInfo.txt $buildPWD
+    #echo "godInfo is "
+    #echo $(cat $buildPWD/godInfo.txt  2>/dev/null)
+
+    mkdir -p $buildPWD
+    cd $installPWD
+    ./fisco-bcos --newaccount
     mv godInfo.txt $buildPWD
-    echo "godInfo is "
+    echo "god Info => "
     echo $(cat $buildPWD/godInfo.txt  2>/dev/null)
 }
 

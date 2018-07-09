@@ -153,6 +153,7 @@ function install_dependencies()
         sudo apt-get -y install libminiupnpc-dev
         sudo apt-get -y install libssl-dev libkrb5-dev
         sudo apt-get -y install lsof
+	sudo apt-get -y install uuid-dev
 
         wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O $DEPENENCIES_DIR/tool/fisco-solc
         sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
@@ -164,6 +165,7 @@ function install_dependencies()
         sudo yum -y install leveldb-devel curl-devel 
         sudo yum -y install libmicrohttpd-devel gmp-devel 
         sudo yum -y install lsof
+	sudo yum -y install libuuid-devel
 
         wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O $DEPENENCIES_DIR/tool/fisco-solc
         sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
