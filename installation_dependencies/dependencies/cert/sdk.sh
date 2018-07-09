@@ -2,24 +2,6 @@
 
 source ./openssl_conf.sh
 
-if [ "" = "`java -version 2>&1 | grep version`" ];
-then
-    echo " Please Install JDK 1.8"
-    exit;
-fi
-
-if [ "" = "`java -version 2>&1 | grep TM`" ];
-then
-    echo " Please Install Java(TM) 1.8"
-    exit;
-fi
-
-if [ "" = "`java -version 2>&1 | grep 1.8`" ];
-then
-    echo " Please Upgrade JDK To  1.8"
-    exit;
-fi
-
 agency=$1
 sdk=$2
 
