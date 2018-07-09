@@ -316,7 +316,6 @@ vim specific_genesis_node_scale_config.sh
 external_ip="127.0.0.1"
 internal_ip="127.0.0.1"
 node_number=2
-identity_type=1
 crypto_mode=0
 ssl="0"
 super_key="d4f2ba36f0434c0a8c1d01b9df1c2bce"
@@ -330,8 +329,7 @@ genesis_system_address_file_path=/fisco-bcos/fisco-package-build-tool/build/test
 配置解释：
 * external_ip：   p2p连接的网段ip, 根据p2p网络的网段配置。
 * internal_ip：   监听网段ip, 用来接收rpc、channel、ssl连接请求, 建议配置为"0.0.0.0"。
-* node_number：   在该服务器上面需要创建的节点数目。  
-* identity_type： 节点类型, "1"：记账节点,  "0"：观察节点。 
+* node_number：   在该服务器上面需要创建的节点数目。 
 * crypto_mode：   落盘加密开关: "0":关闭,  "1":开启。  
 * ssl：           是否使用ssl连接, "0":关闭 "1"开启。
 * super_key：     落盘加密的秘钥, 一般情况不用修改。

@@ -9,7 +9,7 @@ DEPENENCIES_DIR=$installPWD/dependencies
 source $DEPENENCIES_DIR/scripts/utils.sh
 source $DEPENENCIES_DIR/scripts/public_config.sh
 
-source $installPWD/dependencies/config.sh
+source $DEPENENCIES_FOLLOW_DIR/config.sh
 g_is_genesis_host=$IS_GENESIS_HOST_TPL
 
 if [ -f $installPWD/.i_am_genesis_host ]
@@ -19,24 +19,91 @@ else
     g_is_genesis_host=0
 fi
 
+# build start_all.sh
+function generate_startallsh_func()
+{
+    startallsh="#!/bin/bash
+    cd node
+    i=0
+    while [ \$i -lt $nodecount ]
+    do
+        bash start_node\$i.sh
+        sleep 3
+        i=\$((\$i+1))
+    done
+
+    sleep 5
+
+    echo \"check all node status => \"
+
+    i=0
+    while [ \$i -lt $nodecount ]
+    do
+        bash check_node.sh \$i
+        i=\$((\$i+1))
+    done
+    "
+    echo "$startallsh"
+    return 0
+}
+
+# build stop_all.sh
+function generate_stopallsh_func()
+{
+    stoptallsh="#!/bin/bash
+    cd node
+    i=0
+    while [ \$i -lt $nodecount ]
+    do
+        bash stop_node\$i.sh
+        i=\$((\$i+1))
+    done
+    "
+    echo "$stoptallsh"
+    return 0
+}
+
 # build stop_node*.sh
 function generate_stopsh_func()
 {
-    #kill -9 改为 kill -2
     stopsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"$buildPWD/nodedir${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
-    kill_cmd=\"kill -2 \${weth_pid}\"
-    echo \"\${kill_cmd}\"
-    eval \${kill_cmd}"
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    kill_cmd=\"kill -9 \${weth_pid}\"
+    if [ ! -z \$weth_pid ];then
+        echo \"stop node${Idx[$index]} ...\"
+        eval \${kill_cmd}
+    else
+        echo \"node${Idx[$index]} is not running.\"
+    fi"
     echo "$stopsh"
     return 0
+}
+
+# build check_node*.sh
+function generate_checksh_func()
+{
+    checknodesh="#!/bin/bash
+    node=nodedir\$1
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/nodedir\$1/config.json\"|grep -v grep|awk '{print \$2}'\`
+    if [ ! -z \$weth_pid ];then
+        echo \"node\$1 is running.\"
+    else
+        echo \"node\$1 is not running.\"
+    fi"
+    echo "$checknodesh"
 }
 
 # build start_node*.sh
 function generate_startsh_func()
 {
     startsh="#!/bin/bash
-    nohup ./fisco-bcos  --genesis $DEPENENCIES_DIR/genesis.json  --config $buildPWD/nodedir${Idx[$index]}/config.json  >> $buildPWD/nodedir${Idx[$index]}/log/log 2>&1 &"
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    if [ ! -z \$weth_pid ];then
+        echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
+    else
+        echo \"start node${Idx[$index]} ...\"
+        nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/genesis.json  --config ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/log/log 2>&1 &
+    fi"
     echo "$startsh"
     return 0
 }
@@ -60,19 +127,11 @@ function install_nodejs()
     print_install_result "nodejs"
 
     mkdir -p $buildPWD/nodejs/bin/
-    cd $installPWD/dependencies/nodejs/
+    cd $DEPENENCIES_NODEJS_DIR
     tar --strip-components 1 -xzvf node-v*tar.gz -C $buildPWD/nodejs/ 1>>/dev/null
 
     export NODE_HOME=$buildPWD/nodejs
     export PATH=$PATH:$NODE_HOME/bin
-
-    #install node js enviroment in web3lib tool systemcontractv dictionary
-    cd ../web3lib
-    npm install
-    cd ../tool
-    npm install
-    cd ../systemcontract
-    npm install
 
     cd $installPWD
     return 0
@@ -127,25 +186,13 @@ function install_babel()
     return 0
 }
 
-function copy_and_link_if_not_same()
-{
-    # $1 from  
-    # $2 to
-    # $3 link name (can be null)
-    if  [ ! -f "$2" ] || [ "`md5sum $1 | awk '{print $1}'`" != "`md5sum $2 | awk '{print $1}'`" ];then
-        sudo cp $1 $2
-        if [ -n "$3" ];then
-            sudo ln -s $1 $3
-        fi
-    #else
-        #echo "copy: jump the same file " $2
-    fi
-}
-
 #install dependency software
 function install_dependencies() 
 {
     if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+        sudo apt-get -y install gettext
+        sudo apt-get -y install bc
+        sudo apt-get -y install wget
         sudo apt-get -y install openssl
         sudo apt-get -y install build-essential
         sudo apt-get -y install libcurl4-openssl-dev libgmp-dev
@@ -153,20 +200,25 @@ function install_dependencies()
         sudo apt-get -y install libminiupnpc-dev
         sudo apt-get -y install libssl-dev libkrb5-dev
         sudo apt-get -y install lsof
+        sudo apt-get -y install uuid-dev
+        sudo apt-get -y install dos2unix
 
-        wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O $DEPENENCIES_DIR/tool/fisco-solc
-        sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
+        sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O /usr/local/bin/fisco-solc
         sudo chmod a+x /usr/local/bin/fisco-solc
 
     else
+        sudo yum -y install bc
+        sudo yum -y install gettext
+        sudo yum -y install wget
         sudo yum -y install git gcc-c++
         sudo yum -y install openssl openssl-devel
         sudo yum -y install leveldb-devel curl-devel 
         sudo yum -y install libmicrohttpd-devel gmp-devel 
         sudo yum -y install lsof
+        sudo yum -y install libuuid-devel
+        sudo yum -y install dos2unix
 
-        wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O $DEPENENCIES_DIR/tool/fisco-solc
-        sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
+        sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O /usr/local/bin/fisco-solc
         sudo chmod a+x /usr/local/bin/fisco-solc
     fi
 }
@@ -257,7 +309,7 @@ function build_tools()
     chmod +x $installPWD/monitor.sh
 }
 
-function install()
+function install_build()
 {
     echo "    Installing fisco-bcos environment start"
     request_sudo_permission
@@ -277,7 +329,7 @@ function install()
         return 2
     fi
 
-    if [ $nodecount -le 0 ]; then
+    if [ -z $nodecount ] ||[ $nodecount -le 0 ]; then
         echo "there has no node on this server, count is "$nodecount
         return
     fi
@@ -286,107 +338,118 @@ function install()
 
     install_dependencies
 
+    #mkdir node dir
+    current_node_dir_base=${NODE_INSTALL_DIR}
+    mkdir -p ${current_node_dir_base}
+
     i=0
     while [ $i -lt $nodecount ]
     do
         index=$i
-        mkdir -p $buildPWD/nodedir${Idx[$index]}/
-        mkdir -p $buildPWD/nodedir${Idx[$index]}/log/
-        mkdir -p $buildPWD/nodedir${Idx[$index]}/keystore/
-        mkdir -p $buildPWD/nodedir${Idx[$index]}/fisco-data/
+        current_node_dir=${current_node_dir_base}/nodedir${Idx[$index]}
+        mkdir -p $current_node_dir/
+        mkdir -p $current_node_dir/log/
+        mkdir -p $current_node_dir/keystore/
+        mkdir -p $current_node_dir/fisco-data/
         
         if [ $i -eq 0 ];then
-            cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* $DEPENENCIES_JTOOL_DIR/conf/  #ca info copy
+            #copy web3sdk 
+            cp -r $DEPENENCIES_WEB3SDK_DIR ${buildPWD}
+            dos2unix ${buildPWD}/web3sdk/bin/web3sdk
+            sudo chmod a+x ${buildPWD}/web3sdk/bin/web3sdk
+            cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* ${buildPWD}/web3sdk/conf/ >/dev/null 2>&1 #ca info copy
         fi
 
-        #cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/network.rlp $buildPWD/nodedir${Idx[$index]}/fisco-data/
-        #cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/network.rlp.pub $buildPWD/nodedir${Idx[$index]}/fisco-data/
-        #cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/datakey $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
-        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* $buildPWD/nodedir${Idx[$index]}/fisco-data/  #ca info copy
-        cp $DEPENDENCIES_RLP_DIR/cryptomod.json $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
-        cp $DEPENENCIES_DIR/bootstrapnodes.json $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
-        cp $KEYSTORE_FILE_DIR/*.json $buildPWD/nodedir${Idx[$index]}/keystore/ >/dev/null 2>&1
+        #copy node ca
+        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* ${current_node_dir}/fisco-data/
+        cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
 
-        cd $buildPWD/nodedir${Idx[$index]}/fisco-data/
-        nodeid=$(cat node.nodeid)
+        nodeid=$(cat ${current_node_dir}/fisco-data/node.nodeid)
         echo "node id is "$nodeid
 
-        export CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL=$(cat $DEPENENCIES_DIR/syaddress.txt)
+        export CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)
         export CONFIG_JSON_LISTENIP_TPL=${listenip[$index]}
         export CRYPTO_MODE_TPL=${crypto_mode}
         export CONFIG_JSON_RPC_PORT_TPL=${rpcport[$index]}
         export CONFIG_JSON_P2P_PORT_TPL=${p2pport[$index]}
         export CHANNEL_PORT_VALUE_TPL=${channelPort[$index]}
-        export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${buildPWD}/nodedir${Idx[$index]}/keys.info
-        export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${buildPWD}/nodedir${Idx[$index]}/keystore/
-        export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL="${buildPWD}/nodedir${Idx[$index]}/fisco-data/"
+        export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${current_node_dir}/keys.info
+        export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${current_node_dir}/keystore/
+        export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${current_node_dir}/fisco-data/
         export CONFIG_JSON_NETWORK_ID_TPL=${DEFAULT_NETWORK_ID}
 
         MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_NETWORK_ID_TPL}'
-        envsubst $MYVARS < ${TPL_DIR_PATH}/config.json.tpl > $buildPWD/nodedir${Idx[$index]}/config.json
-
-         #port check
-        check_port $CONFIG_JSON_RPC_PORT_TPL
-        if [ $? -ne 0 ];then
-            echo "node $i, rpc port check, $CONFIG_JSON_RPC_PORT_TPL is in use."
-        fi 
-
-        check_port $CHANNEL_PORT_VALUE_TPL
-        if [ $? -ne 0 ];then
-            echo "node $i, channel port check, $CHANNEL_PORT_VALUE_TPL is in use."
-        fi
-        check_port $CONFIG_JSON_P2P_PORT_TPL
-        if [ $? -ne 0 ];then
-            echo "node $i, p2p port check, $CONFIG_JSON_P2P_PORT_TPL is in use."
-        fi
+        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > ${current_node_dir}/config.json
 
         # generate log.conf from tpl
-        export OUTPUT_LOG_FILE_PATH_TPL=$buildPWD/nodedir${Idx[$index]}/log
+        export OUTPUT_LOG_FILE_PATH_TPL=${current_node_dir}/log
         MYVARS='${OUTPUT_LOG_FILE_PATH_TPL}'
-        envsubst $MYVARS < ${TPL_DIR_PATH}/log.conf.tpl > $buildPWD/nodedir${Idx[$index]}/fisco-data/log.conf
+        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/log.conf.tpl > ${current_node_dir}/fisco-data/log.conf
 
         generate_startsh=`generate_startsh_func`
-        echo "${generate_startsh}" > $installPWD/start_node${Idx[$index]}.sh
+        echo "${generate_startsh}" > ${current_node_dir_base}/start_node${Idx[$index]}.sh
         generate_stopsh=`generate_stopsh_func`
-        echo "${generate_stopsh}" > $installPWD/stop_node${Idx[$index]}.sh
-        chmod +x $installPWD/fisco-bcos
-        chmod +x $installPWD/start_node${Idx[$index]}.sh
-        chmod +x $installPWD/stop_node${Idx[$index]}.sh
-
-        #
-        cd $installPWD
-        ./fisco-bcos --cryptokey $CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL/cryptomod.json 1>/dev/null 2>&1
+        echo "${generate_stopsh}" > ${current_node_dir_base}/stop_node${Idx[$index]}.sh
+        #chmod +x ${current_node_dir_base}/fisco-bcos
+        chmod +x ${current_node_dir_base}/start_node${Idx[$index]}.sh
+        chmod +x ${current_node_dir_base}/stop_node${Idx[$index]}.sh
 
         i=$(($i+1))
     done
 
-    #config.js
-    cd $installPWD/dependencies/web3lib/
-    cp ../tpl_dir/config.js.tpl config.js
-    sed -i "s/ip:port/${listenip[0]}:${rpcport[0]}/g"  $installPWD/dependencies/web3lib/config.js
+    generate_startallsh=`generate_startallsh_func`
+    echo "${generate_startallsh}" > $buildPWD/start_all.sh
+    sudo chmod a+x $buildPWD/start_all.sh
 
-    #jtool config
-    export JTOOL_CONFIG_IP=${listenip[0]}
-    export JTOOL_CONFIG_PORT=${channelPort[0]}
-    export JTOOL_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_DIR/syaddress.txt)
-    MYVARS='${JTOOL_CONFIG_IP}:${JTOOL_CONFIG_PORT}:${JTOOL_SYSTEM_CONTRACT_ADDR}'
-    echo "JTOOL_CONFIG_PORT=${channelPort[0]}"
-    echo "JTOOL_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_DIR/syaddress.txt)"
-    envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $installPWD/dependencies/jtool/conf/applicationContext.xml
-    # echo "envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $installPWD/dependencies/jtool/conf/applicationContext.xml"
+    generate_stopallsh=`generate_stopallsh_func`
+    echo "${generate_stopallsh}" > $buildPWD/stop_all.sh
+    sudo chmod a+x $buildPWD/stop_all.sh
 
-    #systemcontractv contract address
-    cp $DEPENENCIES_DIR/syaddress.txt $DEPENENCIES_DIR/systemcontract/output/SystemProxy.address
+    generate_checksh_func=`generate_checksh_func`
+    echo "${generate_checksh_func}" > ${current_node_dir_base}/check_node.sh
+    chmod +x ${current_node_dir_base}/check_node.sh
 
-    build_tools
+    cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $buildPWD/
+    sudo chmod a+x $buildPWD/node_manager.sh
+    #genesis.json
+    cp $DEPENENCIES_FOLLOW_DIR/genesis.json $current_node_dir_base
+    #fisco-bcos
+    cp $DEPENENCIES_FISCO_DIR/fisco-bcos $current_node_dir_base
+    #chmod a+x fisco-bcos
+    sudo chmod a+x $current_node_dir_base/fisco-bcos
 
-    cd $installPWD
+    #web3sdk config
+    export WEB3SDK_CONFIG_IP=${listenip[0]}
+    export WEB3SDK_CONFIG_PORT=${channelPort[0]}
+    export WEB3SDK_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)
+    MYVARS='${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}:${WEB3SDK_SYSTEM_CONTRACT_ADDR}'
+    echo "WEB3SDK_CONFIG_PORT=${channelPort[0]}"
+    echo "WEB3SDK_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)"
+    envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > ${WEB3SDK_INSTALL_DIR}/conf/applicationContext.xml
 
     print_dash
 
     echo "    Installing fisco-bcos success!"
 
+    #node js enviroment install
     install_node_dependencies
+
+    cp -r $DEPENENCIES_TOOL_DIR $buildPWD/
+    cp -r $DEPENENCIES_SC_DIR $buildPWD/
+    cp -r $DEPENENCIES_WEB3LIB_DIR $buildPWD/
+    cd $buildPWD/web3lib/
+    npm install
+    cp -r $buildPWD/web3lib/node_modules $buildPWD/tool/ >/dev/null 2>&1
+    cp -r $buildPWD/web3lib/node_modules $buildPWD/systemcontract/ >/dev/null 2>&1
+
+    #config.js
+    cp $installPWD/dependencies/tpl_dir/config.js.tpl $buildPWD/web3lib/config.js
+    sed -i.bu "s/ip:port/${listenip[0]}:${rpcport[0]}/g"  $buildPWD/web3lib/config.js
+
+    #systemcontractv contract address
+    cp $DEPENENCIES_FOLLOW_DIR/syaddress.txt $buildPWD/systemcontract/output/SystemProxy.address
+
+    echo "    Installing fisco-bcos nodejs enviroment end!"
 
     return 0
 }
@@ -401,7 +464,7 @@ function info()
 
 case "$1" in
     'install')
-        install
+        install_build
         ;;
     'info')
         info

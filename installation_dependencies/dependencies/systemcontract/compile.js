@@ -44,5 +44,9 @@ function docompile(filename){
     await docompile("FileServerManager");
     await docompile("ContractAbiMgr");
     await docompile("ConsensusControlMgr");
+    await docompile("ConsensusControl");
+    await docompile("Authority");
+    await docompile("ContractA");
+    await docompile("ConsensusControlAction");
 
 })();
