@@ -201,7 +201,7 @@ function install_dependencies()
         sudo apt-get -y install libssl-dev libkrb5-dev
         sudo apt-get -y install lsof
         sudo apt-get -y install uuid-dev
-        sudo apt-get -y install dos2unix
+        #sudo apt-get -y install dos2unix
 
         sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O /usr/local/bin/fisco-solc
         sudo chmod a+x /usr/local/bin/fisco-solc
@@ -216,7 +216,7 @@ function install_dependencies()
         sudo yum -y install libmicrohttpd-devel gmp-devel 
         sudo yum -y install lsof
         sudo yum -y install libuuid-devel
-        sudo yum -y install dos2unix
+        #sudo yum -y install dos2unix
 
         sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O /usr/local/bin/fisco-solc
         sudo chmod a+x /usr/local/bin/fisco-solc
@@ -355,7 +355,7 @@ function install_build()
         if [ $i -eq 0 ];then
             #copy web3sdk 
             cp -r $DEPENENCIES_WEB3SDK_DIR ${buildPWD}
-            dos2unix ${buildPWD}/web3sdk/bin/web3sdk
+            #dos2unix ${buildPWD}/web3sdk/bin/web3sdk
             sudo chmod a+x ${buildPWD}/web3sdk/bin/web3sdk
             cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* ${buildPWD}/web3sdk/conf/ >/dev/null 2>&1 #ca info copy
         fi
