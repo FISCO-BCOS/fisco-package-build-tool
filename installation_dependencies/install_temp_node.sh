@@ -346,7 +346,7 @@ function install()
     
     #god miner config
     chmod a+x web3sdk
-    dos2unix web3sdk
+    #dos2unix web3sdk
     blk=$(./web3sdk eth_blockNumber | grep BlockHeight | awk -F ':' '{print $2}' 2>/dev/null)
     echo "blk number is "$blk
     blk=$(($blk+1))
