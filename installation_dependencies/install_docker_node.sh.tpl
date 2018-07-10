@@ -35,6 +35,16 @@ g_docker_fisco_path="/fisco-bcos/node/"
 echo "docker repository => "${g_docker_repository}
 echo "docker version => "${g_docker_ver}
 
+# build register_node*.sh
+function generate_registersh_func()
+{
+    registersh="#!/bin/bash
+    sudo docker exec fisco-node$index"_"${rpcport[$index]} bash -c \"source /etc/profile && cd /fisco-bcos && bash node_manager.sh registerNode /fisco-bcos/node/fisco-data/node.json\"
+    "
+    echo "$registersh"
+    return 0
+}
+
 # build start_node*.sh
 function generate_startsh_func()
 {
@@ -51,7 +61,7 @@ function generate_startsh_func()
 function generate_stopsh_docker_func()
 {
     stopsh="#!/bin/bash
-    container_id=\`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v \"CONTAINER ID\" | awk \'{print \$1}\'\`
+    container_id=\`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v \"CONTAINER ID\" | awk '{print \$1}'\`
     if [ -z \${container_id} ];then
         echo \"cannot find container, container name is fisco-node\"$index"_"${rpcport[$index]}
     else
@@ -225,6 +235,10 @@ function install()
         generate_sh=`generate_startsh_func`
         echo "${generate_sh}" > $dockerPWD/nodedir${Idx[$index]}/start.sh
         sudo chmod +x $dockerPWD/nodedir${Idx[$index]}/start.sh
+	
+	register_sh=`generate_registersh_func`
+        echo "${register_sh}" > $dockerPWD/register_node${Idx[$index]}.sh
+	sudo chmod +x $dockerPWD/register_node${Idx[$index]}.sh
 
         i=$(($i+1))
     done
