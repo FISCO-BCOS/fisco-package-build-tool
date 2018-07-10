@@ -51,7 +51,7 @@ function generate_startsh_func()
 function generate_stopsh_docker_func()
 {
     stopsh="#!/bin/bash
-    container_id=\`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v \"CONTAINER ID\" | awk '{print \$1}'\`
+    container_id=\`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v \"CONTAINER ID\" | awk \'{print \$1}\'\`
     if [ -z \${container_id} ];then
         echo \"cannot find container, container name is fisco-node\"$index"_"${rpcport[$index]}
     else
@@ -154,16 +154,19 @@ function install()
     install_dependencies
 
     i=0
-    while[ $i -lt $nodeacount]
+    while [ $i -lt $nodecount ]
     do
-        container_id=`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v "CONTAINER ID" | awk '{print $1}'
+	index=$i
+        container_id=`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v "CONTAINER ID" | awk '{print $1}'`
         echo "check if fisco-node$index"_"${rpcport[$index]} exist."
         if [ -z ${container_id} ];then
+	    i=$(($i+1))
             continue
         else
             echo "there is already fisco-bcos docker named fisco-node"$index"_"${rpcport[$index]}" ,container_id is "$container_id
             return
         fi
+	i=$(($i+1))
     done
 
     i=0

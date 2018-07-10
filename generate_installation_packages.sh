@@ -935,6 +935,7 @@ function add_eth_node_by_specific_genesis_node()
     cp ${genesis_json_file_path} $node_base_info_dir/
     cp ${genesis_node_info_file_path} $node_base_info_dir/
     cp ${genesis_system_address_file_path} $node_base_info_dir/
+    echo "expand end."
 }
 
 case "$1" in
