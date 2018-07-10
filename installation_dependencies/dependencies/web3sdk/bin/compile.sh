@@ -149,6 +149,7 @@ function compile_and_generate()
         generate_java_code "${package}" "${Output}"
     fi
 }
+rm -rf ${Output}
 compile_and_generate $@
 
 
