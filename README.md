@@ -510,11 +510,21 @@ genesis_ca_dir_path=/fisco-bcos/cert/
 - listen_network_ip：   监听网段ip, 用来接收rpc、channel、ssl连接。
 - node_number：   在该服务节点启动时依赖的文件器上面需要创建的节点数目。 
 - agency_info：   机构名称, 如果不区分机构, 值随意, 但是不可以为空。
-- genesis_json_file_path   genesis.json的路径。
+- genesis_json_file_path   genesis. 其他流程json的路径。
 - genesis_node_info_file_path   bootstrapnodes.json的路径。
-- genesis_system_address_file_path  syaddress.txt的路径。
+- genesis_system_address_file_path  syaddre  ss.txt的路径。
 - genesis_ca_dir_path  分配证书目录。
-- 
+
+注意项：
+扩容时, 除了specific_genesis_node_scale_config.sh 中的配置, 其他配置：  
+P2P_PORT_FOR_TEMP_NODE  
+RPC_PORT_FOR_TEMP_NODE  
+CHANNEL_PORT_FOR_TEMP_NODE  
+IS_BUILD_FOR_DOCKER  
+DOCKER_REPOSITORY   
+DOCKER_VERSION  
+仍然会使用installation_config.sh中的配置.
+
 #### 3. 生成安装包
 
 ```shell
@@ -662,9 +672,12 @@ ext/cert
                 node_172_20_245_44_1/node.crt
                     
 ```
+##### 3.3 启动准备  
+其他的流程保持不变, 启动之前将依赖的证书放入节点的数据目录, 否则节点无法正常启动.  
+每个节点上的web3sdk的正常使用也是依赖sdk的证书, 也需要放入web3sdk/conf/目录(启动的为docker节点时证书需要放入nodedirIDX/web3sdk_ca目录)  
 
-##### 3.2 其他流程
-其他的流程保持不变, 最后在启动节点之前需要将节点依赖的其他证书文件放入节点的数据目录, 然后再启动节点, 用户放置的node.crt会自动拷贝, 用户可以不用重新放置。 
+##### 3.3 其他流程
+启动
 
 # 相关链接  
 - [FISCO BCOS WIKI](https://github.com/FISCO-BCOS/Wiki)  
