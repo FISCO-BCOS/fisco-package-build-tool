@@ -77,23 +77,23 @@ function fisco_bcos_version_check()
     return 2
 }
 
-#Oracle JDK 1.8+ be requied.
+#Oracle JDK 1.8 be requied.
 function check_java_env()
 {
     type java >/dev/null 2>&1
     if [ $? -ne 0 ];then
-        echo "java is not installed, Oracle JDK 1.8+ be requied."
+        echo "java is not installed, Oracle JDK 1.8 be requied."
         return 1
     fi
 
     #JAVA version
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')
-    #Oracle JDK 1.8+
+    #Oracle JDK 1.8
     if [ $JAVA_VER -ge 18 ] && [[ $(java -version 2>&1 | grep "TM") ]];then
         return 0
     fi
 
-    echo "Oracle JDK 1.8+ be requied."
+    echo "Oracle JDK 1.8 be requied."
     echo "now JDK is "
     echo `java -version`
     return 2
