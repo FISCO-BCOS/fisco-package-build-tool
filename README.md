@@ -4,11 +4,11 @@
 # 1. 背景介绍
 - 工具主要功能 ：       
 通过简单的配置 1. 可以很容易的搭建运行在指定服务器上的FISCO BCOS区块链 2. 服务器上搭建运行FISCO BCOS的docker容器, 进行组链。 快速搭建生产可用的FISCO BCOS环境。  
-例如：配置三台服务器, 每台启动两个FISCO BCOS节点或者每台上面启动两个FISCO BCOS docker镜像, 则将生成三个安装包, 对应三台服务器, 将安装包上传到对应的服务器上, 继续按照指引安装, 在每台服务器上启动节点, 就可以组成一个区块链网络。
+例如：配置三台服务器, 每台启动两个FISCO BCOS节点或者每台上面启动两个FISCO BCOS docker镜像节点, 则将生成三个安装包, 对应三台服务器, 将安装包上传到对应的服务器上, 继续按照指引安装, 在每台服务器上启动节点, 就可以组成一个区块链网络。
 
 # 2. 术语  
 * 两种节点类型：**创世节点, 非创世节点**。
-* **创世节点**：配置文件配置的第一台服务器上的第一个节点为创世节点, 创世节点是第一个加入节点管理合约的节点, 其他节点启动时需要主动连接创世节点, 通过与创世节点的连接, 获取其他节点的连接信息, 构建正常的网络。(参考FISCO-BCOS系统合约介绍[[节点管理合约]](https://github.com/FISCO-BCOS/Wiki/tree/master/FISCO-BCOS%E7%B3%BB%E7%BB%9F%E5%90%88%E7%BA%A6%E4%BB%8B%E7%BB%8D#%E8%8A%82%E7%82%B9%E7%AE%A1%E7%90%86%E5%90%88%E7%BA%A6))。
+* **创世节点**：搭建一条新链时, 配置文件配置的第一台服务器上的第一个节点为创世节点, 创世节点是第一个加入节点管理合约的节点, 其他节点启动时需要主动连接创世节点, 通过与创世节点的连接, 获取其他节点的连接信息, 构建正常的网络。(参考FISCO-BCOS系统合约介绍[[节点管理合约]](https://github.com/FISCO-BCOS/Wiki/tree/master/FISCO-BCOS%E7%B3%BB%E7%BB%9F%E5%90%88%E7%BA%A6%E4%BB%8B%E7%BB%8D#%E8%8A%82%E7%82%B9%E7%AE%A1%E7%90%86%E5%90%88%E7%BA%A6))。
 * **非创世节点**：除去创世节点的其它节点。
 
 # 3. 工具提供的功能
@@ -27,6 +27,7 @@
 ```shell
 git 
 dos2unix
+docker
 openssl [1.0.2]
 Oracle JDK[1.8]
 
@@ -34,16 +35,19 @@ Oracle JDK[1.8]
 sudo yum -y install git 
 sudo yum -y install dos2unix
 sudo yum -y install openssl
+sudo yum -y install docker
 
 [Ubuntu]
 sudo apt -y install git
 sudo apt -y install tofrodos
 sudo apt -y install openssl
+sudo yum -y install docker
 ln -s /usr/bin/todos /usr/bin/unix2dos 
 ln -s /usr/bin/fromdos /usr/bin/dos2unix 
 ```
 
-注意： yum/apt下载的JDK为openjdk, 并不符合使用要求, Oracle JDK[1.8] 可以在Oracle官网手动下载 ,下面附带下载连接[[ Oracle JDK 1.8 下载链接]](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+注意： yum/apt下载的JDK为openjdk, 并不符合使用要求, Oracle JDK[1.8] 可以在Oracle官网手动下载 ,下面附带下载连接  
+[[ Oracle JDK 1.8 下载链接]](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 - [x]    其他依赖  
   sudo权限, 当前执行的用户需要具有sudo权限
@@ -55,7 +59,6 @@ git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git
 然后执行下面命令:  
 ```shell
 $ cd fisco-package-build-tool
-$ chmod a+x format.sh ; dos2unix format.sh ; ./format.sh
 ```
 
 #### 5.2 配置新建区块链的节点信息
@@ -82,9 +85,9 @@ CHANNEL_PORT_FOR_TEMP_NODE=8821
 #if build docker install
 IS_BUILD_FOR_DOCKER=0
 #fisco-bcos docker repository, default "docker.io/fiscoorg/fiscobcos"
-DOCKER_REPOSITORY="docker.io/fiscoorg/fiscobcos"
+DOCKER_REPOSITORY="fiscoorg/fisco-octo"
 #fisco-bcos docker version, default "latest"
-DOCKER_VERSION="docker-beta-v1.0.0703"
+DOCKER_VERSION="v1.3.1"
 
 # config for ca
 IS_CA_EXT_MODE=0
@@ -125,7 +128,7 @@ weth_host_0=("***REMOVED***" "***REMOVED***" "2" "agent_0")
 - IS_BUILD_FOR_DOCKER ： 是否构建docker运行环境。 1：是 , 其他值：否
 - DOCKER_REPOSITORY : docker镜像库
 - DOCKER_VERSION : docker的版本号
-- IS_CA_EXT_MODE：秘钥管理机制开关,参考( [附录二：秘钥管理](#ca-manager) ), 一般采取默认值就可以。  
+- IS_CA_EXT_MODE：拓展证书分配的开关,参考( [附录二：证书分配](#ca-manager) ), 一般采取默认值就可以。  
  **配置说明：**  
 - 1. 工具在构建安装包(非扩容流程)过程中会启动一个temp节点, 用于系统合约的部署, 注册节点信息到节点管理合约, 生成genesis.json文件。  
 - 2. 每个节点需要占用三个端口:p2p port、rpc port、channel port, 对于单台服务器上的节点端口使用规则, 默认从temp节点的端口+1开始, 依次增长。例如temp节点的端口配置为了p2p port 30303、rpc port 8545、channel port 8821, 则每台服务器上的第0个节点默认使用p2p port 30304、rpc port 8546、channel port 8822，第1个节点默认使用p2p port 30305、rpc port 8547、channel port 8823, 以此类推, 要确保这些端口没有被占用。  
@@ -133,8 +136,7 @@ weth_host_0=("***REMOVED***" "***REMOVED***" "2" "agent_0")
   a、首先检查/usr/local/bin目录下是否存在fisco-bcos文件,  若存在则说明fisco-bcos已经被编译安装, 不存在则继续流程b 。   
   b、判断配置文件中FISCO_BCOS_LOCAL_PATH的时路径是否存在名为FISCO-BCOS的文件夹, 存在则说明FISCO-BCOS源码已经存在, 直接进入FISCO-BCOS目录进行编译、安装流程, 否则进行流程c。  
   c、从FISCO_BCOS_GIT配置的github地址拉取FISCO-BCOS源码, 拉取完成之后进入FISCO-BCOS目录, 进行FISCO BCOS的编译安装流程, 编译生成的文件为fisco-bcos, 安装目录为/usr/local/bin。  
-d、本工具拉取、编译的代码只会是FISCO BCOS的master分支, 如果需要运行其他分支的代码, 建议下载代码, 切换好分支, 或者将FISCO BCOS自行编译安装。 
-- 4. 理论上来说, docker版本不需要这个编译流程, 但考虑到编译生成的fisco-bcos文件比较大, 自带不是很方便, 所以构建docker环境也会有编译的流程。
+**d、本工具拉取、编译的代码只会是FISCO BCOS的master分支, 如果需要运行其他分支的代码, 建议下载代码, 切换好分支, 或者将FISCO BCOS自行编译安装。后续随着FISCO BCOS的发布, 版本会更多, 每个人需求的版本可能会不一样,所以建议可以首先编译安装需要的FISCO BCOS.**
 
 #### 5.3 创建安装包
 
@@ -154,14 +156,14 @@ temp
 ```
 其中temp目录为临时节点的目录, 其余的几个包分别为对应服务器上的安装包。
 
-下面以***REMOVED***_with_***REMOVED***_genesis_installation_package包为例说明目录结构, 其他安装包的目录结构完全一致：
+下面以***REMOVED***_with_***REMOVED***_genesis_installation_package为例说明目录结构, 其他安装包的目录结构完全一致：
 ```shell
 $ cd ***REMOVED***_with_***REMOVED***_genesis_installation_package
 $ ls
 $ dependencies  install_node.sh
 ```
 - install_node.sh ：安装脚本, 将安装包上传至对应服务器后执行, 用来生成节点运行环境。  
-- dependencies ：目录如下
+- dependencies ：目录, 用来保存中间依赖文件.
 ```shell
 $ ls dependencies/
 $ cert  fisco-bcos  follow  monitor  node_action_info_dir  nodejs  rlp_dir  scripts  systemcontract  tool  tpl_dir  web3lib  web3sdk
@@ -180,7 +182,7 @@ genesis.json  : 创世块文件
 node_manager.sh  : 节点管理工具
 syaddress.txt ： 系统合约地址
 ```
-- node_action_info_dir：保存对应服务器上运行的节点的注册信息文件, 初次构建的节点该目录不需关心, **对于扩容构建的安装包,节点启动后, 需要注册目录下的文件内容到节点管理合约**.  
+- node_action_info_dir：保存服务器上用来进行节点管理合约注册的节点信息, 初次构建的节点该目录不需关心, **对于扩容构建的安装包,节点启动后, 需要注册目录下的文件内容到节点管理合约, 才能使对应节点加入组网**.  
 ```
 nodeactioninfo_***REMOVED***_0.json
 nodeactioninfo_***REMOVED***_1.json
@@ -188,17 +190,17 @@ nodeactioninfo_***REMOVED***_1.json
 说明：
 IDX为索引值,从0开始,表示服务器上的第IDX个节点。
 ```
-- rlp_dir：保存节点、web3sdk的证书.
+- rlp_dir：用来保存节点、web3sdk的证书, install_node.sh install脚本执行完后节点证书会被拷贝到节点的数据目录, web3sdk的证书会被拷贝到web3sdk的conf目录.
 ```
 rlp_dir/node_rlp_IDX/ca/node   #保存节点证书信息
 rlp_dir/node_rlp_IDX/ca/sdk    #保存web3sdk证书信息
 说明：IDX为索引值,从0开始,表示服务器上的第IDX个节点。
 ```
-- tool：nodejs合约工具.
-- web3sdk：web3sdk工具.
+- tool：nodejs工具.
+- web3sdk：web3sdk库.
 - systemcontract：nodejs系统合约工具.
 - web3lib：nodejs公共依赖文件.
-- nodejs：nodejs源码,版本为6.0.
+- nodejs：nodejs源码,版本为6.0, 执行install_node install之后服务器上会安装nodejs的环境.
 - fisco-bcos：fisco-bcos可执行文件.
 
 #### 5.4 扩容流程相关
@@ -213,17 +215,53 @@ dependencies/node_action_info_dir
 * 将安装包上传到对应的服务器, 注意上传的安装包必须与服务器相对应, 否则搭链过程会出错。
 * 一定要确认各个服务器之间的网络可连通, p2p网段的端口网络策略已经放开。
 
+#### 5.6 错误提示FAQ  
+执行./generate_installation_packages.sh build过程中会出现一些错误, 导致工具停止执行, 下面列出一些常见的问题以及解决方案供大家参考:  
+
+a. "no sudo permission, please add youself in the sudoers"  
+当前用户没有sudo权限  
+
+b. "invalid host_config_num = "  
+installation_config.sh配置文件中, MAIN_ARRAY的配置可能是空, 或者没有配置, 如何配置请参考示例. 
+
+c. "config invalid, public_ip: XXX, private_ip: XXXXX, node_num_per_host: XXXXX"  
+installation_config.sh配置文件中, ```weth_host_0=("127.0.0.1" "127.0.0.1" "3" "agent_0")```, weth_host_N配置不正确.
+
+d. "agent info cannot be null empty"  
+installation_config.sh配置文件中, ```weth_host_0=("127.0.0.1" "127.0.0.1" "3" "agent_0")```, weth_host_N配置的机构名称字段不可以为空.
+
+e. "Oracle JDK 1.8+ be requied".  
+需要Oracle JDK 1.8版本的JDK.  
+
+f. "openssl 1.0.2 be requied."
+需要安装1.0.2版本的openssl.
+
+g. "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."  
+检查配置的$RPC_PORT_FOR_TEMP_NODE端口是否被占用.  
+"temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."  
+检查配置的CHANNEL_PORT_FOR_TEMP_NODE端部署合约口是否被占用.   
+"temp node p2p port check, $P2P_PORT_FOR_TEMP_NODE is in use."  
+检查配置的P2P_PORT_FOR_TEMP_NODE端口是否被占用.  
+
+h. "WARNING : fisco-bcos --newaccount failed."  
+fisco-bcos --newaccount, 需要具体分析.  
+
+i. echo "channel port XXX is not listening, maybe temp node start failed."  
+temp节点启动失败, 可以首先查看 build/temp/build/node/nodedir0/log/log_XXXXX.log日志, 看是否能看出temp节点启动失败.  
+
+j. "WARNING : SystemProxy.address is not exist, maybe deploy system contract failed".  
+temp节点部署系统合约失败, 也要根据build/temp/build/node/nodedir0/log/目录下的日志排查. 
+
 **注意**：
-- [x]  1. ./generate_installation_packages.sh build执行出错, 可以参考下面FAQ的解决方案。
-- [x]  2. ./generate_installation_packages.sh build过程出错, 解决问题后, 需要将build目录删除, 再执行下次./generate_installation_packages.sh build。
-- [x]  3. 生成的安装包最好不要部署在build目录内, 部署在build目录时, 启动的fisco-bcos进程也会在build目录下, 会导致build目录无法删除, 下次想重新生成其他安装包时可能引发一些问题。
+- [x]  1. ./generate_installation_packages.sh build过程出错, 解决问题后, 需要将build目录删除, 再执行下次./generate_installation_packages.sh build。
+- [x]  2. 生成的安装包最好不要部署在build目录内, 部署在build目录时, 启动的fisco-bcos进程也会在build目录下, 会导致build目录无法删除, 下次想重新生成其他安装包时可能引发一些问题。
 
 
 # <a name="deploy_genesis_host_node" id="deploy_genesis_host_node">6. 部署节点</a>  
 
 在服务器上面直接运行节点与在服务器上运行docker镜像的节点(installation_config.sh中的IS_BUILD_FOR_DOCKER字段配置决定), 流程上会有些差异, 下面分开来说明.
 
-#### 6.1 非docker方式
+#### 6.1 服务器直接运行节点
 ##### 6.1.1 执行安装脚本  
 进入安装目录, 执行
 ```sh
@@ -252,7 +290,7 @@ check_node.sh : 检查节点是否运行, 使用方式： ./check_node IDX
 
 重要子目录说明：
 nodedirIDX/log ：日志目录, 第IDX个节点的log目录.
-nodedirIDX/fisco-data ： 数据目录,第IDX节点的数据目录.
+nodedirIDX/fisco-data ： 数据目录,第IDX节点的数据目录, 节点启动时要保证证书都放入该目录.
 ```
 - nodejs : 本工具自带安装的nodejs, 版本为6.0.   
 - node.sh : nodejs的环境变量.
@@ -295,9 +333,14 @@ INFO|2018-04-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona9878
 
 每个服务器执行install_node install之后, 都会在安装目录下安装nodejs、babel-node、ethconsole, 环境变量会写入当前安装用户的.bashrc文件, 用户需要使用这些工具可以：  
 1. 退出当前登录, 重新登录一次.  
-2. 执行node.sh脚本, bash node.sh.
+2. 执行node.sh脚本中的内容, 首先cat node.sh, 将显示的内容执行一遍.
+```
+ $ cat node.sh 
+export NODE_HOME=/root/octo/fisco-bcos/build/nodejs; export PATH=$PATH:$NODE_HOME/bin; export NODE_PATH=$NODE_HOME/lib/node_modules:$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
+$ export NODE_HOME=/root/octo/fisco-bcos/build/nodejs; export PATH=$PATH:$NODE_HOME/bin; export NODE_PATH=$NODE_HOME/lib/node_modules:$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
+```
 
-部署合约验证, 进入build/tool目录： 
+部署合约验证, 进入tool目录： 
 ```
 $ cd tool
 $ babel-node deploy.js HelloWorld
@@ -319,7 +362,11 @@ send transaction success: 0x769e4ea7742b451e33cbb0d2a7d3126af8f277a52137624b3d4a
 ```
 合约部署成功。
 
-#### 6.2 docker方式安装 
+##### 6.1.3.3 install_node.sh node执行报错提示  
+a. "you already install the fisco-bcos node in this directory!"  
+install_node.sh install执行过后会生成build目录, 如果目录存在说明已经执行该命令, 如果有其他错误, 解决完成之后, 可以将build目录删除, 重新执行.
+
+#### 6.2 docker方式启动节点 
 ##### 6.2.1 执行安装脚本 
 进入安装目录, 执行
 ```sh
@@ -330,12 +377,13 @@ $ ./install_node.sh install
 $ cd docker
 $ ls
 
-nodedir0  nodedir1 start_node0.sh  start_node1.sh stop_node0.sh  stop_node1.sh start_all.sh  stop_all.sh
+nodedir0  nodedir1 start_node0.sh  start_node1.sh stop_node0.sh  stop_node1.sh start_all.sh  stop_all.sh register_node0.sh register_node1.sh
 ```
 - start_all.sh 启动所有的docker节点   
 - stop_all.sh 停止所有的docker节点  
 - start_nodeIDX : 启动第IDX个docker节点  
-- stop_nodeIDX：停止第IDX个docker节点  
+- stop_nodeIDX：停止第IDX个docker节点 
+- register_nodeIDX : 用来注册第IDX节点的信息到节点管理合约, 非扩容节点不用关心
 - nodedirIDX: 第IDX个docker节点的目录  
 - nodedirIDX/log: 第IDX个docker节点的日志目录  
 - nodedirIDX/fisco-data: 第IDX个docker节点的数据目录
@@ -390,7 +438,7 @@ $ init_web3_para.sh nodejs systemcontract web3lib node  start_node.sh  tool web3
 - nodejs : nodejs安装目录  
 - systemcontract ： nodejs系统合约工具目录.  
 - web3lib : nodejs公共文件目录.  
-- node : fisco-bcos数据目录.
+- node : fisco-bcos节点目录.
 - start_node.sh ： fisco-bcos启动脚本,启动docker时被调用.  
 - tool :  nodejs工具目录.  
 - web3sdk : web3sdk目录  
@@ -414,6 +462,17 @@ cns add operation => cns_name = HelloWorld
 send transaction success: 0x2eedcea5886c8e5b9c60688f7d8aa910fc22868ed2ae0349e7a34be7c34a71fa
 ```
 
+##### 6.2.3 install_node.sh错误提示FAQ  
+a. "you already install the fisco-bcos docker node in this directory!"  
+install_node.sh node之后会生成docker目录, 这个提示说明是重复执行。 
+
+b "docker pull fisco-bcos failed."  
+说明在docker仓库拉取docker失败。  
+
+c. "there is already fisco-bcos docker named fisco-node XXX"  
+说明docker镜像重名, docker镜像中fisco-bcos节点可能使用了冲突的端口。
+
+
 # <a name="specific_genesis_node_expand" id="specific_genesis_node_expand">附录1. 区块链扩容</a>
 
 #### 使用场景  
@@ -425,7 +484,7 @@ send transaction success: 0x2eedcea5886c8e5b9c60688f7d8aa910fc22868ed2ae0349e7a3
 - [x]   这几个文件位于创世节点的安装包的dependencies/follow目录。
 - [x]   区块链安装包创建工具所在的服务器如果之前没有编译、安装FISCO BCOS时, 也可以把创世节点上的fisco-bcos文件拿下来，放入/usr/local/bin目录下.
 
-#### 2. 从创世节点所在服务器上面取出dependencies/cert目录, 里面包含之前创建的区块链的根证书、机构证书信息, 放到构建区块链安装包创建工具所在的机器。
+#### 2. 从创世节点所在服务器上面取出dependencies/cert目录, 里面包含之前创建的区块链的根证书、机构证书信息, 放到构建区块链安装包创建工具所在的机器。如果不需要物料包自身分配证书, 则省略这个流程, 这个可以参考附录2 证书分配。
 
 #### 3. 配置
 
@@ -433,7 +492,7 @@ send transaction success: 0x2eedcea5886c8e5b9c60688f7d8aa910fc22868ed2ae0349e7a3
 ```sh
 vim specific_genesis_node_scale_config.sh
 ```
-假如将上述文件放入/fisco-bcos/ext/目录下,扩容的机器为127.0.0.1, 配置如下：
+假如将上述文件放入/fisco-bcos/目录下,扩容的机器为***REMOVED***, 该机器需要启动两个节点, 机构名称为agent_3, 配置如下：
 
 ```shell
 p2p_network_ip="***REMOVED***"
@@ -441,20 +500,20 @@ listen_network_ip="***REMOVED***"
 node_number=2
 agency_info="agent_3"
 
-genesis_json_file_path=/fisco-bcos/ext/genesis.json
-genesis_node_info_file_path=/fisco-bcos/ext/bootstrapnodes.json
-genesis_system_address_file_path=/fisco-bcos/ext/syaddress.txt
-genesis_ca_dir_path=/fisco-bcos/ext/cert/
+genesis_json_file_path=/fisco-bcos/genesis.json
+genesis_node_info_file_path=/fisco-bcos/bootstrapnodes.json
+genesis_system_address_file_path=/fisco-bcos/syaddress.txt
+genesis_ca_dir_path=/fisco-bcos/cert/
 ```
 配置解释：
 - p2p_network_ip：   p2p连接的网段ip, 根据p2p网络的网段配置。
 - listen_network_ip：   监听网段ip, 用来接收rpc、channel、ssl连接。
-- node_number：   在该服务器上面需要创建的节点数目。 
+- node_number：   在该服务节点启动时依赖的文件器上面需要创建的节点数目。 
 - agency_info：   机构名称, 如果不区分机构, 值随意, 但是不可以为空。
-- genesis_json_file_path   genesis.json的路径
-- genesis_node_info_file_path   bootstrapnodes.json的路径
-- genesis_system_address_file_path  syaddress.txt的路径
-- genesis_ca_dir_path  链的证书目录
+- genesis_json_file_path   genesis.json的路径。
+- genesis_node_info_file_path   bootstrapnodes.json的路径。
+- genesis_system_address_file_path  syaddress.txt的路径。
+- genesis_ca_dir_path  分配证书目录。
 - 
 #### 3. 生成安装包
 
@@ -466,19 +525,76 @@ $ ./generate_installation_packages.sh expand
 ***REMOVED***_with_***REMOVED***_installation_package
 ```
 #### 4. 安装启动节点
-将安装包上传至服务器, 进入目录, 执行./intall_node.sh install  
-进入build目录或者docker目录.
-启动节点: ./start_all.sh  
+将安装包上传至服务器, 进入安装目录
+```
+./intall_node.sh install  
+```
+如果是docker镜像节点的扩容, 则会生成docker目录。  
+如果是服务器上普通节点的扩容, 则会生成build目录。
+启动所有的节点:   
+```
+./start_all.sh
+```
 
-#### 5. 添加新增节点到节点管理合约
-将dependencies/node_action_info_dir的nodeactioninfo_xxxxxxxxxxxx.json文件, 放入创世节点所在服务器的安装目录的node_action_info_dir, 然后执行node_manager.sh命令将新添加的节点注册到管理合约。
+#### 5. 注册新节点到节点管理合约  
+扩容的流程跟从头创建新链的流程比较类似, 区别在于搭建一条新链时, 在build阶段会将本次创建的所有节点的节点信息注册入节点管理合约, 后续扩容的情况需要手动将节点注册入节点管理合约。  
 
-# <a name="密钥管理" id="ca-manager">附录2. 秘钥管理</a>
-#### 1. 默认的管理机制  
+##### 5.1. 节点信息.  
+需要注册的节点信息位于安装包的：dependencies/node_action_info_dir目录.
+```
+//dependencies/node_action_info_dir
+nodeactioninfo_172_20_245_45_0.json
+nodeactioninfo_172_20_245_45_1.json
+nodeactioninfo_172_20_245_45_2.json
+```
+
+##### 5.2.  注册.  
+**确保节点先启动.**   
+###### 5.2.1 扩容节点为服务器上运行的普通节点.  
+进入build目录, 将dependencies/node_action_info_dir目录下所有的文件都注册一次
+```
+$ cd build
+$ ./node_manager.sh registerNode `pwd` ../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_0.json 
+$ ./node_manager.sh registerNode `pwd` ../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_1.json
+$ ./node_manager.sh registerNode `pwd` ../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_2.json
+```
+
+验证,注册的节点是否正常:
+```
+$ tail -f node/nodedir0/log/log_2018071010.log   | egrep "Generating seal"
+INFO|2018-07-10 10:49:29:818|+++++++++++++++++++++++++++ Generating seal oncf8e56468bab78ae807b392a6f75e881075e5c5fc034cec207c1d1fe96ce79a1#4tx:0,maxtx:1000,tq.num=0time:1531190969818
+INFO|2018-07-10 10:49:35:863|+++++++++++++++++++++++++++ Generating seal one23f1af0174daa4c4353d00266aa31a8fcb58d3e7fbc17915d95748a3a77c540#4tx:0,maxtx:1000,tq.num=0time:1531190975863
+INFO|2018-07-10 10:49:41:914|+++++++++++++++++++++++++++ Generating seal on2448f00f295210c07b25090b70f0b610e3b8303fe0a6ec0f8939656c25309b2f#4tx:0,maxtx:1000,tq.num=0time:1531190981914
+INFO|2018-07-10 1
+```
+
+###### 5.2.2  扩容节点为docker节点.  
+依次执行docker目录下的register_nodeIDX.sh脚本, 然后验证节点是否注册成功.
+```
+ tail -f nodedir0/log/log_2018071012.log  | egrep "Generating seal"
+INFO|2018-07-10 12:28:25:021|+++++++++++++++++++++++++++ Generating seal one7fa5b0ccfcf71fb4c3e9dde748135ae5899969642b7fd1d614a8b0bcee9401d#5tx:0,maxtx:0,tq.num=0time:1531225705021
+INFO|2018-07-10 12:28:30:056|+++++++++++++++++++++++++++ Generating seal on85110b70107ef89c6fc50c5c6ab05ca91815a22ec90495396364619776c9582c#5tx:0,maxtx:0,tq.num=0time:1531225710056
+INFO|2018-07-10 12:28:35:095|+++++++++++++++++++++++++++ Generating seal on2d4b5cbedde32e177c6e675f56db80ec36a68fdfe15775fe21b78dea1ed51eb1#5tx:0,maxtx:0,tq.num=0time:1531225715095
+```
+每个节点注册成功之后再继续注册下一个.
+
+
+# <a name="证书分配" id="ca-manager">附录2. 证书分配</a>
+#### 1. 默认的分配机制  
 - FISCO-BCOS默认情况下使用自己的工具分配证书, 工具位于下载的FSICO-BCOS目录的cert子目录, 使用方式参考[FISCO-BCOS 证书生成工具](https://github.com/FISCO-BCOS/FISCO-BCOS/tree/master/doc/manual#第二章-准备链环境)。
 #### 2. 物料包工具的证书分配.  
 - 物料包工具的证书分配默认采用FISCO-BCOS的证书分配机制.  
-- 构建完成各个服务器的安装包之后, 整条链的根证书、机构证书会保存在创世节点所在服务器的dependencies/cert目录, 以上面示例的配置为例,  创世节点服务器cert目录内容(省略了一些不重要的文件)：
+- 构建完成各个服务器的安装包之后, 整条链的根证书、机构证书会保存在创世节点所在服务器的dependencies/cert目录 保存的目录结构为： 
+```
+cert目录  
+    ca.crt 
+    ca.key
+    机构名称子目录
+        agency.crt
+        agency.key
+```
+
+- 以上面示例的配置为例,  创世节点服务器cert目录内容(省略了一些不重要的文件)：
 ```
 ca.crt
 ca.key
@@ -501,7 +617,9 @@ agent_2\
 - agent_2\agency.crt agent_2机构证书 
 - agent_2\agency.key agent_2机构证书私钥
 
-#### 3. 节点启动时依赖的文件   
+#### 3. 节点证书相关的文件  
+
+节点启动时证书会被拷贝到节点的数据目录, 节点启动时依赖的证书文件如下:
 ```
 ca.crt 根证书, x509格式
 agency.crt 机构证书, x509格式
@@ -509,28 +627,39 @@ node.crt 节点证书, x509格式
 node.key 节点私钥证书, pkcs#8格式
 node.private 节点的私钥, pkcs#8解析的私钥
 ```
+
+从node.crt中生成其他模块的一些依赖文件:
+```
+node.json    节点管理合约使用, 用来添加/删除节点使用
+node.nodeid  节点的nodeid, 用来标记节点, node.json字段会使用
+node.serial  节点证书的序列号
+```
+
 上述文件如何生成可以参考[FISCO-BCOS证书生成](https://github.com/FISCO-BCOS/FISCO-BCOS/tree/master/doc/manual#第二章-准备链环境)
 
 #### 3. 物料包工具的证书拓展机制.  
-物料包工具提供了一种拓展功能, 在各个机构或者是节点并不希望暴露私钥信息, 仅仅提供节点证书信息(证书是可以暴露的)的情况下进行构建安装包, 证书实现自分配或者其他方式.  
+物料包工具提供了一种拓展功能, 可以使用户并不依赖FISCO BCOS的证书分配机制。 按照常规流程, 在可信的第三方CA证书机构申请, 然后在FISCO BCOS中使用申请的证书。
+
+从上面的节点证书相关文件可以看出, 构建节点安装包时, 需要节点的node.crt文件用来计算节点依赖的其他文件信息(主要是节点的nodeid, 节点的证书序列号), 所以采用这种方式时, 需要提供要搭建的每个节点的证书文件。
+
 使用流程如下：
 ##### 3.1 启用功能  
 配置installation_config.sh中IS_CA_EXT_MODE=1.  
 
 ##### 3.2 放置节点的证书文件  
-将需要搭建的节点的证书以：结构名称/node_p2pnetworkip_IDX/node.crt方式放入到ext/cert目录.  
+将需要搭建的节点的证书以：机构名称/node_p2pnetworkip_IDX/node.crt方式放入到ext/cert目录.  
 以示例中的配置为例：
 ```
 ext/cert
-        agent0
-                node_***REMOVED***_0/node.crt
-                node_***REMOVED***_1/node.crt
-        agent1
-                node_***REMOVED***_0/node.crt
-                node_***REMOVED***_1/node.crt
-        agent2
-                node_***REMOVED***_0/node.crt
-                node_***REMOVED***_1/node.crt
+        agent_0
+                node_172_20_245_42_0/node.crt
+                node_172_20_245_42_1/node.crt
+        agent_1
+                node_172_20_245_43_0/node.crt
+                node_172_20_245_43_1/node.crt
+        agent_2
+                node_172_20_245_44_0/node.crt
+                node_172_20_245_44_1/node.crt
                     
 ```
 
@@ -545,12 +674,7 @@ ext/cert
 
 # FAQ
 
-- 一定要确保安装的机器上面的各个节点的端口都没有被占用, 当前服务器上面的端口配置可以查看安装目录下的 build/nodedirN/config.json 文件, 可以使用 netstat -anp | egrep 端口号 , 查看端口是否被占用。
- 	```sh
-	    "rpcport":"8546",
-        "p2pport":"30304",
-        "channelPort":"8822",
-	```
+- 一定要确保安装的机器上面的各个节点的端口都没有被占用.
 
 - 一定要确保各个机器之前可以连接, 端口是放开的, 可以通过ping检查各个机器之前的网络连接, 使用telnet检查端口是否开通。
 - 如果构建安装包过程有出错，但不知道错误在哪里，可以这样执行构建脚本：
@@ -564,7 +688,7 @@ ext/cert
 	$ bash -x install_node.sh install
 	```
 	
-- 执行启动脚本start_node0.sh后, ps -aux | egrep fisco发现进程不存在, 可以查看./build/nodedir0/log/log文件的内容, 里面会有具体的报错内容。  
+- 执行启动脚本start_node0.sh后, ps -aux | egrep fisco发现进程不存在, 可以查看日志文件的内容, 里面会有具体的报错内容。  
 常见的一些报错如下：  
 a. 
 ```
