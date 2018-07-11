@@ -28,8 +28,8 @@ function check_if_install()
 #check if the port is used
 function check_port() 
 {
-     echo "    check port is "$1
-     if ! sudo lsof -i:$1 | egrep LISTEN
+    echo "    check port is "$1
+    if ! sudo lsof -i:$1 | egrep LISTEN
     then
         return 0
     else
@@ -102,32 +102,4 @@ spinner()
     done
     printf "    \b\b\b\b"
     echo
-}
-
-function build_crypto_mode_json_file()
-{
-    local current_host_rlp_dir=$1
-    local crypto_mode=$2
-    local key_center_url=""
-    if [ "$3" == "null" ]
-    then
-        key_center_url=""
-    else
-        key_center_url="https://$3"
-    fi
-    local current_node_rlp_dir=$4
-    local super_key=$5
-
-    local crypto_mode_json_file_path=$current_host_rlp_dir/cryptomod.json
-    echo $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/tpl_dir/cryptomod.json.tpl
-    echo $current_host_rlp_dir/cryptomod.json
-
-    export CRYPTO_MODE_TPL=$crypto_mode
-    export KEY_CENTER_URL_TPL=$key_center_url
-    export SUPER_KEY_TPL=${super_key}
-    MYVARS='${CRYPTO_MODE_TPL}:${KEY_CENTER_URL_TPL}:${SUPER_KEY_TPL}'
-    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/tpl_dir/cryptomod.json.tpl > $current_host_rlp_dir/cryptomod.json
-
-    cat $current_host_rlp_dir/cryptomod.json
-    echo "envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/tpl_dir/cryptomod.json.tpl > $current_host_rlp_dir/cryptomod.json"
 }

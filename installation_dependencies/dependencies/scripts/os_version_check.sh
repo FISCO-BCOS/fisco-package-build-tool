@@ -1,79 +1,30 @@
 #!/usr/bin/env sh
 
-#------------------------------------------------------------------------------
-# Bash script for installing pre-requisite packages for cpp-ethereum on a
-# variety of Linux and other UNIX-derived platforms.
-#
-# This is an "infrastucture-as-code" alternative to the manual build
-# instructions pages which we previously maintained, first as Wiki pages
-# and later as readthedocs pages at http://ethdocs.org.
-#
-# The aim of this script is to simplify things down to the following basic
-# flow for all supported operating systems:
-#
-# - git clone --recursive
-# - ./install_deps.sh
-# - cmake && make
-#
-# At the time of writing we are assuming that 'lsb_release' is present for all
-# Linux distros, which is not a valid assumption.  We will need a variety of
-# approaches to actually get this working across all the distros which people
-# are using.
-#
-# See http://unix.stackexchange.com/questions/92199/how-can-i-reliably-get-the-operating-systems-name
-# for some more background on this common problem.
-#
-# TODO - There is no support here yet for cross-builds in any form, only
-# native builds.  Expanding the functionality here to cover the mobile,
-# wearable and SBC platforms covered by doublethink and EthEmbedded would
-# also bring in support for Android, iOS, watchOS, tvOS, Tizen, Sailfish,
-# Maemo, MeeGo and Yocto.
-#
-# The documentation for cpp-ethereum is hosted at http://cpp-ethereum.org
-#
-# ------------------------------------------------------------------------------
-# This file is part of cpp-ethereum.
-#
-# cpp-ethereum is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# cpp-ethereum is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with cpp-ethereum.  If not, see <http://www.gnu.org/licenses/>
-#
-# (c) 2016 cpp-ethereum contributors.
-#------------------------------------------------------------------------------
-
 set -e
 
+myname="fisco-package-build-tool"
+
 # Check for 'uname' and abort if it is not available.
-uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - cpp-ethereum requires 'uname' to identify the platform."; exit 1; }
+uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 
 case $(uname -s) in
 
 #------------------------------------------------------------------------------
 # macOS
 #------------------------------------------------------------------------------
-
 Darwin)
     case $(sw_vers -productVersion | awk -F . '{print $1"."$2}') in
         10.9)
-            echo "Installing cpp-ethereum dependencies on OS X 10.9 Mavericks."
+            echo "Installing $myname dependencies on OS X 10.9 Mavericks."
             ;;
         10.10)
-            echo "Installing cpp-ethereum dependencies on OS X 10.10 Yosemite."
+            echo "Installing $myname dependencies on OS X 10.10 Yosemite."
             ;;
         10.11)
-            echo "Installing cpp-ethereum dependencies on OS X 10.11 El Capitan."
+            echo "Installing $myname dependencies on OS X 10.11 El Capitan."
             ;;
         10.12)
-            echo "Installing cpp-ethereum dependencies on macOS 10.12 Sierra."
+            echo "Installing $myname dependencies on macOS 10.12 Sierra."
             echo ""
             echo "NOTE - You are in unknown territory with this preview OS."
             echo "Even Homebrew doesn't have official support yet, and there are"
@@ -103,10 +54,8 @@ Darwin)
 # FreeBSD
 #------------------------------------------------------------------------------
 FreeBSD)
-    echo "Installing cpp-ethereum dependencies on FreeBSD."
-    echo "ERROR - 'install_deps.sh' doesn't have FreeBSD support yet."
-    echo "Please let us know if you see this error message, and we can work out what is missing."
-    echo "At https://gitter.im/ethereum/cpp-ethereum-development."
+    echo "Installing $myname dependencies on FreeBSD."
+    echo "ERROR - $myname doesn't have FreeBSD support yet."
     exit 1
     ;;
 
@@ -126,24 +75,12 @@ Linux)
 
     if [ -f "/etc/arch-release" ]; then
 
-        echo "Installing cpp-ethereum dependencies on Arch Linux."
-
-        # The majority of our dependencies can be found in the
-        # Arch Linux official repositories.
-        # See https://wiki.archlinux.org/index.php/Official_repositories
-        $SUDO pacman -Sy --noconfirm \
-            autoconf \
-            automake \
-            gcc \
-            libtool \
-            boost \
-            leveldb \
-            libmicrohttpd \
-            miniupnpc
+        echo "Installing $myname dependencies on Arch Linux."
 
     elif [ -f "/etc/os-release" ]; then
 
         DISTRO_NAME=$(. /etc/os-release; echo $NAME)
+	echo "Linux distribution: $DISTRO_NAME."
         case $DISTRO_NAME in
 
         Debian*)
@@ -207,6 +144,21 @@ Linux)
 
         CentOS*)
             echo "Installing cpp-ethereum dependencies on CentOS."
+            # Enable EPEL repo that contains leveldb-devel
+            $SUDO yum -y -q install epel-release
+            $SUDO yum -y -q install \
+                make \
+                gcc-c++ \
+                boost-devel \
+                leveldb-devel \
+                curl-devel \
+                libmicrohttpd-devel \
+                gmp-devel \
+                openssl openssl-devel
+            ;;
+		#add Oracle Linux Server dependencies
+		Oracle*)
+            echo "Installing cpp-ethereum dependencies on Oracle Linux Server."
             # Enable EPEL repo that contains leveldb-devel
             $SUDO yum -y -q install epel-release
             $SUDO yum -y -q install \

@@ -7,56 +7,93 @@ function toggle_debug()
 {
     IS_DEBUG=1
     mkdir -p build/
-    #set -e
-    #exec 5>build/debug_output.txt
-    #exec 1>>build/debug_output.txt
-    #exec 2>>build/debug_output.txt
-    #BASH_XTRACEFD="5"
+    #exec 1>>build/stdout.txt
+    exec 2>>build/stderr.log
+    #BASH_XTRACEFD="5"s
     PS4='$LINENO: '
-    set -x
+    #set -x
 }
 
 #toggle_debug
 
 #public config
+UNDER_LINE_STR="_"
 installPWD=$PWD
 INSTALLATION_DEPENENCIES_LIB_DIR_NAME=installation_dependencies
+INSTALLATION_DEPENENCIES_EXT_DIR_NAME=ext
 INSTALLATION_DEPENENCIES_LIB_DIR=$installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME
+INSTALLATION_DEPENENCIES_EXT_DIR=$installPWD/$INSTALLATION_DEPENENCIES_EXT_DIR_NAME
+
 source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/utils.sh
 source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/public_config.sh
 
 #private config
-source $PWD/$DEPENDENCIES_CONFIG_FILE_NAME
+source $PWD/installation_config.sh
 CACHE_DIR_PATH=$installation_build_dir/.cache_dir
 INITIALIZATION_DONE_FILE_PATH=$CACHE_DIR_PATH/initialization_done
-GOD_ADDRESS_DEFAULT_VALUE="0x00855942dbd63353d9dac56abe17d818e6779c42"
 RPC_PORT_DEFAULT_VALUE=$(($RPC_PORT_FOR_TEMP_NODE+1))
 P2P_PORT_DEFAULT_VALUE=$(($P2P_PORT_FOR_TEMP_NODE+1))
 CHANNEL_PORT_DEFAULT_VALUE=$(($CHANNEL_PORT_FOR_TEMP_NODE+1))
 PORT_DEFAULT_VALUE=$(($P2P_PORT_FOR_TEMP_NODE+1))
-IDENTITY_TYPE_DEFAULT_VALUE="1"
 TEMP_NODE_NAME="temp"
 TEMP_BUILD_DIR=$installation_build_dir/$TEMP_NODE_NAME/build
-GENESIS_RLP_DIR=$installation_build_dir/$TEMP_NODE_NAME/build/genesis_rlp_dir
 TARGET_ETH_PATH=/usr/local/bin/fisco-bcos
 
-#Oracle JDK 1.8+ be requied.
+#openssl 1.0.2+ be requied.
+function check_openssl()
+{
+    type openssl >/dev/null 2>&1
+    if [ $? -ne 0 ];then
+        echo "openssl is not installed, OpenSSL 1.0.2+ be requied."
+        return 1
+    fi
+
+    #openssl version
+    OPENSSL_VER=$(openssl version 2>&1 | sed -n ';s/.*OpenSSL \(.*\)\.\(.*\)\.\([0-9]*\).*/\1\2\3/p;')
+
+    #openssl 1.0.2+
+    if [ $OPENSSL_VER -ge 102 ];then
+        return 0
+    fi
+
+    echo "openssl 1.0.2 be requied."
+    echo "now openssl is "
+    echo `openssl version`
+    return 2
+}
+
+#fisco-bcos 1.3.0+ need
+function fisco_bcos_version_check()
+{
+    FISCO_VERSION=$(${TARGET_ETH_PATH} --version 2>&1 | sed -n ';s/.*FISCO-BCOS version  \(.*\)\.\(.*\)\.\([1-9]*\).*/\1\2\3/p;')
+    #openssl 1.0.2+
+    if [ $FISCO_VERSION -ge 130 ];then
+        return 0
+    fi
+
+    echo "fisco-bcos 1.3.0+ be requied."
+    echo "now fisco-bcos is "
+    echo `${TARGET_ETH_PATH} --version`
+    return 2
+}
+
+#Oracle JDK 1.8 be requied.
 function check_java_env()
 {
     type java >/dev/null 2>&1
     if [ $? -ne 0 ];then
-        echo "java is not installed, Oracle JDK 1.8+ be requied."
+        echo "java is not installed, Oracle JDK 1.8 be requied."
         return 1
     fi
 
     #JAVA version
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')
-    #Oracle JDK 1.8+
+    #Oracle JDK 1.8
     if [ $JAVA_VER -ge 18 ] && [[ $(java -version 2>&1 | grep "TM") ]];then
         return 0
     fi
 
-    echo "Oracle JDK 1.8+ be requied."
+    echo "Oracle JDK 1.8 be requied."
     echo "now JDK is "
     echo `java -version`
     return 2
@@ -69,15 +106,7 @@ function init_global_variable()
 
     echo "host_config_num = "$g_host_config_num
 
-    g_genesis_node_action_info_json_path=""
-    g_genesis_new_json_path=$TEMP_BUILD_DIR/genesis.json
     g_status_process=${PROCESS_INITIALIZATION}
-    if [ -f $CACHE_DIR_PATH/g_genesis_node_action_container_dir_path ]
-    then
-        g_genesis_node_action_container_dir_path=$(cat $CACHE_DIR_PATH/g_genesis_node_action_container_dir_path)
-    else
-        g_genesis_node_action_container_dir_path=""
-    fi
 
     if [ -f $CACHE_DIR_PATH/g_genesis_node_info_path ]
     then
@@ -152,7 +181,7 @@ function copy_genesis_related_info()
     fi
 }
 
-#create node for node of the server
+#build node for node of the server
 function build_node_ca()
 {
     agency=$1
@@ -160,18 +189,74 @@ function build_node_ca()
     src=$3
     dst=$4
 
-    echo "agency is => "$agency
-    echo "node is => "$node
-    echo "cert is => "$src
-    echo "ca is => "$dst
+    echo "agency => "$agency
+    echo "node => "$node
+    echo "dst => "$dst
+
+    local ext_dir=${INSTALLATION_DEPENENCIES_EXT_DIR}/cert/
+    bash $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/cert/ext.sh $agency $node ${ext_dir}
+    cd $ext_dir
+    if [ ! -f ${ext_dir}/$agency/$node/node.nodeid ];then
+        echo "node.nodeid is not exist, agency => $agency, node => $node"
+        return 2
+    fi
+
+    cp ${ext_dir}/ca.crt $dst/node 2>/dev/null
+    cp ${ext_dir}/$agency/agency.crt $dst/node 2>/dev/null
+
+    mkdir -p $dst/node
+    cp ${ext_dir}/$agency/$node/node* $dst/node
+
+    return 0
+}
+
+#create node for node of the server
+function create_node_ca()
+{
+    agency=$1
+    node=$2
+    src=$3
+    dst=$4
+
+    echo "agency => "$agency
+    echo "node => "$node
+    echo "src => "$src
+    echo "dst => "$dst
 
     cd $src
-    bash chain.sh >/dev/null 2>&1 #ca for chain
-    bash agency.sh $agency >/dev/null 2>&1  #ca for agent
-    bash node.sh $agency $node >/dev/null 2>&1 #ca for node
-    bash sdk.sh $agency "sdk" >/dev/null 2>&1 #ca for sdk
-    
-    cd $agency && mv $node $dst/node && mv sdk $dst
+
+    bash chain.sh 1>/dev/null #ca for chain
+    if [ ! -f "ca.key" ]; then
+        echo "ca.key is not exist, maybe \" bash chain.sh \" failed."
+        return 2
+    elif [ ! -f "ca.crt" ]; then
+        echo "ca.crt is not exist, maybe \" bash chain.sh \" failed."
+        return 2
+    fi
+
+    bash agency.sh $agency 1>/dev/null #ca for agent
+    if [ ! -d $agency ]; then
+        echo "$agency dir is not exist, maybe \" bash agency.sh $agency\" failed."
+        return 2
+    fi
+
+    bash node.sh $agency $node 1>/dev/null #ca for node
+    if [ ! -d $agency/$node ]; then
+        echo "$agency/$node dir is not exist, maybe \" bash node.sh $agency $node \" failed."
+        return 2
+    fi
+
+    bash sdk.sh $agency "sdk" 1>/dev/null #ca for sdk
+    if [ ! -d $agency/sdk ]; then
+        echo "$agency/sdk dir is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
+        return 2
+    fi
+
+    mkdir -p $dst/node
+    cp $agency/$node/* $dst/node
+    mv $agency/sdk $dst
+
+    return 0
 }
 
 #create install packag for every node of the server
@@ -181,20 +266,13 @@ function build_node_installation_package()
     local private_ip=$2
     local node_num_per_host=$3
     local host_type=$4
-    local crypto_mode=$5
-    local super_key=$6
-    local identity_type=$7
-    local agent_info=$8
-    local key_center_url="null"
+    local agent_info=$5
 
     echo "build_node_installation_package =>"
-    echo "host_type = "$host_type
-    echo "public_ip = "$public_ip
-    echo "private_ip = "$private_ip
+    echo "p2p_ip = "$public_ip
+    echo "listen_ip = "$private_ip
     echo "node_num = "$node_num_per_host
-    echo "crypto_mode = "$crypto_mode
-    echo "super_key = "$super_key
-    echo "identity_type = "$identity_type
+    echo "host_type = "$host_type
     echo "agent_info = "$agent_info
 
     public_ip_underline=$(replace_dot_with_underline $public_ip)
@@ -222,9 +300,11 @@ function build_node_installation_package()
 
     mkdir -p $current_node_path/
     mkdir -p $current_node_path/dependencies/
+    mkdir -p $current_node_path/dependencies/fisco-bcos
+    mkdir -p $current_node_path/dependencies/follow/
     mkdir -p $current_node_path/dependencies/rlp_dir/
 
-    cp $TARGET_ETH_PATH $current_node_path/
+    cp $TARGET_ETH_PATH $current_node_path/dependencies/fisco-bcos/
     cp -r $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies $current_node_path/
 
     if [ $host_type -eq $TYPE_TEMP_HOST ]
@@ -234,18 +314,23 @@ function build_node_installation_package()
     elif [ $host_type -eq $TYPE_GENESIS_HOST ]
     then
         export IS_GENESIS_HOST_TPL=1
-        envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh.tpl > $current_node_path/install_node.sh
-        chmod +x $current_node_path/install_node.sh
+        if [ ! -z ${IS_BUILD_FOR_DOCKER} ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
+            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh.tpl > $current_node_path/install_node.sh
+            chmod +x $current_node_path/install_node.sh
+        else
+            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh.tpl > $current_node_path/install_node.sh
+            chmod +x $current_node_path/install_node.sh
+        fi
 
         # copy node_manager.sh
-        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh $current_node_path/
+        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
 
         # create "i am genesis node" file, the genesis node will contain this file in his root dir.
         touch $current_node_path/.i_am_genesis_host
 
-        g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
-        mkdir -p ${g_genesis_node_action_container_dir_path}/
-        echo ${g_genesis_node_action_container_dir_path} > $CACHE_DIR_PATH/g_genesis_node_action_container_dir_path
+        #g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
+        #mkdir -p ${g_genesis_node_action_container_dir_path}/
+        #echo ${g_genesis_node_action_container_dir_path} > $CACHE_DIR_PATH/g_genesis_node_action_container_dir_path
 
         g_genesis_cert_dir_path=$current_node_path/dependencies/cert
         echo ${g_genesis_cert_dir_path} > $CACHE_DIR_PATH/g_genesis_cert_dir_path
@@ -255,9 +340,15 @@ function build_node_installation_package()
             mv $TEMP_BUILD_DIR/godInfo.txt ${g_genesis_cert_dir_path} >/dev/null 2>&1
         fi
     else 
-        export IS_GENESIS_HOST_TPL=0
-        envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh.tpl > $current_node_path/install_node.sh
-        chmod +x $current_node_path/install_node.sh
+        # copy node_manager.sh
+        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
+        if [ ! -z ${IS_BUILD_FOR_DOCKER} ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
+            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh.tpl > $current_node_path/install_node.sh
+            chmod +x $current_node_path/install_node.sh
+        else
+            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh.tpl > $current_node_path/install_node.sh
+            chmod +x $current_node_path/install_node.sh
+        fi
     fi
 
     listen_ip_list_str=""
@@ -266,7 +357,6 @@ function build_node_installation_package()
     p2p_port_list_str=""
     node_desc_list_str=""
     agent_info_list_str=""
-    identity_type_list_str=""
     idx_list_str=""
 
     local current_host_rlp_dir=$current_node_path/dependencies/rlp_dir
@@ -279,16 +369,29 @@ function build_node_installation_package()
         mkdir -p $current_node_rlp_dir/
         mkdir -p $current_node_rlp_dir/ca/
         
-        build_crypto_mode_json_file $current_host_rlp_dir $crypto_mode $key_center_url $current_node_rlp_dir $super_key
-        
         node_name=$public_ip_underline"_"$node_index
         if [ $host_type -eq $TYPE_TEMP_HOST ];then
             node_cert_path=$current_node_path/dependencies/cert/
+            node_ca_path=$current_node_rlp_dir/ca/
+            create_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
+            if [ $? -ne 0 ];then
+                return 2;
+            fi
         else
             node_cert_path=${g_genesis_cert_dir_path}
+            node_ca_path=$current_node_rlp_dir/ca/
+            if [ ! -z ${IS_CA_EXT_MODE} ] && [ ${IS_CA_EXT_MODE} -eq 1 ];then
+                build_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
+                if [ $? -ne 0 ];then
+                    return 2;
+                fi
+            else
+                create_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
+                if [ $? -ne 0 ];then
+                    return 2;
+                fi
+            fi
         fi
-        node_ca_path=$current_node_rlp_dir/ca/
-        build_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
 
         if [ $node_index -eq $(($node_num_per_host-1)) ]
         then
@@ -322,16 +425,16 @@ function build_node_installation_package()
             current_node_action_info_file_path=$installation_build_dir/$node_dir_name/dependencies/node_action_info_dir/nodeactioninfo_"$public_ip_underline"_"$node_index".json
             cp $node_ca_path/node/node.json $current_node_action_info_file_path
 
-            if [ $host_type -eq $TYPE_GENESIS_HOST ] && [ $node_index -eq 0 ]
-            then
-                g_genesis_node_action_info_json_path=$current_node_action_info_file_path
-            fi
+            #if [ $host_type -eq $TYPE_GENESIS_HOST ] && [ $node_index -eq 0 ]
+            #then
+            #    g_genesis_node_action_info_json_path=$current_node_action_info_file_path
+            #fi
 
             # copy all node action info files to the container dir which owned by genesis node
-            if [ ${g_status_process} -eq ${PROCESS_INITIALIZATION} ] || [ ${g_status_process} -eq ${PROCESS_EXPAND_NODE} ]
-            then
-                cp $current_node_action_info_file_path ${g_genesis_node_action_container_dir_path}
-            fi
+            #if [ ${g_status_process} -eq ${PROCESS_INITIALIZATION} ] || [ ${g_status_process} -eq ${PROCESS_EXPAND_NODE} ]
+            #then
+            #    cp $current_node_action_info_file_path ${g_genesis_node_action_container_dir_path}
+            #fi
         fi
 
         if [ $host_type -eq $TYPE_GENESIS_HOST ] && [ $node_index -eq 0 ]
@@ -352,20 +455,12 @@ function build_node_installation_package()
         node_desc_list_str=$node_desc_list_str"$node_desc"$delim_str
         agent_info_list_str=$agent_info_list_str"$agent_info"$delim_str
 
-        identity_type_list_str=$identity_type_list_str"$identity_type"$delim_str
         idx_list_str=$idx_list_str"$node_index"$delim_str
 
         node_index=$(($node_index+1))
     done
 
-    local god_addr=""
-    if [ -f $g_genesis_cert_dir_path/godInfo.txt ];then
-        god_addr=$(cat $g_genesis_cert_dir_path/godInfo.txt | grep address | awk -F ':' '{print $2}' 2>/dev/null)
-    fi
-
-    if [ -z ${god_addr} ];then
-            god_addr=$GOD_ADDRESS_DEFAULT_VALUE
-    fi
+    local god_addr=$(cat $g_genesis_cert_dir_path/godInfo.txt 2>/dev/null | grep address | awk -F ':' '{print $2}')
 
     export NODE_NUM_TPL=$node_num_per_host
     export GOD_ADDRESS_TPL=${god_addr}
@@ -375,12 +470,13 @@ function build_node_installation_package()
     export P2P_PORT_TPL=$p2p_port_list_str
     export NODE_DESC_TPL=$node_desc_list_str
     export AGENCY_INFO_TPL=$agent_info_list_str
-    export IDENTITY_TYPE_TPL=$identity_type_list_str
     export IDX_TPL=$idx_list_str
-    export CRYPTO_MODE_TPL=$crypto_mode
-    MYVARS='${NODE_NUM_TPL}:${GOD_ADDRESS_TPL}:${LISTEN_IP_TPL}:${CRYPTO_MODE_TPL}:${RPC_PORT_TPL}:${CHANNEL_PORT_VALUE_TPL}:${P2P_PORT_TPL}:${NODE_DESC_TPL}:${AGENCY_INFO_TPL}:${IDENTITY_TYPE_TPL}:${IDX_TPL}'
-    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/config.sh
-    echo "envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/config.sh"
+    export DOCKER_REPOSITORY_TPL=${DOCKER_REPOSITORY}
+    export DOCKER_VERSION_TPL=${DOCKER_VERSION}
+
+    MYVARS='${DOCKER_REPOSITORY_TPL}:${DOCKER_VERSION_TPL}:${NODE_NUM_TPL}:${GOD_ADDRESS_TPL}:${LISTEN_IP_TPL}:${RPC_PORT_TPL}:${CHANNEL_PORT_VALUE_TPL}:${P2P_PORT_TPL}:${NODE_DESC_TPL}:${AGENCY_INFO_TPL}:${IDX_TPL}'
+    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/follow/config.sh
+    # echo "envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/config.sh"
     return 0
 }
 
@@ -388,26 +484,14 @@ function build_node_installation_package()
 function build_base_info_dir()
 {
     node_base_info_dir=$1/dependencies
-    mkdir -p $node_base_info_dir/
-
-    if [ ! -f ${g_genesis_new_json_path} ];then
-        echo "WARNING : g_genesis_new_json_path not exist."
-    fi
-
-    if [ ! -f ${g_genesis_node_info_path} ];then
-        echo "WARNING : g_genesis_node_info_path not exist."
-    fi
-    
-    if [ ! -f $TEMP_BUILD_DIR/syaddress.txt ];then
-        echo "WARNING : syaddress.txt not exist."
-    fi
+    mkdir -p $node_base_info_dir/follow/
 
     # genesis.json
-    cp $g_genesis_new_json_path $node_base_info_dir/
+    cp $TEMP_BUILD_DIR/genesis.json $node_base_info_dir/follow/
     # bootstrapnodes.json
-    cp $g_genesis_node_info_path $node_base_info_dir/
+    cp $g_genesis_node_info_path $node_base_info_dir/follow/
     # system contract address
-    cp $TEMP_BUILD_DIR/syaddress.txt $node_base_info_dir/
+    cp $TEMP_BUILD_DIR/syaddress.txt $node_base_info_dir/follow/
 
     return 0
 }
@@ -417,17 +501,35 @@ function build_temp_node()
     # it means the temp node have already build if the $TEMP_BUILD_DIR is exist, so no need build again.
     if ! [ -d $TEMP_BUILD_DIR ]
     then
-        #build temp node, in order to generate the genesis json file
-        temp_node_num=1
-        local crypto_mode=0
-        local key_center_url="null"
-        local super_key="null"
-        local identity_type=$IDENTITY_TYPE_DEFAULT_VALUE
-        local temp_agenct_info="temp"
-        build_node_installation_package "127.0.0.1" "127.0.0.1" $temp_node_num $TYPE_TEMP_HOST $crypto_mode $super_key $identity_type $temp_agenct_info
+        #port checkcheck
+        check_port $RPC_PORT_FOR_TEMP_NODE
+        if [ $? -ne 0 ];then
+            echo "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."
+            return 1
+        fi
 
-        cd $installation_build_dir/$TEMP_NODE_NAME/
-        ./install_temp_node.sh install
+        check_port $CHANNEL_PORT_FOR_TEMP_NODE
+        if [ $? -ne 0 ];then
+            echo "temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."
+            return 1
+        fi
+
+        check_port $P2P_PORT_FOR_TEMP_NODE
+        if [ $? -ne 0 ];then
+            echo "temp node p2p port check, $P2P_PORT_FOR_TEMP_NODE is in use."
+            return 1
+        fi
+        #build temp node, in order to generate the genesis json file
+        local temp_node_num=1
+        local temp_agenct_info="temp"
+        build_node_installation_package "127.0.0.1" "127.0.0.1" $temp_node_num $TYPE_TEMP_HOST $temp_agenct_info
+
+        if [ $? -eq 0 ];then
+            cd $installation_build_dir/$TEMP_NODE_NAME/
+            bash install_temp_node.sh install
+        else
+            return 2
+        fi
     else
         alert_msg="temp node is already exist."
         echo $alert_msg
@@ -441,32 +543,54 @@ function build_temp_node()
 #deploy system contract
 function deploy_system_contract_for_initialization()
 {
-    cd $installation_build_dir/$TEMP_NODE_NAME/
-    ./start_node0.sh
-    sleep 24
+    cd $installation_build_dir/$TEMP_NODE_NAME/build/node/
+    bash start_node0_godminer.sh
+    sleep 8
     # check if temp node is running
     check_port $CHANNEL_PORT_FOR_TEMP_NODE
     if [ $? -eq 0 ];then
-        echo "channel port $CHANNEL_PORT_FOR_TEMP_NODE is not listening, maybe temp node start failed."
+        echo "channel port $CHANNEL_PORT_FOR_TEMP_NODE is not listening, maybe temp node god mode start failed."
         return 1
     fi
 
-    cd $installation_build_dir/$TEMP_NODE_NAME/dependencies/jtool/bin
+    cd $installation_build_dir/$TEMP_NODE_NAME/build/web3sdk/bin
     chmod a+x system_contract_tools.sh
-    ./system_contract_tools.sh NodeAction registerNode file:$g_genesis_node_action_info_json_path
+
+    ## register all node to the system contract
+    for ((i=0; i<g_host_config_num; i++))
+    do
+        declare sub_arr=(${!MAIN_ARRAY[i]})
+        public_ip=${sub_arr[0]}
+        private_ip=${sub_arr[1]}
+        node_num_per_host=${sub_arr[2]}
+        local host_type=$(get_host_type $i)
+        local node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
+        local current_node_path=$installation_build_dir/$node_dir_name
+        local public_ip_underline=$(replace_dot_with_underline $public_ip)
+        for ((j=0; j<$node_num_per_host; j++))
+        do
+            local node_index=$j
+            local node_path=$current_node_path/dependencies/node_action_info_dir/nodeactioninfo_"$public_ip_underline"_"$node_index".json
+            echo " ==== register node json =>"${node_path}
+            bash system_contract_tools.sh NodeAction registerNode file:${node_path}
+        done
+    done
+
+    echo "all register node => "
+    bash system_contract_tools.sh NodeAction all
 
     # export the genesis file
-    cd $installation_build_dir/$TEMP_NODE_NAME/
-    ./stop_node0.sh 1>/dev/null
+    cd $installation_build_dir/$TEMP_NODE_NAME/build/node/
+    bash stop_node0.sh 1>/dev/null
     if [ ${IS_DEBUG} -eq 1 ]
     then
-        nohup ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/nodedir0/config.json --export-genesis $g_genesis_new_json_path  >$installation_build_dir/$TEMP_NODE_NAME/build/nodedir0/fisco-bcos.log 2>&1 &
+        ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 2>&1
     else
-        nohup ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/nodedir0/config.json --export-genesis $g_genesis_new_json_path  >$installation_build_dir/$TEMP_NODE_NAME/build/nodedir0/.log 1>/dev/null 2>&1 &
+        ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 1>/dev/null 2>&1
     fi
     echo "    exporting genesis file : "
-    $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 3 &
-    sleep 4
+    $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 12 &
+    sleep 12
 
     cd $installPWD
 
@@ -490,7 +614,13 @@ function get_host_type()
 
 function check_config_validation()
 {
-    for ((i=0; i<$g_host_config_num; i++))
+    g_host_config_num=${#MAIN_ARRAY[@]}
+    if [ -z "$g_host_config_num" ] || [ $g_host_config_num -le 0 ];then
+        echo "invalid host_config_num = "$g_host_config_num
+        return 1
+    fi
+
+    for ((i=0; i<g_host_config_num; i++))
     do
         declare sub_arr=(${!MAIN_ARRAY[i]})
         public_ip=${sub_arr[0]}
@@ -502,63 +632,12 @@ function check_config_validation()
             return 2
         fi
 
-        local identity_type=${sub_arr[3]}
-        #echo $identity_type
-        if ! [ -z "$identity_type" ]
-        then
-            if [ "$identity_type" -eq 0 ] || [ "$identity_type" -eq 1 ]
-            then
-                echo -ne
-            else
-                echo "identity_type is invalid, only 0、1 is valid value!"
-                return 3
-            fi
-        else 
-            echo "invalid identify_type, identify_type is null"
-            return 3
-        fi
-
-        local encryption_mode=${sub_arr[4]}
-        #echo $encryption_mode
-        if ! [ -z "$encryption_mode" ]
-        then
-            if [ "$encryption_mode" -eq 0 ] || [ "$encryption_mode" -eq 1 ]
-            then
-                echo -ne
-            else
-                echo "encryption_mode is invalid, only 0, 1 is valid value!"
-                return 3
-            fi
-        else
-            echo "invalid encryption_mode, encryption_mode is null"
-            return 3
-        fi
-
-        local agent=${sub_arr[6]}
+        local agent=${sub_arr[3]}
         if [ -z "$agent" ]; then
             echo "agent info cannot be null empty"
             return 4
         fi
     done
-
-    #port checkcheck
-    check_port $RPC_PORT_FOR_TEMP_NODE
-    if [ $? -ne 0 ];then
-        echo "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."
-        return 4
-    fi
-
-    check_port $CHANNEL_PORT_FOR_TEMP_NODE
-    if [ $? -ne 0 ];then
-        echo "temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."
-        return 4
-    fi
-
-    check_port $P2P_PORT_FOR_TEMP_NODE
-    if [ $? -ne 0 ];then
-        echo "temp node p2p port check, $P2P_PORT_FOR_TEMP_NODE is in use."
-        return 4
-    fi
 
     return 0
 }
@@ -617,8 +696,10 @@ function build_fisco_bcos()
 #clone and download fisco-bcos
 function clone_and_build_fisco()
 {
+    install_dependencies
+    
     #fisco-bcos already exist
-    if [ -f "/usr/local/bin/fisco-bcos" ]; then
+    if [ -f ${TARGET_ETH_PATH} ]; then
         return 0
     fi
 
@@ -635,7 +716,7 @@ function clone_and_build_fisco()
     fi
 
     echo "fisco local path = "$fisco_local_path
-    cd $installPWD
+    
     cd $fisco_local_path
     #git clone FISCO-BCOS
     if [ ! -d FISCO-BCOS  ];then
@@ -647,18 +728,26 @@ function clone_and_build_fisco()
         return 1
     fi
 
-    install_dependencies
     build_fisco_bcos
 
-    if [ ! -f "/usr/local/bin/fisco-bcos" ]; then
+    if [ ! -f ${TARGET_ETH_PATH} ]; then
 	    return 1
-	else
-	    return 0
     fi
+}
+
+function version()
+{
+    VERSION=$(cat release_note.txt 2>/dev/null)
+    echo "                                                     "
+    echo "##### fisco-package-build-tool VERSION=$VERSION #####"
+    echo "                                                     "
 }
 
 function main()
 {
+    #show tool version info
+    version
+
     #sudo permission check
     request_sudo_permission
     ret=$?
@@ -666,16 +755,6 @@ function main()
     then
         return $ret
     fi
-
-    #check java enviroment
-    check_java_env
-    ret=$?
-    if [  $ret -ne 0 ] ; then
-        return 2
-    fi
-    
-    #init all global variable
-    init_global_variable
 
     #check config valid
     check_config_validation
@@ -685,8 +764,37 @@ function main()
         return $ret
     fi
 
+    #check java enviroment, Oracle JDK 1.8 should be require
+    check_java_env
+    ret=$?
+    if [  $ret -ne 0 ] ; then
+        return 2
+    fi
+
+    #check openssl enviroment, openssl 1.0.2+ should be require
+    check_openssl
+    ret=$?
+    if [  $ret -ne 0 ] ; then
+        return 2
+    fi
+
+    #clone from github for fisco-bcos source
+    #check if need compile fisco-bcos
+    clone_and_build_fisco
+    if [ $? -ne 0 ];then
+       return 2
+    fi
+
+    #init all global variable
+    init_global_variable
+    if [ $? -ne 0 ]
+    then
+        return $ret
+    fi
+
     print_dash
 
+    #check if expand 
     if [ -f ${INITIALIZATION_DONE_FILE_PATH} ]
     then
         # expand mode
@@ -696,47 +804,45 @@ function main()
         mkdir -p $CACHE_DIR_PATH
     fi
 
-    clone_and_build_fisco
-    if [ $? -ne 0 ];then
-       echo "fisco-bcos file is not exist! please check your clone and build process."
-       return 2
-    fi
-
+    #build temp node 
+    #deploy system contract
+    #register all node to system contract
     build_temp_node
     syaddress=$(cat $TEMP_BUILD_DIR/syaddress.txt  2>/dev/null)
     if [ -z $syaddress ];then
-        echo "WARNING : system contract address null, maybe deploy system contract failed."
+        #echo "WARNING : system contract address null, maybe deploy system contract failed."
         return 2  
     fi
 
     # load config from installation_config.sh
-    # Loop and print it. Using offset and length to extract values
-    for ((i=0; i<$g_host_config_num; i++))
+    for ((i=0; i<g_host_config_num; i++))
     do
         declare sub_arr=(${!MAIN_ARRAY[i]})
         public_ip=${sub_arr[0]}
         private_ip=${sub_arr[1]}
         node_num_per_host=${sub_arr[2]}
-        identity_type=${sub_arr[3]}
-        local crypto_mode=${sub_arr[4]}
-        local super_key=${sub_arr[5]}
-        local agency_info=${sub_arr[6]}
+        local agency_info=${sub_arr[3]}
 
         build_host_type=$(get_host_type $i)
 
-        build_node_installation_package $public_ip $private_ip $node_num_per_host $build_host_type $crypto_mode $super_key $identity_type $agency_info
+        build_node_installation_package $public_ip $private_ip $node_num_per_host $build_host_type $agency_info
+        if [ $? -ne 0 ];then
+            return $?
+        fi
     done
 
     # there is no need deploy system contract again when expand the chain.
     if [ $g_status_process -eq ${PROCESS_INITIALIZATION} ]
     then
         deploy_system_contract_for_initialization
+        if [ $? -ne 0 ];then
+            return $?
+        fi
     fi
 
     expand_node_num=0
-
-    ## the first node, it will be the genesis node
-    for ((i=0; i<$g_host_config_num; i++))
+    ## register all node to system contract
+    for ((i=0; i<g_host_config_num; i++))
     do
         declare sub_arr=(${!MAIN_ARRAY[i]})
         public_ip=${sub_arr[0]}
@@ -748,6 +854,7 @@ function main()
         build_host_type=$(get_host_type $i)
 
         copy_genesis_related_info $public_ip $private_ip $node_num_per_host $build_host_type
+        expand_node_num=$((${expand_node_num}+1))
     done
 
     if [ $expand_node_num -eq 0 ]
@@ -785,10 +892,7 @@ function add_eth_node_by_specific_genesis_node()
 
     local p2p_network_ip_local=${p2p_network_ip}
     local listen_network_ip_local=${listen_network_ip}
-    local identity_type_local=${identity_type}
     local node_num_per_host_local=${node_number}
-    local crypto_mode=${crypto_mode}
-    local super_key=${super_key}
     local agency_info=${agency_info}
     local build_host_type_local=$TYPE_FOLLOWER_HOST
 
@@ -815,17 +919,23 @@ function add_eth_node_by_specific_genesis_node()
         return $ret
     fi
 
-    build_node_installation_package $p2p_network_ip_local $listen_network_ip_local $node_num_per_host_local $build_host_type_local $crypto_mode $super_key $identity_type_local $agency_info
+    build_node_installation_package $p2p_network_ip_local $listen_network_ip_local $node_num_per_host_local $build_host_type_local $agency_info
+    if [ $? -ne 0 ];then
+        return $?
+    fi
 
     local node_dir_name_local=$(get_node_dir_name $build_host_type_local $p2p_network_ip_local $listen_network_ip_local)
     local current_node_path_local=$installation_build_dir/$node_dir_name_local
 
-    local node_base_info_dir=$current_node_path_local/dependencies
+    local node_base_info_dir=$current_node_path_local/dependencies/follow/
     mkdir -p $node_base_info_dir/
 
+    # copy node_manager.sh
+    cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $node_base_info_dir/
     cp ${genesis_json_file_path} $node_base_info_dir/
     cp ${genesis_node_info_file_path} $node_base_info_dir/
     cp ${genesis_system_address_file_path} $node_base_info_dir/
+    echo "expand end."
 }
 
 case "$1" in
