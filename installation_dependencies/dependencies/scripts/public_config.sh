@@ -1,25 +1,25 @@
 #!/bin/bash
 
 DEFAULT_NETWORK_ID="12345"
-DEFAULT_SUPER_KEY="d4f2ba36f0434c0a8c1d01b9df1c2bce"
 buildPWD=$installPWD/build
 installation_build_dir=$installPWD/build
 
+NODE_INSTALL_DIR=$buildPWD/node
+WEB3SDK_INSTALL_DIR=$buildPWD/web3sdk
+NODEJS_INSTALL_DIR=$buildPWD/nodejs
+
 NODE_MODULES_DIR=$buildPWD/nodejs/lib/node_modules
+
 DEPENENCIES_DIR=$installPWD/dependencies
-DEPENENCIES_LIB_DIR=$installPWD/dependencies/lib
-DEPENENCIES_LIB64_DIR=$installPWD/dependencies/lib64
-DEPENENCIES_JTOOL_DIR=$installPWD/dependencies/jtool
-NODEJS_DIR=$installPWD/dependencies/nodejs
+DEPENENCIES_WEB3SDK_DIR=$installPWD/dependencies/web3sdk
+DEPENENCIES_WEB3LIB_DIR=$installPWD/dependencies/web3lib
+DEPENENCIES_FOLLOW_DIR=$installPWD/dependencies/follow
+DEPENENCIES_FISCO_DIR=$installPWD/dependencies/fisco-bcos
+DEPENENCIES_SC_DIR=$installPWD/dependencies/systemcontract
+DEPENENCIES_TOOL_DIR=$installPWD/dependencies/tool
+DEPENENCIES_NODEJS_DIR=$installPWD/dependencies/nodejs
 DEPENDENCIES_RLP_DIR=$installPWD/dependencies/rlp_dir
-BASE_INFO_DIR_NAME=followers_dependencies
-FOLLOWER_DEPENENCIES_DIR=$buildPWD/$BASE_INFO_DIR_NAME
-FOLLOWER_INSTALL_PACKAGE_NAME=follower_install_package
-DEPENDENCIES_CONFIG_FILE_NAME=installation_config.sh
-UNDER_LINE_STR="_"
-TPL_DIR_PATH=$DEPENENCIES_DIR/tpl_dir
-KEY_INFO_DIR_PATH=$DEPENENCIES_DIR/ca
-KEYSTORE_FILE_DIR=$DEPENENCIES_DIR/keystore_files
+DEPENDENCIES_TPL_DIR=$installPWD/dependencies/tpl_dir
 
 TYPE_GENESIS_HOST=1
 TYPE_FOLLOWER_HOST=2
