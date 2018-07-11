@@ -77,23 +77,23 @@ function fisco_bcos_version_check()
     return 2
 }
 
-#Oracle JDK 1.8+ be requied.
+#Oracle JDK 1.8 be requied.
 function check_java_env()
 {
     type java >/dev/null 2>&1
     if [ $? -ne 0 ];then
-        echo "java is not installed, Oracle JDK 1.8+ be requied."
+        echo "java is not installed, Oracle JDK 1.8 be requied."
         return 1
     fi
 
     #JAVA version
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')
-    #Oracle JDK 1.8+
+    #Oracle JDK 1.8
     if [ $JAVA_VER -ge 18 ] && [[ $(java -version 2>&1 | grep "TM") ]];then
         return 0
     fi
 
-    echo "Oracle JDK 1.8+ be requied."
+    echo "Oracle JDK 1.8 be requied."
     echo "now JDK is "
     echo `java -version`
     return 2
@@ -584,9 +584,9 @@ function deploy_system_contract_for_initialization()
     bash stop_node0.sh 1>/dev/null
     if [ ${IS_DEBUG} -eq 1 ]
     then
-        nohup ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 2>&1 &
+        ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 2>&1
     else
-        nohup ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 1>/dev/null 2>&1 &
+        ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 1>/dev/null 2>&1
     fi
     echo "    exporting genesis file : "
     $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 12 &
