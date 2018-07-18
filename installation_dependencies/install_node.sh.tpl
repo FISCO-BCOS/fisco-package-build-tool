@@ -299,6 +299,13 @@ function install()
         
         if [ $i -eq 0 ];then
             cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* $DEPENENCIES_JTOOL_DIR/conf/  #ca info copy
+            if [ $g_is_genesis_host -eq 1 ];then
+                cp $DEPENENCIES_DIR/tpl_dir/empty_bootstrapnodes.json $buildPWD/nodedir${Idx[$index]}/fisco-data/bootstrapnodes.json >/dev/null 2>&1
+            else
+                cp $DEPENENCIES_DIR/bootstrapnodes.json $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+            fi
+        else    
+            cp $DEPENENCIES_DIR/bootstrapnodes.json $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
         fi
 
         #cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/network.rlp $buildPWD/nodedir${Idx[$index]}/fisco-data/
@@ -306,7 +313,7 @@ function install()
         #cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/datakey $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
         cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* $buildPWD/nodedir${Idx[$index]}/fisco-data/  #ca info copy
         cp $DEPENDENCIES_RLP_DIR/cryptomod.json $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
-        cp $DEPENENCIES_DIR/bootstrapnodes.json $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+        # cp $DEPENENCIES_DIR/bootstrapnodes.json $buildPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
         cp $KEYSTORE_FILE_DIR/*.json $buildPWD/nodedir${Idx[$index]}/keystore/ >/dev/null 2>&1
 
         cd $buildPWD/nodedir${Idx[$index]}/fisco-data/
