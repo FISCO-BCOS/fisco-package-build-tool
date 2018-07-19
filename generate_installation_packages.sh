@@ -589,8 +589,8 @@ function deploy_system_contract_for_initialization()
         ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 1>/dev/null 2>&1
     fi
     echo "    exporting genesis file : "
-    $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 12 &
-    sleep 12
+    $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 2 &
+    sleep 3
 
     cd $installPWD
 
@@ -867,7 +867,7 @@ function main()
     fi
 
     echo
-    print_dash
+    #print_dash
 
     echo "    Building end!"
     return 0
