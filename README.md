@@ -578,16 +578,24 @@ INFO|2018-07-10 10:49:41:914|+++++++++++++++++++++++++++ Generating seal on2448f
 INFO|2018-07-10 1
 ```
 
-###### 5.2.2  扩容节点为docker节点.  
-依次执行docker目录下的register_nodeIDX.sh脚本, 然后验证节点是否注册成功.
+###### 5.2.2  扩容节点为docker节点. 
+
+###### 5.2.2.1  扩容操作
+- 依次执行docker目录下的register_nodeIDX.sh脚本, 然后验证节点是否注册成功.
 ```
  tail -f nodedir0/log/log_2018071012.log  | egrep "Generating seal"
 INFO|2018-07-10 12:28:25:021|+++++++++++++++++++++++++++ Generating seal one7fa5b0ccfcf71fb4c3e9dde748135ae5899969642b7fd1d614a8b0bcee9401d#5tx:0,maxtx:0,tq.num=0time:1531225705021
 INFO|2018-07-10 12:28:30:056|+++++++++++++++++++++++++++ Generating seal on85110b70107ef89c6fc50c5c6ab05ca91815a22ec90495396364619776c9582c#5tx:0,maxtx:0,tq.num=0time:1531225710056
 INFO|2018-07-10 12:28:35:095|+++++++++++++++++++++++++++ Generating seal on2d4b5cbedde32e177c6e675f56db80ec36a68fdfe15775fe21b78dea1ed51eb1#5tx:0,maxtx:0,tq.num=0time:1531225715095
 ```
-每个节点注册成功之后再继续注册下一个.
+###### 5.2.2.1  删除节点  
+- 需要删除某个节点时, 执行对应的目录下的unregister_nodeIDX.sh脚本即可.
+```
+$ unregister_node0.sh
+```
+然后使用node_manager.sh all查看对应的节点是否已经从节点管理合约删除。
 
+###### 5.2.2  扩容节点为docker节点.
 
 # <a name="证书分配" id="ca-manager">附录2. 证书分配</a>
 #### 1. 默认的分配机制  
