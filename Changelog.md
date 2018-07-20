@@ -12,16 +12,20 @@
 2. 文档更新.  
 3. 新的连接管理导致的证书管理机制修改, 每个节点证书在构建安装包过程中生成.  
 
+### V1.1.1 (2018-07-09)
+* Update
+1. 适配FISCO-BCOS v1.3.1版本。
+2. 构建过程中, 生成god账号过程使用fisco-bcos --newaccount命令, 不再使用nodejs命令, 加快生成速度。
+
 ### V1.2.0 (2018-07-04) 
 * Update:
 1. 支持构建docker环境的搭建. 
 2. 提供CA证书拓展机制, 可以不再使用FISCO-BCOS的内置证书分配机制. 
-3. 简化搭建环境的步骤, 构建新链时, 所有节点均被注册到节点管理合约, 可以省略注册流程, 扩容时才需将新节点信息注册到节点管理合约. 
-4. installation_config.sh中添加IS_BUILD_FOR_DOCKER、DOCKER_REPOSITORY、DOCKER_VERSION、IS_CA_EXT_MODE配置, 作用请参考使用手册. 
-5. 删除identity type、crypto mode、super key这几个配置. 
-identity type用来标记是否是出块节点, 在新版本中, 注册到管理合约的节点默认都是出块节点, 能够使用有效证书接入的节点都是观察节点(只同步块数据, 不出块). 
-crypto mode用来标记落盘加密, 这个在后续中会添加用户指引如何使用该功能. 
-6. 减少过程中不必要的nodejs环境搭建, 加快构建流程. 比如： 创建god账号信息使用fisco-bcos --newaccount内置的命令, 不再使用nodejs工具.
+3. 添加FISCO_BCOS_VERSION配置, 用来配置需要部署的fisco-bcos版本, 如果本地版本不符合则重新拉取代码编译更新.  
+4. 简化搭建环境的步骤, 构建新链时, 所有记账节点均被注册到节点管理合约, 可以省略注册流程, 扩容或者观察节点需要转换为记账节点时才需将新节点信息注册到节点管理合约. 
+5. installation_config.sh中添加IS_BUILD_FOR_DOCKER、DOCKER_REPOSITORY、DOCKER_VERSION、IS_CA_EXT_MODE配置, 作用请参考使用手册. 
+6. 删除crypto mode、super key这几个配置：crypto mode用来标记落盘加密, 这个在后续中会添加用户指引如何使用该功能. 
+7. 添加操作系统版本的校验, 目前支持的操作版本为CentOS 7.2+ 、Ubuntu 16.04+ 、Oracle Linux Server 7.4+.
 7. JDK的依赖版本由JDK 1.8改为OracleJDK 1.8, 内附下载地址.  
 8. 添加openssl版本的检测.
 9. 添加expand流程jdk、openssl版本的检测.
