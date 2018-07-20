@@ -351,18 +351,24 @@ function install_build()
         mkdir -p $current_node_dir/log/
         mkdir -p $current_node_dir/keystore/
         mkdir -p $current_node_dir/fisco-data/
-        
+
         if [ $i -eq 0 ];then
             #copy web3sdk 
             cp -r $DEPENENCIES_WEB3SDK_DIR ${buildPWD}
-            #dos2unix ${buildPWD}/web3sdk/bin/web3sdk
             sudo chmod a+x ${buildPWD}/web3sdk/bin/web3sdk
             cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* ${buildPWD}/web3sdk/conf/ >/dev/null 2>&1 #ca info copy
+            if [ $g_is_genesis_host -eq 1 ];then
+                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json ${current_node_dir}/fisco-data/bootstrapnodes.json >/dev/null 2>&1
+            else
+                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
+            fi
+        else    
+            cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
         fi
 
         #copy node ca
         cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* ${current_node_dir}/fisco-data/
-        cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
+        # cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
 
         nodeid=$(cat ${current_node_dir}/fisco-data/node.nodeid)
         echo "node id is "$nodeid

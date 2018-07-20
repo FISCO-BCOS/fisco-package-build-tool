@@ -4,6 +4,7 @@
 FISCO_BCOS_GIT="https://github.com/FISCO-BCOS/FISCO-BCOS.git"
 #local FISCO BCOS path, if FICSO BSOC is not exist in the path, pull it from the github.
 FISCO_BCOS_LOCAL_PATH="../"
+FISCO_BCOS_VERSION="1.3.1"
 
 # default config for temp block node, if the port already exist, please change the following config.
 P2P_PORT_FOR_TEMP_NODE=30313
