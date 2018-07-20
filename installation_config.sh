@@ -4,6 +4,7 @@
 FISCO_BCOS_GIT="https://github.com/FISCO-BCOS/FISCO-BCOS.git"
 #local FISCO BCOS path, if FICSO BSOC is not exist in the path, pull it from the github.
 FISCO_BCOS_LOCAL_PATH="../"
+#FISCO BCOS version need
 FISCO_BCOS_VERSION="1.3.1"
 
 # default config for temp block node, if the port already exist, please change the following config.
@@ -13,7 +14,7 @@ CHANNEL_PORT_FOR_TEMP_NODE=8831
 
 ##config for docker generation
 #if build docker install
-IS_BUILD_FOR_DOCKER=0
+IS_BUILD_FOR_DOCKER=1
 #fisco-bcos docker repository, default "docker.io/fiscoorg/fiscobcos"
 DOCKER_REPOSITORY="fiscoorg/fisco-octo"
 #fisco-bcos docker version, default "latest"
@@ -28,7 +29,7 @@ IS_CA_EXT_MODE=0
 # field 1 : listennetworkip
 # field 2 : node number on this host
 # filed 3 : agency info
-weth_host_0=("127.0.0.1" "0.0.0.0" "5" "agent_0")
+weth_host_0=("127.0.0.1" "0.0.0.0" "4" "agent_0")
 
 MAIN_ARRAY=(
 weth_host_0[@]
