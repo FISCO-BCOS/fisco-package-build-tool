@@ -29,3 +29,4 @@
 7. JDK的依赖版本由JDK 1.8改为OracleJDK 1.8, 内附下载地址.  
 8. 添加openssl版本的检测.
 9. 添加expand流程jdk、openssl版本的检测.
+10. 创世块节点的bootstrapnodes.json中不再添加自己的p2p链接信息.
