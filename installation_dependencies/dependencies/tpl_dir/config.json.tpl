@@ -10,7 +10,6 @@
     "keystoredir":"${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}",
     "datadir":"${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}",
     "networkid":"${CONFIG_JSON_NETWORK_ID_TPL}",
-    "vm":"interpreter",
     "logverbosity":"4",
     "coverlog":"OFF",
     "eventlog":"ON",

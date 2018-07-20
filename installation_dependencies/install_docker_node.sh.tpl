@@ -45,6 +45,16 @@ function generate_registersh_func()
     return 0
 }
 
+# build unregister_node*.sh
+function generate_unregistersh_func()
+{
+    registersh="#!/bin/bash
+    sudo docker exec fisco-node$index"_"${rpcport[$index]} bash -c \"source /etc/profile && cd /fisco-bcos && bash node_manager.sh cancelNode /fisco-bcos/node/fisco-data/node.json\"
+    "
+    echo "$registersh"
+    return 0
+}
+
 # build start_node*.sh
 function generate_startsh_func()
 {
@@ -190,9 +200,19 @@ function install()
         mkdir -p $dockerPWD/nodedir${Idx[$index]}/web3sdk_ca/
         #mkdir -p $dockerPWD/nodedir${Idx[$index]}/dependencies/
 
+        if [ $i -eq 0 ];then
+            if [ $g_is_genesis_host -eq 1 ];then
+                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/bootstrapnodes.json >/dev/null 2>&1
+            else
+                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+            fi
+        else    
+            cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+        fi
+
         cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* $dockerPWD/nodedir${Idx[$index]}/web3sdk_ca/
         cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* $dockerPWD/nodedir${Idx[$index]}/fisco-data/
-        cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+        # cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
         cp $DEPENENCIES_FOLLOW_DIR/genesis.json $dockerPWD/nodedir${Idx[$index]}/ >/dev/null 2>&1
 
         # cp -r $DEPENENCIES_DIR/node_action_info_dir $dockerPWD/node${Idx[$index]}/dependencies/
@@ -236,9 +256,13 @@ function install()
         echo "${generate_sh}" > $dockerPWD/nodedir${Idx[$index]}/start.sh
         sudo chmod +x $dockerPWD/nodedir${Idx[$index]}/start.sh
 	
-	register_sh=`generate_registersh_func`
+	    register_sh=`generate_registersh_func`
         echo "${register_sh}" > $dockerPWD/register_node${Idx[$index]}.sh
-	sudo chmod +x $dockerPWD/register_node${Idx[$index]}.sh
+	    sudo chmod +x $dockerPWD/register_node${Idx[$index]}.sh
+
+        unregister_sh=`generate_unregistersh_func`
+        echo "${unregister_sh}" > $dockerPWD/unregister_node${Idx[$index]}.sh
+	    sudo chmod +x $dockerPWD/unregister_node${Idx[$index]}.sh
 
         i=$(($i+1))
     done
