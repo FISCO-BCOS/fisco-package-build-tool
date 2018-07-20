@@ -26,6 +26,7 @@ INSTALLATION_DEPENENCIES_EXT_DIR=$installPWD/$INSTALLATION_DEPENENCIES_EXT_DIR_N
 
 source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/utils.sh
 source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/public_config.sh
+source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/os_version_check.sh
 
 #private config
 source $PWD/installation_config.sh
@@ -62,19 +63,41 @@ function check_openssl()
     return 2
 }
 
-#fisco-bcos 1.3.0+ need
+#fisco-bcos version check, At least 1.3.0 is required
 function fisco_bcos_version_check()
 {
-    FISCO_VERSION=$(${TARGET_ETH_PATH} --version 2>&1 | sed -n ';s/.*FISCO-BCOS version  \(.*\)\.\(.*\)\.\([1-9]*\).*/\1\2\3/p;')
-    #openssl 1.0.2+
-    if [ $FISCO_VERSION -ge 130 ];then
+    FISCO_VERSION=$(${TARGET_ETH_PATH} --version 2>&1 | egrep "FISCO-BCOS *version" | awk '{print $3}')
+    
+    # FISCO BCOS gm version not support
+    if  echo "$FISCO_VERSION" | egrep "gm" ; then
+        echo "FISCO BCOS gm version not support yet."
+        return 1
+    fi 
+
+    # fisco bcos 1.3.0+
+    ver=$(echo "$FISCO_VERSION" | awk -F . '{print $1$2}')
+    if [ $ver -lt 13 ];then
+        echo "At least FISCO-BCOS 1.3.0 is required."
+        echo "now fisco-bcos is $FISCO_VERSION"
+        return 2
+    fi
+
+    REQUIRE_VERSION=$1;
+    #do not need specified version
+    if [ -z "$REQUIRE_VERSION" ];then
         return 0
     fi
 
-    echo "fisco-bcos 1.3.0+ be requied."
-    echo "now fisco-bcos is "
-    echo `${TARGET_ETH_PATH} --version`
-    return 2
+    # version compare
+    ver0=$(echo "$FISCO_VERSION" | awk -F . '{print $1"."$2"."$3}')
+    if [ "$ver0" = "$REQUIRE_VERSION" ];then
+        return 0
+    fi
+
+    echo "REQUIRE_VERSION is $REQUIRE_VERSION"
+    echo "now fisco bcos version is $FISCO_VERSION"
+
+    return 3
 }
 
 #Oracle JDK 1.8 be requied.
@@ -87,7 +110,7 @@ function check_java_env()
     fi
 
     #JAVA version
-    JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*"/\1\2/p;')
+    JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*".*/\1\2/p;')
     #Oracle JDK 1.8
     if [ $JAVA_VER -ge 18 ] && [[ $(java -version 2>&1 | grep "TM") ]];then
         return 0
@@ -623,12 +646,12 @@ function check_config_validation()
     for ((i=0; i<g_host_config_num; i++))
     do
         declare sub_arr=(${!MAIN_ARRAY[i]})
-        public_ip=${sub_arr[0]}
-        private_ip=${sub_arr[1]}
-        node_num_per_host=${sub_arr[2]}
-        if [ -z "$public_ip" ] || [ -z "$private_ip" ] || [ -z "$node_num_per_host" ]
+        local p2pnetworkip=${sub_arr[0]}
+        local listenip=${sub_arr[1]}
+        local node_num_per_host=${sub_arr[2]}
+        if [ -z "$p2pnetworkip" ] || [ -z "$listenip" ] || [ -z "$node_num_per_host" ]
         then
-            echo "config invalid, public_ip: ""$public_ip, private_ip: $private_ip, node_num_per_host: $node_num_per_host"
+            echo "config invalid, p2pnetworkip: ""$p2pnetworkip, listenip: $listenip, node_num_per_host: $node_num_per_host"
             return 2
         fi
 
@@ -672,20 +695,18 @@ function install_dependencies()
 
 function build_fisco_bcos()
 {
-    cd FISCO-BCOS
+    #cd FISCO-BCOS
 
     #install deps
-    sudo chmod +x scripts/install_deps.sh
-    ./scripts/install_deps.sh
+    sudo bash scripts/install_deps.sh
 
     #build bcos
-    mkdir -p build
-    cd build/
-
+    sudo mkdir -p build
+    cd build
     if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-    cmake -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
+    sudo cmake -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
     else
-    cmake3 -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
+    sudo cmake3 -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
     fi
 
     sudo make
@@ -698,40 +719,46 @@ function clone_and_build_fisco()
 {
     install_dependencies
     
+    require_version=${FISCO_BCOS_VERSION}
     #fisco-bcos already exist
     if [ -f ${TARGET_ETH_PATH} ]; then
-        return 0
+        #check TARGET_ETH_PATH version
+        fisco_bcos_version_check ${require_version}
+        if [ $? -eq 0 ];then
+            return 0
+        fi
     fi
 
-    git_path=$FISCO_BCOS_GIT
-    if [ -z  $FISCO_BCOS_GIT ];then
-        git_path="https://github.com/FISCO-BCOS/FISCO-BCOS.git"
-    fi
-
-    echo "git clone path = "$git_path
-
+    github_path="https://github.com/FISCO-BCOS/FISCO-BCOS.git"
     fisco_local_path=$FISCO_BCOS_LOCAL_PATH
-    if [ -z $fisco_local_path ];then
+    if [ -z ${fisco_local_path} ];then
         fisco_local_path=$installPWD/../  #Parent Directory
-    fi
+    fi    
 
-    echo "fisco local path = "$fisco_local_path
-    
     cd $fisco_local_path
-    #git clone FISCO-BCOS
-    if [ ! -d FISCO-BCOS  ];then
-        git clone $git_path
+    git clone $github_path FISCO-BCOS
+    if [ ! -d FISCO-BCOS ];then
+        echo "git clone FISCO-BCOS failed."
+        return 1
     fi
 
-    if [ ! -d FISCO-BCOS ];then
-        echo "FISCO-BCOS directory is not exist, maybe git clone failed, unable to compile and will exit!"
-        return 1
+    cd FISCO-BCOS
+    git pull origin
+    git checkout "v"${require_version}
+    if [ $? -ne 0 ];then
+        echo "git checkout ${require_version} failed, maybe ${require_version} not exist."
+        return 2
     fi
 
     build_fisco_bcos
 
+    #maybe compile failed
     if [ ! -f ${TARGET_ETH_PATH} ]; then
 	    return 1
+    else
+        #check TARGET_ETH_PATH version
+        fisco_bcos_version_check ${require_version}
+        return $?
     fi
 }
 
@@ -778,18 +805,18 @@ function main()
         return 2
     fi
 
-    #clone from github for fisco-bcos source
-    #check if need compile fisco-bcos
-    clone_and_build_fisco
-    if [ $? -ne 0 ];then
-       return 2
-    fi
-
     #init all global variable
     init_global_variable
     if [ $? -ne 0 ]
     then
         return $ret
+    fi
+
+    #clone from github for fisco-bcos source
+    #check if need compile fisco-bcos
+    clone_and_build_fisco
+    if [ $? -ne 0 ];then
+       return $?
     fi
 
     print_dash
@@ -867,7 +894,7 @@ function main()
     fi
 
     echo
-    #print_dash
+    print_dash
 
     echo "    Building end!"
     return 0
