@@ -82,6 +82,11 @@ function fisco_bcos_version_check()
         return 2
     fi
 
+    #build docker env, fisco-bcos is used by temp node , at least 1.3.0 is ok.
+    if [ ! -z ${IS_BUILD_FOR_DOCKER} ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
+        return 0
+    fi
+
     REQUIRE_VERSION=$1;
     #do not need specified version
     if [ -z "$REQUIRE_VERSION" ];then
@@ -261,17 +266,27 @@ function create_node_ca()
     if [ ! -d $agency ]; then
         echo "$agency dir is not exist, maybe \" bash agency.sh $agency\" failed."
         return 2
-    fi
+    fi    
 
     bash node.sh $agency $node 1>/dev/null #ca for node
     if [ ! -d $agency/$node ]; then
         echo "$agency/$node dir is not exist, maybe \" bash node.sh $agency $node \" failed."
         return 2
     fi
+	
+    if [ ! -f $agency/$node/node.key ];then
+        echo "$agency/$node/node.key is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
+        return 2
+    fi
 
     bash sdk.sh $agency "sdk" 1>/dev/null #ca for sdk
     if [ ! -d $agency/sdk ]; then
         echo "$agency/sdk dir is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
+        return 2
+    fi
+
+    if [ ! -f $agency/sdk/client.keystore ];then
+        echo "$agency/sdk/client.keystore is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
         return 2
     fi
 
@@ -743,13 +758,14 @@ function clone_and_build_fisco()
     fi
 
     cd FISCO-BCOS
-    git pull origin
+    git fetch origin
     git checkout "v"${require_version}
     if [ $? -ne 0 ];then
         echo "git checkout ${require_version} failed, maybe ${require_version} not exist."
         return 2
     fi
 
+    echo "now branch is "$(git branch)
     build_fisco_bcos
 
     #maybe compile failed
