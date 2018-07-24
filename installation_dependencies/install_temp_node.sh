@@ -363,11 +363,11 @@ function install()
     MYVARS='${IDX_TPL}:${PORT_TPL}:${IDENTITYTYPE_TPL}:${PEERIP_TPL}:${GODMINERSTART_TPL}:${GODMINEREND_TPL}:${NODEID_TPL}:${NODEDESC_TPL}:${AGENCYINFO_TPL}'
     envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/godminer.json.tpl > ${current_node_dir}/godminer.json
 
-    sed -i "s/${DEFAULT_SYSTEM_CONTRACT_ADDRESS}/$syaddress/g" ${current_web3sdk}/conf/applicationContext.xml
+    sed -i.bu "s/${DEFAULT_SYSTEM_CONTRACT_ADDRESS}/$syaddress/g" ${current_web3sdk}/conf/applicationContext.xml
     echo "system contract deployed ,syaddress => "${syaddress}
     
     #replace system contract address
-    sed -i "s/$DEFAULT_SYSTEM_CONTRACT_ADDRESS/$syaddress/g" ${current_node_dir}/config.json
+    sed -i.bu "s/$DEFAULT_SYSTEM_CONTRACT_ADDRESS/$syaddress/g" ${current_node_dir}/config.json
 
     #sleep 6
     bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
