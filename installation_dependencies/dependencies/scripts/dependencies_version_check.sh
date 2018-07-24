@@ -25,7 +25,7 @@ function openssl_version_check()
 {
     type openssl >/dev/null 2>&1
     if [ $? -ne 0 ];then
-        { echo >&2 "OpenSSL is not installed, OpenSSL 1.0.2 be requied."; exit 1; }
+        { echo >&2 "ERROR - OpenSSL is not installed, OpenSSL 1.0.2 be requied."; exit 1; }
     fi
 
     #openssl version
@@ -36,5 +36,5 @@ function openssl_version_check()
         return 
     fi
 
-    { echo >&2 "OpenSSL 1.0.2 be requied , now OpenSSL version is "`openssl version`; exit 1; }
+    { echo >&2 "ERROR - OpenSSL 1.0.2 be requied , now OpenSSL version is "`openssl version`; exit 1; }
 }

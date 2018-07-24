@@ -203,8 +203,8 @@ function install_dependencies()
         sudo apt-get -y install uuid-dev
         #sudo apt-get -y install dos2unix
 
-        sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O /usr/local/bin/fisco-solc
-        sudo chmod a+x /usr/local/bin/fisco-solc
+        #sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O /usr/local/bin/fisco-solc
+        #sudo chmod a+x /usr/local/bin/fisco-solc
 
     else
         sudo yum -y install bc
@@ -218,8 +218,8 @@ function install_dependencies()
         sudo yum -y install libuuid-devel
         #sudo yum -y install dos2unix
 
-        sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O /usr/local/bin/fisco-solc
-        sudo chmod a+x /usr/local/bin/fisco-solc
+        #sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O /usr/local/bin/fisco-solc
+        #sudo chmod a+x /usr/local/bin/fisco-solc
     fi
 }
 
@@ -423,6 +423,10 @@ function install_build()
     cp $DEPENENCIES_FISCO_DIR/fisco-bcos $current_node_dir_base
     #chmod a+x fisco-bcos
     sudo chmod a+x $current_node_dir_base/fisco-bcos
+
+    # fisco-solc
+    sudo cp $DEPENENCIES_DIR/solc/fisco-solc /usr/local/bin/
+    sudo chmod a+x /usr/local/bin/fisco-solc
 
     #web3sdk config
     export WEB3SDK_CONFIG_IP=${listenip[0]}
