@@ -27,6 +27,7 @@ INSTALLATION_DEPENENCIES_EXT_DIR=$installPWD/$INSTALLATION_DEPENENCIES_EXT_DIR_N
 source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/utils.sh
 source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/public_config.sh
 source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/os_version_check.sh
+source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/dependencies_version_check.sh
 
 #private config
 source $PWD/installation_config.sh
@@ -66,8 +67,10 @@ function check_openssl()
 #fisco-bcos version check, At least 1.3.0 is required
 function fisco_bcos_version_check()
 {
+    REQUIRE_VERSION=$1;
+    # config fisco-bcos version check
+
     FISCO_VERSION=$(${TARGET_ETH_PATH} --version 2>&1 | egrep "FISCO-BCOS *version" | awk '{print $3}')
-    
     # FISCO BCOS gm version not support
     if  echo "$FISCO_VERSION" | egrep "gm" ; then
         echo "FISCO BCOS gm version not support yet."
@@ -82,12 +85,6 @@ function fisco_bcos_version_check()
         return 2
     fi
 
-    #build docker env, fisco-bcos is used by temp node , at least 1.3.0 is ok.
-    if [ ! -z ${IS_BUILD_FOR_DOCKER} ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
-        return 0
-    fi
-
-    REQUIRE_VERSION=$1;
     #do not need specified version
     if [ -z "$REQUIRE_VERSION" ];then
         return 0
@@ -95,7 +92,7 @@ function fisco_bcos_version_check()
 
     # version compare
     ver0=$(echo "$FISCO_VERSION" | awk -F . '{print $1"."$2"."$3}')
-    if [ "$ver0" = "$REQUIRE_VERSION" ];then
+    if [ "v$ver0" = "$REQUIRE_VERSION" ] || [ "V$ver0" = "$REQUIRE_VERSION" ];then
         return 0
     fi
 
@@ -266,27 +263,17 @@ function create_node_ca()
     if [ ! -d $agency ]; then
         echo "$agency dir is not exist, maybe \" bash agency.sh $agency\" failed."
         return 2
-    fi    
+    fi
 
     bash node.sh $agency $node 1>/dev/null #ca for node
     if [ ! -d $agency/$node ]; then
         echo "$agency/$node dir is not exist, maybe \" bash node.sh $agency $node \" failed."
         return 2
     fi
-	
-    if [ ! -f $agency/$node/node.key ];then
-        echo "$agency/$node/node.key is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
-        return 2
-    fi
 
     bash sdk.sh $agency "sdk" 1>/dev/null #ca for sdk
     if [ ! -d $agency/sdk ]; then
         echo "$agency/sdk dir is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
-        return 2
-    fi
-
-    if [ ! -f $agency/sdk/client.keystore ];then
-        echo "$agency/sdk/client.keystore is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
         return 2
     fi
 
@@ -673,7 +660,7 @@ function check_config_validation()
         local agent=${sub_arr[3]}
         if [ -z "$agent" ]; then
             echo "agent info cannot be null empty"
-            return 4
+            return 3
         fi
     done
 
@@ -735,6 +722,7 @@ function clone_and_build_fisco()
     install_dependencies
     
     require_version=${FISCO_BCOS_VERSION}
+
     #fisco-bcos already exist
     if [ -f ${TARGET_ETH_PATH} ]; then
         #check TARGET_ETH_PATH version
@@ -758,14 +746,13 @@ function clone_and_build_fisco()
     fi
 
     cd FISCO-BCOS
-    git fetch origin
-    git checkout "v"${require_version}
+    git pull origin
+    git checkout ${require_version}
     if [ $? -ne 0 ];then
         echo "git checkout ${require_version} failed, maybe ${require_version} not exist."
         return 2
     fi
 
-    echo "now branch is "$(git branch)
     build_fisco_bcos
 
     #maybe compile failed
@@ -786,46 +773,46 @@ function version()
     echo "                                                     "
 }
 
+# version check
+function dependencies_check()
+{
+    # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
+    os_version_check
+    # java => Oracle JDK 1.8
+    java_version_check
+    # openssl => OpenSSL 1.0.2
+    openssl_version_check
+
+    # add more check here
+}
+
 function main()
 {
-    #show tool version info
+    # version print
     version
 
-    #sudo permission check
+    # version check
+    dependencies_check
+
+    # sudo permission check
     request_sudo_permission
-    ret=$?
-    if [ $ret -ne 0 ]
+    if [ $? -ne 0 ]
     then
-        return $ret
+        return $?
     fi
 
-    #check config valid
+    # check config valid
     check_config_validation
-    ret=$?
-    if [ $ret -ne 0 ]
+    if [ $? -ne 0 ]
     then
-        return $ret
+        return $?
     fi
 
-    #check java enviroment, Oracle JDK 1.8 should be require
-    check_java_env
-    ret=$?
-    if [  $ret -ne 0 ] ; then
-        return 2
-    fi
-
-    #check openssl enviroment, openssl 1.0.2+ should be require
-    check_openssl
-    ret=$?
-    if [  $ret -ne 0 ] ; then
-        return 2
-    fi
-
-    #init all global variable
+    # init all global variable
     init_global_variable
     if [ $? -ne 0 ]
     then
-        return $ret
+        return $?
     fi
 
     #clone from github for fisco-bcos source
