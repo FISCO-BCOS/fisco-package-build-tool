@@ -424,6 +424,8 @@ function install_build()
     #chmod a+x fisco-bcos
     sudo chmod a+x $current_node_dir_base/fisco-bcos
 
+    print_install_result "fisco-solc"
+
     # fisco-solc
     sudo cp $DEPENENCIES_DIR/solc/fisco-solc /usr/local/bin/
     sudo chmod a+x /usr/local/bin/fisco-solc

@@ -1,19 +1,21 @@
 #!/bin/bash
 
-#set -e
+set -e
+
+function check_if_install()
+{
+    type $1 >/dev/null 2>&1
+    if [ $? -ne 0 ];then
+        { echo >&2 "ERROR - $1 is not installed."; exit 1; }
+    fi
+}
 
 #Oracle JDK 1.8 be requied.
 function java_version_check()
 {
-    type java >/dev/null 2>&1
-    if [ $? -ne 0 ];then
-        { echo >&2 "ERROR - java is not installed, Oracle JDK 1.8 be requied."; exit 1; }
-    fi
+    check_if_install java
 
-    type keytool >/dev/null 2>&1
-    if [ $? -ne 0 ];then
-        { echo >&2 "ERROR - keytool is not installed, Oracle JDK 1.8 be requied."; exit 1; }
-    fi
+    check_if_install keytool
 
     #JAVA version
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*".*/\1\2/p;')
@@ -42,10 +44,7 @@ function java_version_check()
 #openssl 1.0.2 be requied.
 function openssl_version_check()
 {
-    type openssl >/dev/null 2>&1
-    if [ $? -ne 0 ];then
-        { echo >&2 "ERROR - OpenSSL is not installed, OpenSSL 1.0.2 be requied."; exit 1; }
-    fi
+    check_if_install openssl
 
     #openssl version
     OPENSSL_VER=$(openssl version 2>&1 | sed -n ';s/.*OpenSSL \(.*\)\.\(.*\)\.\([0-9]*\).*/\1\2\3/p;')
@@ -60,4 +59,10 @@ function openssl_version_check()
     fi
 
     { echo >&2 "ERROR - OpenSSL 1.0.2 be requied , now OpenSSL version is "`openssl version`; exit 1; }
+}
+
+#check if git is installed
+function git_check()
+{
+    check_if_install git
 }
