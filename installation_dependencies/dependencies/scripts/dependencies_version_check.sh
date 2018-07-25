@@ -17,6 +17,11 @@ function java_version_check()
 
     #JAVA version
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*".*/\1\2/p;')
+
+    if [ -z "$JAVA_VER" ];then
+        { echo >&2 "ERROR - failed to get java version, version is "`java -version`; exit 1; }
+    fi    
+
     #Oracle JDK 1.8
     if [ $JAVA_VER -eq 18 ] && [[ $(java -version 2>&1 | grep "TM") ]];then
         #is java and keytool match ?
@@ -44,6 +49,10 @@ function openssl_version_check()
 
     #openssl version
     OPENSSL_VER=$(openssl version 2>&1 | sed -n ';s/.*OpenSSL \(.*\)\.\(.*\)\.\([0-9]*\).*/\1\2\3/p;')
+
+    if [ -z "$OPENSSL_VER" ];then
+        { echo >&2 "ERROR - failed to get openssl version, version is "`openssl version`; exit 1; }
+    fi
 
     #openssl 1.0.2
     if [ $OPENSSL_VER -eq 102 ];then
