@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -e
+set -e
 
 IS_DEBUG=0
 function toggle_debug()

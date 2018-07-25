@@ -1,4 +1,5 @@
 #!/bin/bash
+set +e
 
 #check if the port is used
 function check_port() 
