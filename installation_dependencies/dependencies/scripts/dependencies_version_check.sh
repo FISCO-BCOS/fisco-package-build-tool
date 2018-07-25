@@ -10,11 +10,25 @@ function java_version_check()
         { echo >&2 "ERROR - java is not installed, Oracle JDK 1.8 be requied."; exit 1; }
     fi
 
+    type keytool >/dev/null 2>&1
+    if [ $? -ne 0 ];then
+        { echo >&2 "ERROR - keytool is not installed, Oracle JDK 1.8 be requied."; exit 1; }
+    fi
+
     #JAVA version
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*".*/\1\2/p;')
     #Oracle JDK 1.8
     if [ $JAVA_VER -eq 18 ] && [[ $(java -version 2>&1 | grep "TM") ]];then
-        return 
+        #is java and keytool match ?
+        JAVA_PATH=$(dirname `which java`)
+        KEYTOOL_PATH=$(dirname `which keytool`)
+        if [ "$JAVA_PATH" = "$KEYTOOL_PATH" ];then
+            echo " java path => "${JAVA_PATH}
+            echo " keytool path => "${KEYTOOL_PATH}
+            return
+        fi
+
+        { echo >&2 "ERROR - java and keytool is not match, java is ${JAVA_PATH} , keytool is ${KEYTOOL_PATH}"; exit 1; }
     fi
 
     { echo >&2 "ERROR - Oracle JDK 1.8 be requied, now JDK is "`java -version`; exit 1; }
