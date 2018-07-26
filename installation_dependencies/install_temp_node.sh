@@ -19,7 +19,7 @@ function toggle_debug()
 installPWD=$PWD
 source $installPWD/dependencies/scripts/utils.sh
 source $installPWD/dependencies/scripts/public_config.sh
-source $installPWD/dependencies/scripts/dependencies_version_check.sh
+source $installPWD/dependencies/scripts/dependencies_check.sh
 
 #check_param $1 $2
 source $DEPENENCIES_FOLLOW_DIR/config.sh

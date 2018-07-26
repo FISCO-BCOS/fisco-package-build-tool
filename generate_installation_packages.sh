@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 IS_DEBUG=0
 function toggle_debug()
@@ -23,7 +23,7 @@ source $installPWD/installation_dependencies/dependencies/scripts/utils.sh
 source $installPWD/installation_dependencies/dependencies/scripts/public_config.sh
 source $installPWD/installation_dependencies/dependencies/scripts/os_version_check.sh
 source $installPWD/installation_dependencies/dependencies/scripts/dependencies_install.sh
-source $installPWD/installation_dependencies/dependencies/scripts/dependencies_version_check.sh
+source $installPWD/installation_dependencies/dependencies/scripts/dependencies_check.sh
 
 #private config
 source $installPWD/installation_config.sh
@@ -694,6 +694,9 @@ function main()
 
     # sudo permission check
     request_sudo_permission
+
+    # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
+    os_version_check
 
     # check config valid
     check_config_validation

@@ -8,7 +8,9 @@ installPWD=$PWD
 DEPENENCIES_DIR=$installPWD/dependencies
 source $DEPENENCIES_DIR/scripts/utils.sh
 source $DEPENENCIES_DIR/scripts/public_config.sh
+source $DEPENENCIES_DIR/scripts/os_version_check.sh
 source $DEPENENCIES_DIR/scripts/dependencies_install.sh
+source $DEPENENCIES_DIR/scripts/dependencies_check.sh
 
 source $DEPENENCIES_FOLLOW_DIR/config.sh
 g_is_genesis_host=$IS_GENESIS_HOST_TPL
@@ -282,6 +284,8 @@ function install_build()
     then
         return -1
     fi
+
+    os_version_check
 
     sudo chown -R $(whoami) $installPWD
 
