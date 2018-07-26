@@ -8,6 +8,7 @@ installPWD=$PWD
 DEPENENCIES_DIR=$installPWD/dependencies
 source $DEPENENCIES_DIR/scripts/utils.sh
 source $DEPENENCIES_DIR/scripts/public_config.sh
+source $DEPENENCIES_DIR/scripts/dependencies_install.sh
 
 source $DEPENENCIES_FOLLOW_DIR/config.sh
 g_is_genesis_host=$IS_GENESIS_HOST_TPL
@@ -186,43 +187,6 @@ function install_babel()
     return 0
 }
 
-#install dependency software
-function install_dependencies() 
-{
-    if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-        sudo apt-get -y install gettext
-        sudo apt-get -y install bc
-        sudo apt-get -y install wget
-        sudo apt-get -y install openssl
-        sudo apt-get -y install build-essential
-        sudo apt-get -y install libcurl4-openssl-dev libgmp-dev
-        sudo apt-get -y install libleveldb-dev  libmicrohttpd-dev
-        sudo apt-get -y install libminiupnpc-dev
-        sudo apt-get -y install libssl-dev libkrb5-dev
-        sudo apt-get -y install lsof
-        sudo apt-get -y install uuid-dev
-        #sudo apt-get -y install dos2unix
-
-        #sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O /usr/local/bin/fisco-solc
-        #sudo chmod a+x /usr/local/bin/fisco-solc
-
-    else
-        sudo yum -y install bc
-        sudo yum -y install gettext
-        sudo yum -y install wget
-        sudo yum -y install git gcc-c++
-        sudo yum -y install openssl openssl-devel
-        sudo yum -y install leveldb-devel curl-devel 
-        sudo yum -y install libmicrohttpd-devel gmp-devel 
-        sudo yum -y install lsof
-        sudo yum -y install libuuid-devel
-        #sudo yum -y install dos2unix
-
-        #sudo wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O /usr/local/bin/fisco-solc
-        #sudo chmod a+x /usr/local/bin/fisco-solc
-    fi
-}
-
 function nodejs_env_check()
 {
     echo "Checking nodejs enviroment beginning."
@@ -253,7 +217,7 @@ function nodejs_env_check()
     echo "Checking nodejs enviroment end."
 }
 
-function install_node_dependencies()
+function install_node()
 {
     #install nodejs related in the subcategory , if the user already install nodejs , nothing has effect.
     install_nodejs
@@ -336,7 +300,7 @@ function install_build()
 
     print_dash
 
-    install_dependencies
+    dependencies_install
 
     #mkdir node dir
     current_node_dir_base=${NODE_INSTALL_DIR}
@@ -444,7 +408,7 @@ function install_build()
     echo "    Installing fisco-bcos success!"
 
     #node js enviroment install
-    install_node_dependencies
+    install_node
 
     cp -r $DEPENENCIES_TOOL_DIR $buildPWD/
     cp -r $DEPENENCIES_SC_DIR $buildPWD/

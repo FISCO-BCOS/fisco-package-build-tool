@@ -17,20 +17,16 @@ function toggle_debug()
 #toggle_debug
 
 #public config
-UNDER_LINE_STR="_"
 installPWD=$PWD
-INSTALLATION_DEPENENCIES_LIB_DIR_NAME=installation_dependencies
-INSTALLATION_DEPENENCIES_EXT_DIR_NAME=ext
-INSTALLATION_DEPENENCIES_LIB_DIR=$installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME
-INSTALLATION_DEPENENCIES_EXT_DIR=$installPWD/$INSTALLATION_DEPENENCIES_EXT_DIR_NAME
 
-source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/utils.sh
-source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/public_config.sh
-source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/os_version_check.sh
-source $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/dependencies_version_check.sh
+source $installPWD/installation_dependencies/dependencies/scripts/utils.sh
+source $installPWD/installation_dependencies/dependencies/scripts/public_config.sh
+source $installPWD/installation_dependencies/dependencies/scripts/os_version_check.sh
+source $installPWD/installation_dependencies/dependencies/scripts/dependencies_install.sh
+source $installPWD/installation_dependencies/dependencies/scripts/dependencies_version_check.sh
 
 #private config
-source $PWD/installation_config.sh
+source $installPWD/installation_config.sh
 CACHE_DIR_PATH=$installation_build_dir/.cache_dir
 INITIALIZATION_DONE_FILE_PATH=$CACHE_DIR_PATH/initialization_done
 RPC_PORT_DEFAULT_VALUE=$(($RPC_PORT_FOR_TEMP_NODE+1))
@@ -40,29 +36,6 @@ PORT_DEFAULT_VALUE=$(($P2P_PORT_FOR_TEMP_NODE+1))
 TEMP_NODE_NAME="temp"
 TEMP_BUILD_DIR=$installation_build_dir/$TEMP_NODE_NAME/build
 TARGET_ETH_PATH=/usr/local/bin/fisco-bcos
-
-#openssl 1.0.2+ be requied.
-function check_openssl()
-{
-    type openssl >/dev/null 2>&1
-    if [ $? -ne 0 ];then
-        echo "openssl is not installed, OpenSSL 1.0.2+ be requied."
-        return 1
-    fi
-
-    #openssl version
-    OPENSSL_VER=$(openssl version 2>&1 | sed -n ';s/.*OpenSSL \(.*\)\.\(.*\)\.\([0-9]*\).*/\1\2\3/p;')
-
-    #openssl 1.0.2+
-    if [ $OPENSSL_VER -ge 102 ];then
-        return 0
-    fi
-
-    echo "openssl 1.0.2 be requied."
-    echo "now openssl is "
-    echo `openssl version`
-    return 2
-}
 
 #fisco-bcos version check, At least 1.3.0 is required
 function fisco_bcos_version_check()
@@ -102,28 +75,6 @@ function fisco_bcos_version_check()
     return 3
 }
 
-#Oracle JDK 1.8 be requied.
-function check_java_env()
-{
-    type java >/dev/null 2>&1
-    if [ $? -ne 0 ];then
-        echo "java is not installed, Oracle JDK 1.8 be requied."
-        return 1
-    fi
-
-    #JAVA version
-    JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*".*/\1\2/p;')
-    #Oracle JDK 1.8
-    if [ $JAVA_VER -ge 18 ] && [[ $(java -version 2>&1 | grep "TM") ]];then
-        return 0
-    fi
-
-    echo "Oracle JDK 1.8 be requied."
-    echo "now JDK is "
-    echo `java -version`
-    return 2
-} 
-
 # global variable
 function init_global_variable()
 {
@@ -148,11 +99,6 @@ function init_global_variable()
     else
         g_genesis_cert_dir_path=""
     fi
-}
-
-function replace_dot_with_underline()
-{
-    echo $1 | sed -e "s/\./_/g"
 }
 
 function get_node_dir_name()
@@ -432,7 +378,7 @@ function build_node_installation_package()
             rpc_port=$RPC_PORT_FOR_TEMP_NODE
             channel_port=$CHANNEL_PORT_FOR_TEMP_NODE
             p2p_port=$P2P_PORT_FOR_TEMP_NODE
-            node_desc="$public_ip"$UNDER_LINE_STR"temp"
+            node_desc="$public_ip""_temp"
 
             export HOST_IP=$public_ip
             export HOST_PORT=$p2p_port
@@ -444,7 +390,7 @@ function build_node_installation_package()
             rpc_port=$(($RPC_PORT_DEFAULT_VALUE+$node_index))
             channel_port=$(($CHANNEL_PORT_DEFAULT_VALUE+$node_index))
             p2p_port=$(($P2P_PORT_DEFAULT_VALUE+$node_index))
-            node_desc="$public_ip"$UNDER_LINE_STR"$node_index"
+            node_desc="$public_ip""_""$node_index"
 
             mkdir -p $installation_build_dir/$node_dir_name/dependencies/node_action_info_dir/
             current_node_action_info_file_path=$installation_build_dir/$node_dir_name/dependencies/node_action_info_dir/nodeactioninfo_"$public_ip_underline"_"$node_index".json
@@ -614,7 +560,7 @@ function deploy_system_contract_for_initialization()
         ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 1>/dev/null 2>&1
     fi
     echo "    exporting genesis file : "
-    $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 2 &
+    $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/scripts/percent_num_progress_bar.sh 2 &
     sleep 3
 
     cd $installPWD
@@ -667,38 +613,8 @@ function check_config_validation()
     return 0
 }
 
-
-#install dependency software
-function install_dependencies() 
-{
-    if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-        sudo apt-get -y install gettext
-        sudo apt-get -y install bc
-        sudo apt-get -y install cmake
-        sudo apt-get -y install git
-        sudo apt-get -y install openssl
-        sudo apt-get -y install build-essential libboost-all-dev
-        sudo apt-get -y install libcurl4-openssl-dev libgmp-dev
-        sudo apt-get -y install libleveldb-dev  libmicrohttpd-dev
-        sudo apt-get -y install libminiupnpc-dev
-        sudo apt-get -y install libssl-dev libkrb5-dev
-        sudo apt-get -y install lsof
-    else
-        sudo yum -y install bc
-        sudo yum -y install gettext
-        sudo yum -y install cmake3
-        sudo yum -y install git gcc-c++
-        sudo yum -y install openssl openssl-devel
-        sudo yum -y install boost-devel leveldb-devel curl-devel 
-        sudo yum -y install libmicrohttpd-devel gmp-devel 
-        sudo yum -y install lsof
-    fi
-}
-
 function build_fisco_bcos()
 {
-    #cd FISCO-BCOS
-
     #install deps
     sudo bash scripts/install_deps.sh
 
@@ -719,8 +635,6 @@ function build_fisco_bcos()
 #clone and download fisco-bcos
 function clone_and_build_fisco()
 {
-    install_dependencies
-    
     require_version=${FISCO_BCOS_VERSION}
 
     #fisco-bcos already exist
@@ -773,33 +687,13 @@ function version()
     echo "                                                     "
 }
 
-# version check
-function dependencies_check()
-{
-    # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
-    os_version_check
-    # java => Oracle JDK 1.8
-    java_version_check
-    # openssl => OpenSSL 1.0.2
-    openssl_version_check
-
-    # add more check here
-}
-
 function main()
 {
     # version print
     version
 
-    # version check
-    dependencies_check
-
     # sudo permission check
     request_sudo_permission
-    if [ $? -ne 0 ]
-    then
-        return $?
-    fi
 
     # check config valid
     check_config_validation
@@ -815,12 +709,20 @@ function main()
         return $?
     fi
 
+    # dependensies install
+    dependencies_install
+    # check if dependensies install success
+    dependencies_check
+
     #clone from github for fisco-bcos source
     #check if need compile fisco-bcos
     clone_and_build_fisco
     if [ $? -ne 0 ];then
        return $?
     fi
+
+    # version check
+    dependencies_check
 
     print_dash
 
@@ -900,17 +802,6 @@ function main()
     print_dash
 
     echo "    Building end!"
-    return 0
-}
-
-function check_file_exist()
-{
-    local file_name=$1
-    if ! [ -f ${file_name} ]
-    then
-        echo "${file_name} file is not exist"
-        return 2
-    fi
     return 0
 }
 
