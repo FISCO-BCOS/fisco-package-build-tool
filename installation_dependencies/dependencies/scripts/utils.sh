@@ -13,21 +13,6 @@ function check_port()
     fi
 }
 
-function request_sudo_permission() 
-{
-    echo "    checking permission..."
-    sudo echo -n " "
-
-    if [ $? -ne 0 ]
-    then
-        echo "no sudo permission, please add youself in the sudoers"
-        #exit
-        return 2
-    fi
-
-    return 0
-}
-
 function is_valid_ip()
 {
     if [[ $1 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
@@ -78,4 +63,20 @@ spinner()
     done
     printf "    \b\b\b\b"
     echo
+}
+
+function replace_dot_with_underline()
+{
+    echo $1 | sed -e "s/\./_/g"
+}
+
+function check_file_exist()
+{
+    local file_name=$1
+    if ! [ -f ${file_name} ]
+    then
+        echo "${file_name} file is not exist"
+        return 2
+    fi
+    return 0
 }

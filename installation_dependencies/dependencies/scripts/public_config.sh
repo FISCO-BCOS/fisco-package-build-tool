@@ -1,6 +1,8 @@
 #!/bin/bash
 
 DEFAULT_NETWORK_ID="12345"
+DEFAULT_SYSTEM_CONTRACT_ADDRESS="0x919868496524eedc26dbb81915fa1547a20f8998"
+
 buildPWD=$installPWD/build
 installation_build_dir=$installPWD/build
 
@@ -20,6 +22,9 @@ DEPENENCIES_TOOL_DIR=$installPWD/dependencies/tool
 DEPENENCIES_NODEJS_DIR=$installPWD/dependencies/nodejs
 DEPENDENCIES_RLP_DIR=$installPWD/dependencies/rlp_dir
 DEPENDENCIES_TPL_DIR=$installPWD/dependencies/tpl_dir
+
+INSTALLATION_DEPENENCIES_LIB_DIR=$installPWD/installation_dependencies
+INSTALLATION_DEPENENCIES_EXT_DIR=$installPWD/ext
 
 TYPE_GENESIS_HOST=1
 TYPE_FOLLOWER_HOST=2
