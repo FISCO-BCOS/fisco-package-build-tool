@@ -45,12 +45,8 @@ function os_version_check()
     #------------------------------------------------------------------------------
     Darwin)
         case $(sw_vers -productVersion | awk -F . '{print $1"."$2}') in
-            10.9)
-                echo "Running $myname on OS X 10.9 Mavericks."
-                ;;
             *)
-                echo "Unsupported macOS version."
-                exit 1
+                echo "Darwin operation."
                 ;;
         esac #case $(sw_vers
 
