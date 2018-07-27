@@ -29,13 +29,11 @@ source $installPWD/installation_dependencies/dependencies/scripts/dependencies_c
 source $installPWD/installation_config.sh
 CACHE_DIR_PATH=$installation_build_dir/.cache_dir
 INITIALIZATION_DONE_FILE_PATH=$CACHE_DIR_PATH/initialization_done
+
 RPC_PORT_DEFAULT_VALUE=$(($RPC_PORT_FOR_TEMP_NODE+1))
 P2P_PORT_DEFAULT_VALUE=$(($P2P_PORT_FOR_TEMP_NODE+1))
 CHANNEL_PORT_DEFAULT_VALUE=$(($CHANNEL_PORT_FOR_TEMP_NODE+1))
 PORT_DEFAULT_VALUE=$(($P2P_PORT_FOR_TEMP_NODE+1))
-TEMP_NODE_NAME="temp"
-TEMP_BUILD_DIR=$installation_build_dir/$TEMP_NODE_NAME/build
-TARGET_ETH_PATH=/usr/local/bin/fisco-bcos
 
 #fisco-bcos version check, At least 1.3.0 is required
 function fisco_bcos_version_check()
@@ -43,7 +41,7 @@ function fisco_bcos_version_check()
     REQUIRE_VERSION=$1;
     # config fisco-bcos version check
 
-    FISCO_VERSION=$(${TARGET_ETH_PATH} --version 2>&1 | egrep "FISCO-BCOS *version" | awk '{print $3}')
+    FISCO_VERSION=$(${TARGET_FISCO_BCOS_PATH} --version 2>&1 | egrep "FISCO-BCOS *version" | awk '{print $3}')
     # FISCO BCOS gm version not support
     if  echo "$FISCO_VERSION" | egrep "gm" ; then
         echo "FISCO BCOS gm version not support yet."
@@ -275,7 +273,7 @@ function build_node_installation_package()
     mkdir -p $current_node_path/dependencies/follow/
     mkdir -p $current_node_path/dependencies/rlp_dir/
 
-    cp $TARGET_ETH_PATH $current_node_path/dependencies/fisco-bcos/
+    cp $TARGET_FISCO_BCOS_PATH $current_node_path/dependencies/fisco-bcos/
     cp -r $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies $current_node_path/
 
     if [ $host_type -eq $TYPE_TEMP_HOST ]
@@ -638,8 +636,8 @@ function clone_and_build_fisco()
     require_version=${FISCO_BCOS_VERSION}
 
     #fisco-bcos already exist
-    if [ -f ${TARGET_ETH_PATH} ]; then
-        #check TARGET_ETH_PATH version
+    if [ -f ${TARGET_FISCO_BCOS_PATH} ]; then
+        #check TARGET_FISCO_BCOS_PATH version
         fisco_bcos_version_check ${require_version}
         if [ $? -eq 0 ];then
             return 0
@@ -670,10 +668,10 @@ function clone_and_build_fisco()
     build_fisco_bcos
 
     #maybe compile failed
-    if [ ! -f ${TARGET_ETH_PATH} ]; then
+    if [ ! -f ${TARGET_FISCO_BCOS_PATH} ]; then
 	    return 1
     else
-        #check TARGET_ETH_PATH version
+        #check TARGET_FISCO_BCOS_PATH version
         fisco_bcos_version_check ${require_version}
         return $?
     fi

@@ -45,13 +45,20 @@ function dependencies_install()
     #------------------------------------------------------------------------------
     Darwin)
         case $(sw_vers -productVersion | awk -F . '{print $1"."$2}') in
-            10.9)
-                echo "Running $myname on OS X 10.9 Mavericks."
-                ;;
             *)
-                echo "Unsupported macOS version."
-                exit 1
-                ;;
+                /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+                brew install dos2unix
+                brew install leveldb
+                brew install gettext
+                brew link --force gettext
+                brew install cmake
+                brew install libmicrohttpd 
+                brew install miniupnpc
+                brew install openssl
+                brew upgrade openssl
+                brew link --force openssl
+
+            ;;
         esac #case $(sw_vers
 
         ;; #Darwin)

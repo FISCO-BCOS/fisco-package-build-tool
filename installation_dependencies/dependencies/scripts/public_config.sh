@@ -1,10 +1,15 @@
 #!/bin/bash
 
+TARGET_FISCO_BCOS_PATH=/usr/local/bin/fisco-bcos
+
 DEFAULT_NETWORK_ID="12345"
 DEFAULT_SYSTEM_CONTRACT_ADDRESS="0x919868496524eedc26dbb81915fa1547a20f8998"
 
 buildPWD=$installPWD/build
 installation_build_dir=$installPWD/build
+
+TEMP_NODE_NAME="temp"
+TEMP_BUILD_DIR=$installation_build_dir/$TEMP_NODE_NAME/build
 
 NODE_INSTALL_DIR=$buildPWD/node
 WEB3SDK_INSTALL_DIR=$buildPWD/web3sdk
