@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#if genesis host
+is_genesis_host=${IS_GENESIS_HOST_TPL}
+
 #node num
 nodecount=${NODE_NUM_TPL}
 
