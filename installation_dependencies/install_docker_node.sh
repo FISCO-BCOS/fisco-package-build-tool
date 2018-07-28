@@ -11,14 +11,7 @@ source $DEPENENCIES_DIR/scripts/utils.sh
 source $DEPENENCIES_DIR/scripts/public_config.sh
 
 source $DEPENENCIES_FOLLOW_DIR/config.sh
-g_is_genesis_host=$IS_GENESIS_HOST_TPL
-
-if [ -f $installPWD/.i_am_genesis_host ]
-then
-    g_is_genesis_host=1
-else
-    g_is_genesis_host=0
-fi
+g_is_genesis_host=${is_genesis_host}
 
 g_docker_repository=${docker_repository}
 if [ -z ${g_docker_repository} ];then
@@ -230,13 +223,12 @@ function install()
         export CONFIG_JSON_RPC_PORT_TPL=${rpcport[$index]}
         export CONFIG_JSON_P2P_PORT_TPL=${p2pport[$index]}
         export CHANNEL_PORT_VALUE_TPL=${channelPort[$index]}
-        export CONFIG_JSON_NETWORK_ID_TPL=${DEFAULT_NETWORK_ID}
 
         export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${g_docker_fisco_path}"keys.info"
         export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${g_docker_fisco_path}"keystore/"
         export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${g_docker_fisco_path}"fisco-data/"
 
-        MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_NETWORK_ID_TPL}'
+        MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}'
         envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > $dockerPWD/nodedir${Idx[$index]}/config.json
 
         # generate log.conf from tpl

@@ -283,19 +283,16 @@ function build_node_installation_package()
     elif [ $host_type -eq $TYPE_GENESIS_HOST ]
     then
         export IS_GENESIS_HOST_TPL=1
-        if [ ! -z ${IS_BUILD_FOR_DOCKER} ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
-            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh.tpl > $current_node_path/install_node.sh
+        if [ ! -z "${IS_BUILD_FOR_DOCKER}" ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
+            cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
         else
-            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh.tpl > $current_node_path/install_node.sh
+            cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
         fi
 
         # copy node_manager.sh
         cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
-
-        # create "i am genesis node" file, the genesis node will contain this file in his root dir.
-        touch $current_node_path/.i_am_genesis_host
 
         #g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
         #mkdir -p ${g_genesis_node_action_container_dir_path}/
@@ -309,13 +306,14 @@ function build_node_installation_package()
             mv $TEMP_BUILD_DIR/godInfo.txt ${g_genesis_cert_dir_path} >/dev/null 2>&1
         fi
     else 
+        export IS_GENESIS_HOST_TPL=0
         # copy node_manager.sh
         cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
-        if [ ! -z ${IS_BUILD_FOR_DOCKER} ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
-            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh.tpl > $current_node_path/install_node.sh
+        if [ ! -z "${IS_BUILD_FOR_DOCKER}" ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
+            cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
         else
-            envsubst '${IS_GENESIS_HOST_TPL}' < $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh.tpl > $current_node_path/install_node.sh
+            cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
         fi
     fi
@@ -349,7 +347,7 @@ function build_node_installation_package()
         else
             node_cert_path=${g_genesis_cert_dir_path}
             node_ca_path=$current_node_rlp_dir/ca/
-            if [ ! -z ${IS_CA_EXT_MODE} ] && [ ${IS_CA_EXT_MODE} -eq 1 ];then
+            if [ ! -z "${IS_CA_EXT_MODE}" ] && [ ${IS_CA_EXT_MODE} -eq 1 ];then
                 build_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
                 if [ $? -ne 0 ];then
                     return 2;
@@ -443,9 +441,8 @@ function build_node_installation_package()
     export DOCKER_REPOSITORY_TPL=${DOCKER_REPOSITORY}
     export DOCKER_VERSION_TPL=${DOCKER_VERSION}
 
-    MYVARS='${DOCKER_REPOSITORY_TPL}:${DOCKER_VERSION_TPL}:${NODE_NUM_TPL}:${GOD_ADDRESS_TPL}:${LISTEN_IP_TPL}:${RPC_PORT_TPL}:${CHANNEL_PORT_VALUE_TPL}:${P2P_PORT_TPL}:${NODE_DESC_TPL}:${AGENCY_INFO_TPL}:${IDX_TPL}'
+    MYVARS='${IS_GENESIS_HOST_TPL}:${DOCKER_REPOSITORY_TPL}:${DOCKER_VERSION_TPL}:${NODE_NUM_TPL}:${GOD_ADDRESS_TPL}:${LISTEN_IP_TPL}:${RPC_PORT_TPL}:${CHANNEL_PORT_VALUE_TPL}:${P2P_PORT_TPL}:${NODE_DESC_TPL}:${AGENCY_INFO_TPL}:${IDX_TPL}'
     envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/follow/config.sh
-    # echo "envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/config.sh"
     return 0
 }
 
