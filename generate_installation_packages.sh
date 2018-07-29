@@ -30,11 +30,6 @@ source $installPWD/installation_config.sh
 CACHE_DIR_PATH=$installation_build_dir/.cache_dir
 INITIALIZATION_DONE_FILE_PATH=$CACHE_DIR_PATH/initialization_done
 
-RPC_PORT_DEFAULT_VALUE=$(($RPC_PORT_FOR_TEMP_NODE+1))
-P2P_PORT_DEFAULT_VALUE=$(($P2P_PORT_FOR_TEMP_NODE+1))
-CHANNEL_PORT_DEFAULT_VALUE=$(($CHANNEL_PORT_FOR_TEMP_NODE+1))
-PORT_DEFAULT_VALUE=$(($P2P_PORT_FOR_TEMP_NODE+1))
-
 #fisco-bcos version check, At least 1.3.0 is required
 function fisco_bcos_version_check()
 {
@@ -371,9 +366,9 @@ function build_node_installation_package()
 
         if [ $host_type -eq $TYPE_TEMP_HOST ]
         then
-            rpc_port=$RPC_PORT_FOR_TEMP_NODE
-            channel_port=$CHANNEL_PORT_FOR_TEMP_NODE
-            p2p_port=$P2P_PORT_FOR_TEMP_NODE
+            rpc_port=$RPC_PORT_NODE
+            channel_port=$CHANNEL_PORT_NODE
+            p2p_port=$P2P_PORT_NODE
             node_desc="$public_ip""_temp"
 
             export HOST_IP=$public_ip
@@ -383,9 +378,9 @@ function build_node_installation_package()
             envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/bootstrapnodes.json.tpl > $installation_build_dir/$node_dir_name/dependencies/rlp_dir/bootstrapnodes.json
 
         else
-            rpc_port=$(($RPC_PORT_DEFAULT_VALUE+$node_index))
-            channel_port=$(($CHANNEL_PORT_DEFAULT_VALUE+$node_index))
-            p2p_port=$(($P2P_PORT_DEFAULT_VALUE+$node_index))
+            rpc_port=$(($RPC_PORT_NODE+$node_index))
+            channel_port=$(($CHANNEL_PORT_NODE+$node_index))
+            p2p_port=$(($P2P_PORT_NODE+$node_index))
             node_desc="$public_ip""_""$node_index"
 
             mkdir -p $installation_build_dir/$node_dir_name/dependencies/node_action_info_dir/
@@ -468,21 +463,21 @@ function build_temp_node()
     if ! [ -d $TEMP_BUILD_DIR ]
     then
         #port checkcheck
-        check_port $RPC_PORT_FOR_TEMP_NODE
+        check_port $RPC_PORT_NODE
         if [ $? -ne 0 ];then
-            echo "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."
+            echo "temp node rpc port check, $RPC_PORT_NODE is in use."
             return 1
         fi
 
-        check_port $CHANNEL_PORT_FOR_TEMP_NODE
+        check_port $CHANNEL_PORT_NODE
         if [ $? -ne 0 ];then
-            echo "temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."
+            echo "temp node channel port check, $CHANNEL_PORT_NODE is in use."
             return 1
         fi
 
-        check_port $P2P_PORT_FOR_TEMP_NODE
+        check_port $P2P_PORT_NODE
         if [ $? -ne 0 ];then
-            echo "temp node p2p port check, $P2P_PORT_FOR_TEMP_NODE is in use."
+            echo "temp node p2p port check, $P2P_PORT_NODE is in use."
             return 1
         fi
         #build temp node, in order to generate the genesis json file
@@ -513,9 +508,9 @@ function deploy_system_contract_for_initialization()
     bash start_node0_godminer.sh
     sleep 8
     # check if temp node is running
-    check_port $CHANNEL_PORT_FOR_TEMP_NODE
+    check_port $CHANNEL_PORT_NODE
     if [ $? -eq 0 ];then
-        echo "channel port $CHANNEL_PORT_FOR_TEMP_NODE is not listening, maybe temp node god mode start failed."
+        echo "channel port $CHANNEL_PORT_NODE is not listening, maybe temp node god mode start failed."
         return 1
     fi
 

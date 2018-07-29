@@ -77,9 +77,9 @@ FISCO_BCOS_GIT="https://github.com/FISCO-BCOS/FISCO-BCOS.git"
 FISCO_BCOS_LOCAL_PATH="../"
 
 # default config for temp block node, if the port already exist, please change the following config.
-P2P_PORT_FOR_TEMP_NODE=30303
-RPC_PORT_FOR_TEMP_NODE=8545
-CHANNEL_PORT_FOR_TEMP_NODE=8821
+P2P_PORT_NODE=30303
+RPC_PORT_NODE=8545
+CHANNEL_PORT_NODE=8821
 
 ##config for docker generation
 #if build docker install
@@ -236,12 +236,12 @@ e. "Oracle JDK 1.8+ be requied".
 f. "openssl 1.0.2 be requied."
 需要安装1.0.2版本的openssl.
 
-g. "temp node rpc port check, $RPC_PORT_FOR_TEMP_NODE is in use."  
-检查配置的$RPC_PORT_FOR_TEMP_NODE端口是否被占用.  
-"temp node channel port check, $CHANNEL_PORT_FOR_TEMP_NODE is in use."  
-检查配置的CHANNEL_PORT_FOR_TEMP_NODE端部署合约口是否被占用.   
-"temp node p2p port check, $P2P_PORT_FOR_TEMP_NODE is in use."  
-检查配置的P2P_PORT_FOR_TEMP_NODE端口是否被占用.  
+g. "temp node rpc port check, $RPC_PORT_NODE is in use."  
+检查配置的$RPC_PORT_NODE端口是否被占用.  
+"temp node channel port check, $CHANNEL_PORT_NODE is in use."  
+检查配置的CHANNEL_PORT_NODE端部署合约口是否被占用.   
+"temp node p2p port check, $P2P_PORT_NODE is in use."  
+检查配置的P2P_PORT_NODE端口是否被占用.  
 
 h. "WARNING : fisco-bcos --newaccount failed."  
 fisco-bcos --newaccount, 需要具体分析.  
@@ -517,9 +517,9 @@ genesis_ca_dir_path=/fisco-bcos/cert/
 
 注意项：
 扩容时, 除了specific_genesis_node_scale_config.sh 中的配置, 其他配置：  
-P2P_PORT_FOR_TEMP_NODE  
-RPC_PORT_FOR_TEMP_NODE  
-CHANNEL_PORT_FOR_TEMP_NODE  
+P2P_PORT_NODE  
+RPC_PORT_NODE  
+CHANNEL_PORT_NODE  
 DOCKER_TOGGLE  
 DOCKER_REPOSITORY   
 DOCKER_VERSION  
