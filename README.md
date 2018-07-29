@@ -83,7 +83,7 @@ CHANNEL_PORT_FOR_TEMP_NODE=8821
 
 ##config for docker generation
 #if build docker install
-IS_BUILD_FOR_DOCKER=0
+DOCKER_TOGGLE=0
 #fisco-bcos docker repository, default "docker.io/fiscoorg/fiscobcos"
 DOCKER_REPOSITORY="fiscoorg/fisco-octo"
 #fisco-bcos docker version, default "latest"
@@ -125,7 +125,7 @@ weth_host_2[@]
 - field 3(agent info)： 机构名称, 不关心机构则可以随意值, 但不能为空。  
 weth_host_0=("***REMOVED***" "***REMOVED***" "2" "agent_0")  
 说明需要在***REMOVED***这台服务器上面启动两个节点, 节点对应的机构名称是agent_0,。  
-- IS_BUILD_FOR_DOCKER ： 是否构建docker运行环境。 1：是 , 其他值：否
+- DOCKER_TOGGLE ： 是否构建docker运行环境。 1：是 , 其他值：否
 - DOCKER_REPOSITORY : docker镜像库
 - DOCKER_VERSION : docker的版本号
 - IS_CA_EXT_MODE：拓展证书分配的开关,参考( [附录二：证书分配](#ca-manager) ), 一般采取默认值就可以。  
@@ -520,7 +520,7 @@ genesis_ca_dir_path=/fisco-bcos/cert/
 P2P_PORT_FOR_TEMP_NODE  
 RPC_PORT_FOR_TEMP_NODE  
 CHANNEL_PORT_FOR_TEMP_NODE  
-IS_BUILD_FOR_DOCKER  
+DOCKER_TOGGLE  
 DOCKER_REPOSITORY   
 DOCKER_VERSION  
 仍然会使用installation_config.sh中的配置.

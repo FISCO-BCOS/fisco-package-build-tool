@@ -283,7 +283,7 @@ function build_node_installation_package()
     elif [ $host_type -eq $TYPE_GENESIS_HOST ]
     then
         export IS_GENESIS_HOST_TPL=1
-        if [ ! -z "${IS_BUILD_FOR_DOCKER}" ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
+        if [ ! -z "${DOCKER_TOGGLE}" ] && [ ${DOCKER_TOGGLE} -eq 1 ];then
             cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
         else

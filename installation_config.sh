@@ -14,7 +14,7 @@ CHANNEL_PORT_FOR_TEMP_NODE=8831
 
 ##config for docker generation
 #if build docker install
-IS_BUILD_FOR_DOCKER=1
+DOCKER_TOGGLE=1
 #fisco-bcos docker repository, default "docker.io/fiscoorg/fiscobcos"
 DOCKER_REPOSITORY="fiscoorg/fisco-octo"
 #fisco-bcos docker version, default "latest"
