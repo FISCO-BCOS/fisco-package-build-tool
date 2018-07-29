@@ -86,7 +86,7 @@ function ini_get()
     local param=$3
 
     local value=$(crudini --get $file $section $param)
-    if [ $? -ne 0];then
+    if [ $? -ne 0 ];then
         { echo >&2 "ERROR - ini config get failed, section is $section param is $param."; exit 1; }
     fi
 
@@ -177,7 +177,7 @@ function parser_ini()
     local param="ca_ext"
     local ca_ext=$(ini_get $file $section $param)
     echo "===>>> ca_ext is"${ca_ext}
-    env_set "IS_CA_EXT_MODE" ${ca_ext}
+    env_set "CA_EXT_MODE" ${ca_ext}
 
 # [ports]
 # p2p_port=30303

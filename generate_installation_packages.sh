@@ -309,7 +309,7 @@ function build_node_installation_package()
         export IS_GENESIS_HOST_TPL=0
         # copy node_manager.sh
         cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
-        if [ ! -z "${IS_BUILD_FOR_DOCKER}" ] && [ ${IS_BUILD_FOR_DOCKER} -eq 1 ];then
+        if [ ! -z "${DOCKER_TOGGLE}" ] && [ ${DOCKER_TOGGLE} -eq 1 ];then
             cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
         else
@@ -347,7 +347,7 @@ function build_node_installation_package()
         else
             node_cert_path=${g_genesis_cert_dir_path}
             node_ca_path=$current_node_rlp_dir/ca/
-            if [ ! -z "${IS_CA_EXT_MODE}" ] && [ ${IS_CA_EXT_MODE} -eq 1 ];then
+            if [ ! -z "${CA_EXT_MODE}" ] && [ ${CA_EXT_MODE} -eq 1 ];then
                 build_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
                 if [ $? -ne 0 ];then
                     return 2;

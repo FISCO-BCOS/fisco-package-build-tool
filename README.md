@@ -90,7 +90,7 @@ DOCKER_REPOSITORY="fiscoorg/fisco-octo"
 DOCKER_VERSION="v1.3.1"
 
 # config for ca
-IS_CA_EXT_MODE=0
+CA_EXT_MODE=0
 
 # config for the blockchain node
 # the first node is the genesis node
@@ -128,7 +128,7 @@ weth_host_0=("172.20.245.42" "172.20.245.42" "2" "agent_0")
 - DOCKER_TOGGLE ： 是否构建docker运行环境。 1：是 , 其他值：否
 - DOCKER_REPOSITORY : docker镜像库
 - DOCKER_VERSION : docker的版本号
-- IS_CA_EXT_MODE：拓展证书分配的开关,参考( [附录二：证书分配](#ca-manager) ), 一般采取默认值就可以。  
+- CA_EXT_MODE：拓展证书分配的开关,参考( [附录二：证书分配](#ca-manager) ), 一般采取默认值就可以。  
  **配置说明：**  
 - 1. 工具在构建安装包(非扩容流程)过程中会启动一个temp节点, 用于系统合约的部署, 注册节点信息到节点管理合约, 生成genesis.json文件。  
 - 2. 每个节点需要占用三个端口:p2p port、rpc port、channel port, 对于单台服务器上的节点端口使用规则, 默认从temp节点的端口+1开始, 依次增长。例如temp节点的端口配置为了p2p port 30303、rpc port 8545、channel port 8821, 则每台服务器上的第0个节点默认使用p2p port 30304、rpc port 8546、channel port 8822，第1个节点默认使用p2p port 30305、rpc port 8547、channel port 8823, 以此类推, 要确保这些端口没有被占用。  

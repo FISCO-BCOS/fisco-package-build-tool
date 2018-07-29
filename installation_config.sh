@@ -7,10 +7,10 @@ FISCO_BCOS_LOCAL_PATH="../"
 #FISCO BCOS version need
 FISCO_BCOS_VERSION="1.3.1"
 
-# default config for temp block node, if the port already exist, please change the following config.
-P2P_PORT_FOR_TEMP_NODE=30313
-RPC_PORT_FOR_TEMP_NODE=8555
-CHANNEL_PORT_FOR_TEMP_NODE=8831
+# default config for node, if the port already exist, please change the following config.
+P2P_PORT_NODE=30313
+RPC_PORT_NODE=8555
+CHANNEL_PORT_NODE=8831
 
 ##config for docker generation
 #if build docker install
@@ -21,7 +21,7 @@ DOCKER_REPOSITORY="fiscoorg/fisco-octo"
 DOCKER_VERSION="v1.3.1"
 
 # config for ca
-IS_CA_EXT_MODE=0
+CA_EXT_MODE=0
 
 # config for the blockchain node
 # the first node is the genesis node
