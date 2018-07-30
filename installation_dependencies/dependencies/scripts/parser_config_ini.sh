@@ -253,19 +253,19 @@ function valid_node()
     local agent=${node[3]}
 
     if [ -z ${p2pip} ];then
-        { echo >&2 "ERROR - [nodes] p2pip null . node => "$node; exit 1; }
+        { echo >&2 "ERROR - [nodes] p2pip null . node => "$1; exit 1; }
     fi
 
     if [ -z ${listenip} ];then
-        { echo >&2 "ERROR - [nodes] listenip null . node => "$node; exit 1; }
+        { echo >&2 "ERROR - [nodes] listenip null . node => "$1; exit 1; }
     fi
 
     if [ -z ${count} ];then
-        { echo >&2 "ERROR - [nodes] count null . node => "$node; exit 1; }
+        { echo >&2 "ERROR - [nodes] count null . node => "$1; exit 1; }
     fi
 
     if [ -z ${agent} ];then
-        { echo >&2 "ERROR - [nodes] agent null . node => "$node; exit 1; }
+        { echo >&2 "ERROR - [nodes] agent null . node => "$1; exit 1; }
     fi
 
     is_p2pip_valid=$(is_valid_ip $p2pip)
