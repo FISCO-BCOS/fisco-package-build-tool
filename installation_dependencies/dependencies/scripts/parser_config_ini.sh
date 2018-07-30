@@ -78,16 +78,31 @@ function parser_ini_init()
     esac
 }
 
+#check if ip valid
+function is_valid_ip()
+{
+    if [[ $1 =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
 #ini file get opr
 function ini_get()
 {
     local file=$1
     local section=$2
     local param=$3
+    local no_exit=$4
 
     local value=$(crudini --get $file $section $param)
     if [ $? -ne 0 ];then
-        { echo >&2 "ERROR - ini config get failed, section is $section param is $param."; exit 1; }
+        if [ "${no_exit}" = "true" ];then
+            #{ echo >&2 "ERROR - ini config get failed, section is $section param is $param."; exit 1; }
+        else
+            { echo >&2 "ERROR - ini config get failed, section is $section param is $param."; exit 1; }
+        fi
     fi
 
     echo "$value"
@@ -205,6 +220,144 @@ function parser_ini()
 # node0= 127.0.0.1  0.0.0.0  4  agent
 # [nodes] section
     local section="nodes"
+    local max_node=9999999
+    local node_index=0
+    while [ $node_index -lt $max_node ]
+    do
+        local param="node"$node_index
+        local node_info=$(ini_get $file $section $param "true")
+        if [ -z "${node_info}" ];then
+            break
+        fi
 
-    env
+        env_set "NODE_INFO_"$node_index ${node_info}
+
+        node_index=$(($node_index+1))
+    done
+
+    env_set "NODE_COUNT" ${node_index}
+}
+
+# is node valid
+function valid_node()
+{
+    local node="$1"
+    local arr=($node)
+
+    # node0= 127.0.0.1  0.0.0.0  4  agent
+    local p2pip=$arr[0]
+    local listenip=$arr[1]
+    local count=$arr[2]
+    local agent=$arr[3]
+
+    is_p2pip_valid=$(is_valid_ip $p2pip)
+    is_listenip_ip_valid=$(is_valid_ip $listenip)
+
+    if [ "$is_p2pip_valid" = "false" ];then
+        { echo >&2 "ERROR - [nodes] p2pip invalid, node => ${node} ."; exit 1; }
+    elif [ "$is_listenip_ip_valid" = "false" ]
+        { echo >&2 "ERROR - [nodes] listenip invalid, node => ${node} ."; exit 1; }
+    fi
+
+    if [ $count -le 0 ];then
+         { echo >&2 "ERROR - [nodes] count invalid, node => ${node} ."; exit 1; }
+    fi
+
+    if [ -z $agent ];then
+         { echo >&2 "ERROR - [nodes] agent invalid, node => ${node} ."; exit 1; }
+    fi
+}
+
+# check all env
+function ini_param_check()
+{
+    # env FISCO_BCOS_GIT 
+    local github_url=${FISCO_BCOS_GIT}
+    if [ -z ${github_url} ];then
+        { echo >&2 "ERROR - FISCO_BCOS_GIT cannot find ,[common] github_url may not set ."; exit 1; }
+    fi
+
+    # env FISCO_BCOS_LOCAL_PATH 
+    local fisco_bcos_src_local=${FISCO_BCOS_LOCAL_PATH}
+    if [ -z ${fisco_bcos_src_local} ];then
+        { echo >&2 "ERROR - FISCO_BCOS_LOCAL_PATH cannot find ,[common] fisco_bcos_src_local may not set ."; exit 1; }
+    fi
+
+    # env FISCO_BCOS_VERSION 
+    local fisco_bcos_version=${FISCO_BCOS_VERSION}
+    if [ -z ${fisco_bcos_version} ];then
+        { echo >&2 "ERROR - FISCO_BCOS_VERSION cannot find ,[common] fisco_bcos_version may not set ."; exit 1; }
+    fi
+
+    # env DOCKER_TOGGLE 
+    local docker_toggle=${DOCKER_TOGGLE}
+    if [ -z ${docker_toggle} ];then
+        { echo >&2 "ERROR - DOCKER_TOGGLE cannot find ,[docker] docker_toggle may not set ."; exit 1; }
+    fi
+
+    # env DOCKER_REPOSITORY 
+    local docker_repository=${DOCKER_REPOSITORY}
+    if [ -z ${docker_repository} ];then
+        { echo >&2 "ERROR - DOCKER_REPOSITORY cannot find ,[docker] docker_repository may not set ."; exit 1; }
+    fi
+
+    # env DOCKER_VERSION 
+    local docker_version=${DOCKER_VERSION}
+    if [ -z ${docker_version} ];then
+        { echo >&2 "ERROR - DOCKER_VERSION cannot find ,[docker] docker_version may not set ."; exit 1; }
+    fi
+
+    # env CA_EXT_MODE 
+    local ca_ext=${CA_EXT_MODE}
+    if [ -z ${ca_ext} ];then
+        { echo >&2 "ERROR - CA_EXT_MODE cannot find ,[other] ca_ext may not set ."; exit 1; }
+    fi
+
+    # env P2P_PORT_NODE 
+    local p2p_port=${P2P_PORT_NODE}
+    if [ -z ${p2p_port} ];then
+        { echo >&2 "ERROR - P2P_PORT_NODE cannot find ,[port] p2p_port may not set ."; exit 1; }
+    fi
+    if [ ${p2p_port} -le 0 ] || [ ${p2p_port} -ge 65536 ];then
+        { echo >&2 "ERROR - P2P_PORT_NODE invalid ,[port] p2p_port invalid => ${P2P_PORT_NODE} ."; exit 1; }
+    fi
+
+    # env P2P_PORT_NODE 
+    local rpc_port=${RPC_PORT_NODE}
+    if [ -z ${rpc_port} ];then
+        { echo >&2 "ERROR - RPC_PORT_NODE cannot find ,[port] rpc_port may not set ."; exit 1; }
+    fi
+    if [ ${rpc_port} -le 0 ] || [ ${rpc_port} -ge 65536 ];then
+        { echo >&2 "ERROR - RPC_PORT_NODE invalid ,[ports] rpc_port invalid => ${RPC_PORT_NODE} ."; exit 1; }
+    fi
+
+    # env CHANNEL_PORT_NODE 
+    local channel_port=${CHANNEL_PORT_NODE}
+    if [ -z ${channel_port} ];then
+        { echo >&2 "ERROR - CHANNEL_PORT_NODE cannot find ,[ports] channel_port may not set ."; exit 1; }
+    fi
+    if [ ${channel_port} -le 0 ] || [ ${channel_port} -ge 65536 ];then
+        { echo >&2 "ERROR - CHANNEL_PORT_NODE invalid ,[ports] channel_port invalid => ${CHANNEL_PORT_NODE} ."; exit 1; }
+    fi
+
+    local node_count=${NODE_COUNT}
+    if [ -z "$node_count" ];then
+        { echo >&2 "ERROR - node_count invalid ,[nodes] invalid ."; exit 1; }
+    fi
+
+    if [ $node_count -le 0 ];then
+        { echo >&2 "ERROR - node_count invalid ,[nodes] invalid ."; exit 1; }
+    fi
+
+    local node_index=0
+    while [ $node_index -lt $node_count ]
+    do
+        local node_info=${"NODE_INFO_$node_index"}
+        
+        valid_node $node_info
+
+        env_set "NODE_INFO_"$node_index (${node_info})
+
+        node_index=$(($node_index+1))
+    done
 }
