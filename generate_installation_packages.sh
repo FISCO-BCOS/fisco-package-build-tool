@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -e
+# set -e
 
 IS_DEBUG=0
 function toggle_debug()
@@ -521,10 +521,10 @@ function deploy_system_contract_for_initialization()
     ## register all node to the system contract
     for ((i=0; i<g_host_config_num; i++))
     do
-        declare sub_arr=${NODE_INFO_$i}
-        public_ip=${sub_arr[0]}
-        private_ip=${sub_arr[1]}
-        node_num_per_host=${sub_arr[2]}
+	local sub_arr=(`eval echo '$'"NODE_INFO_${i}"`)
+        local public_ip=${sub_arr[0]}
+        local private_ip=${sub_arr[1]}
+        local node_num_per_host=${sub_arr[2]}
         local host_type=$(get_host_type $i)
         local node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
         local current_node_path=$installation_build_dir/$node_dir_name
@@ -659,9 +659,6 @@ function main()
     # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
     os_version_check
 
-    # init all global variable
-    init_global_variable
-
     # dependensies install
     dependencies_install
     # check if dependensies install success
@@ -672,6 +669,10 @@ function main()
 
     # config.ini param check
     ini_param_check
+
+    env 
+    # init all global variable
+    init_global_variable
 
     #clone from github for fisco-bcos source
     #check if need compile fisco-bcos
@@ -705,10 +706,10 @@ function main()
     # load config from installation_config.sh
     for ((i=0; i<g_host_config_num; i++))
     do
-        declare sub_arr=${NODE_INFO_$i}
-        public_ip=${sub_arr[0]}
-        private_ip=${sub_arr[1]}
-        node_num_per_host=${sub_arr[2]}
+	local sub_arr=(`eval echo '$'"NODE_INFO_${i}"`)
+        local public_ip=${sub_arr[0]}
+        local private_ip=${sub_arr[1]}
+        local node_num_per_host=${sub_arr[2]}
         local agency_info=${sub_arr[3]}
 
         build_host_type=$(get_host_type $i)
@@ -732,7 +733,7 @@ function main()
     ## register all node to system contract
     for ((i=0; i<g_host_config_num; i++))
     do
-        declare sub_arr=${NODE_INFO_$i}
+        declare sub_arr=(`eval echo '$'"NODE_INFO_${i}"`)
         public_ip=${sub_arr[0]}
         private_ip=${sub_arr[1]}
         node_num_per_host=${sub_arr[2]}
