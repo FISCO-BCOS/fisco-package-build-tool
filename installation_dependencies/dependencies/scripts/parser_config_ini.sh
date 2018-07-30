@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#set -e
 # init function , install crudini
 function parser_ini_init() 
 {
@@ -100,6 +101,7 @@ function ini_get()
     if [ $? -ne 0 ];then
         if [ "${no_exit}" = "true" ];then
             #{ echo >&2 "ERROR - ini config get failed, section is $section param is $param."; exit 1; }
+	    echo ""
         else
             { echo >&2 "ERROR - ini config get failed, section is $section param is $param."; exit 1; }
         fi
@@ -111,9 +113,9 @@ function ini_get()
 #env set
 function env_set()
 {
-    local env=$1
-    local value=$2
-    export $env=$value
+    local env="$1"
+    local value="$2"
+    export $env="$value"
 }
 
 #parser config.ini file
@@ -230,32 +232,32 @@ function parser_ini()
             break
         fi
 
-        env_set "NODE_INFO_"$node_index ${node_info}
+        env_set "NODE_INFO_"$node_index "${node_info}"
 
         node_index=$(($node_index+1))
     done
 
     env_set "NODE_COUNT" ${node_index}
+
 }
 
 # is node valid
 function valid_node()
 {
-    local node="$1"
-    local arr=($node)
+    local arr=($1)
 
     # node0= 127.0.0.1  0.0.0.0  4  agent
-    local p2pip=$arr[0]
-    local listenip=$arr[1]
-    local count=$arr[2]
-    local agent=$arr[3]
+    local p2pip=${arr[0]}
+    local listenip=${arr[1]}
+    local count=${arr[2]}
+    local agent=${arr[3]}
 
     is_p2pip_valid=$(is_valid_ip $p2pip)
     is_listenip_ip_valid=$(is_valid_ip $listenip)
 
     if [ "$is_p2pip_valid" = "false" ];then
         { echo >&2 "ERROR - [nodes] p2pip invalid, node => ${node} ."; exit 1; }
-    elif [ "$is_listenip_ip_valid" = "false" ]
+    elif [ "$is_listenip_ip_valid" = "false" ];then
         { echo >&2 "ERROR - [nodes] listenip invalid, node => ${node} ."; exit 1; }
     fi
 
@@ -352,11 +354,11 @@ function ini_param_check()
     local node_index=0
     while [ $node_index -lt $node_count ]
     do
-        local node_info=${"NODE_INFO_$node_index"}
-        
-        valid_node $node_info
+	local node_name=NODE_INFO_${node_index}
+	local node_info=`eval echo '$'"$node_name"` 
+        valid_node $"$node_info"
 
-        env_set "NODE_INFO_"$node_index (${node_info})
+        env_set "NODE_INFO_"$node_index "${node_info}"
 
         node_index=$(($node_index+1))
     done
