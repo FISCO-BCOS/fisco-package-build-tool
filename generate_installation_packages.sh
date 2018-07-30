@@ -24,6 +24,7 @@ source $installPWD/installation_dependencies/dependencies/scripts/public_config.
 source $installPWD/installation_dependencies/dependencies/scripts/os_version_check.sh
 source $installPWD/installation_dependencies/dependencies/scripts/dependencies_install.sh
 source $installPWD/installation_dependencies/dependencies/scripts/dependencies_check.sh
+source $installPWD/installation_dependencies/dependencies/scripts/parser_config_ini.sh
 
 #private config
 source $installPWD/installation_config.sh
@@ -71,7 +72,7 @@ function fisco_bcos_version_check()
 # global variable
 function init_global_variable()
 {
-    g_host_config_num=${#MAIN_ARRAY[@]}
+    g_host_config_num=${NODE_COUNT}
 
     echo "host_config_num = "$g_host_config_num
 
@@ -520,7 +521,7 @@ function deploy_system_contract_for_initialization()
     ## register all node to the system contract
     for ((i=0; i<g_host_config_num; i++))
     do
-        declare sub_arr=(${!MAIN_ARRAY[i]})
+        declare sub_arr=${NODE_INFO_$i}
         public_ip=${sub_arr[0]}
         private_ip=${sub_arr[1]}
         node_num_per_host=${sub_arr[2]}
@@ -571,36 +572,6 @@ function get_host_type()
     fi
 
     echo $build_host_type_local
-}
-
-function check_config_validation()
-{
-    g_host_config_num=${#MAIN_ARRAY[@]}
-    if [ -z "$g_host_config_num" ] || [ $g_host_config_num -le 0 ];then
-        echo "invalid host_config_num = "$g_host_config_num
-        return 1
-    fi
-
-    for ((i=0; i<g_host_config_num; i++))
-    do
-        declare sub_arr=(${!MAIN_ARRAY[i]})
-        local p2pnetworkip=${sub_arr[0]}
-        local listenip=${sub_arr[1]}
-        local node_num_per_host=${sub_arr[2]}
-        if [ -z "$p2pnetworkip" ] || [ -z "$listenip" ] || [ -z "$node_num_per_host" ]
-        then
-            echo "config invalid, p2pnetworkip: ""$p2pnetworkip, listenip: $listenip, node_num_per_host: $node_num_per_host"
-            return 2
-        fi
-
-        local agent=${sub_arr[3]}
-        if [ -z "$agent" ]; then
-            echo "agent info cannot be null empty"
-            return 3
-        fi
-    done
-
-    return 0
 }
 
 function build_fisco_bcos()
@@ -688,24 +659,19 @@ function main()
     # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
     os_version_check
 
-    # check config valid
-    check_config_validation
-    if [ $? -ne 0 ]
-    then
-        return $?
-    fi
-
     # init all global variable
     init_global_variable
-    if [ $? -ne 0 ]
-    then
-        return $?
-    fi
 
     # dependensies install
     dependencies_install
     # check if dependensies install success
     dependencies_check
+
+    # parser config.ini file
+    parser_ini config.ini
+
+    # config.ini param check
+    ini_param_check
 
     #clone from github for fisco-bcos source
     #check if need compile fisco-bcos
@@ -713,9 +679,6 @@ function main()
     if [ $? -ne 0 ];then
        return $?
     fi
-
-    # version check
-    dependencies_check
 
     print_dash
 
@@ -742,7 +705,7 @@ function main()
     # load config from installation_config.sh
     for ((i=0; i<g_host_config_num; i++))
     do
-        declare sub_arr=(${!MAIN_ARRAY[i]})
+        declare sub_arr=${NODE_INFO_$i}
         public_ip=${sub_arr[0]}
         private_ip=${sub_arr[1]}
         node_num_per_host=${sub_arr[2]}
@@ -769,7 +732,7 @@ function main()
     ## register all node to system contract
     for ((i=0; i<g_host_config_num; i++))
     do
-        declare sub_arr=(${!MAIN_ARRAY[i]})
+        declare sub_arr=${NODE_INFO_$i}
         public_ip=${sub_arr[0]}
         private_ip=${sub_arr[1]}
         node_num_per_host=${sub_arr[2]}
