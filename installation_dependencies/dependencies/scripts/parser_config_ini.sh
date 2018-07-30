@@ -244,29 +244,29 @@ function parser_ini()
 # is node valid
 function valid_node()
 {
-    local arr=($1)
+    local node=($1)
 
     # node0= 127.0.0.1  0.0.0.0  4  agent
-    local p2pip=${arr[0]}
-    local listenip=${arr[1]}
-    local count=${arr[2]}
-    local agent=${arr[3]}
+    local p2pip=${node[0]}
+    local listenip=${node[1]}
+    local count=${node[2]}
+    local agent=${node[3]}
 
     is_p2pip_valid=$(is_valid_ip $p2pip)
     is_listenip_ip_valid=$(is_valid_ip $listenip)
 
     if [ "$is_p2pip_valid" = "false" ];then
-        { echo >&2 "ERROR - [nodes] p2pip invalid, node => ${node} ."; exit 1; }
+        { echo >&2 "ERROR - [nodes] p2pip invalid, p2pip => ${p2pip} ."; exit 1; }
     elif [ "$is_listenip_ip_valid" = "false" ];then
-        { echo >&2 "ERROR - [nodes] listenip invalid, node => ${node} ."; exit 1; }
+        { echo >&2 "ERROR - [nodes] listenip invalid, listenip => ${listenip} ."; exit 1; }
     fi
 
     if [ $count -le 0 ];then
-         { echo >&2 "ERROR - [nodes] count invalid, node => ${node} ."; exit 1; }
+         { echo >&2 "ERROR - [nodes] count invalid, count => ${count} ."; exit 1; }
     fi
 
     if [ -z $agent ];then
-         { echo >&2 "ERROR - [nodes] agent invalid, node => ${node} ."; exit 1; }
+         { echo >&2 "ERROR - [nodes] agent invalid, agent => ${agent} ."; exit 1; }
     fi
 }
 
