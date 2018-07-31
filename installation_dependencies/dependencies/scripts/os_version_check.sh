@@ -84,7 +84,7 @@ function os_version_check()
 
                 ver=$(echo "$UBUNTU_VERSION" | awk -F . '{print $1$2}')
                 #Ubuntu 16.04 or Ubuntu 16.04+
-                if [ $ver -lt 1604 ];then
+                if [ $ver -ne 1604 ];then
                     { echo >&2 "ERROR - Unsupported Ubuntu Version. At least 16.04 is required."; exit 1; }
                 fi
 

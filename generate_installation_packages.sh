@@ -2,19 +2,14 @@
 
 # set -e
 
-IS_DEBUG=0
+# 
 function toggle_debug()
 {
-    IS_DEBUG=1
     mkdir -p build/
-    #exec 1>>build/stdout.txt
+    # exec 1>>build/stdout.log
     exec 2>>build/stderr.log
-    #BASH_XTRACEFD="5"s
-    PS4='$LINENO: '
-    #set -x
+    # exec 3>>build/stdinfo.log
 }
-
-#toggle_debug
 
 installPWD=$PWD
 
@@ -106,16 +101,13 @@ function build_node_ca()
     src=$3
     dst=$4
 
-    echo "agency => "$agency
-    echo "node => "$node
-    echo "dst => "$dst
+    echo "Build ca, agency=$agency, node=$node, dst=$dst"
 
     local ext_dir=${INSTALLATION_DEPENENCIES_EXT_DIR}/cert/
     bash $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/cert/ext.sh $agency $node ${ext_dir}
     cd $ext_dir
     if [ ! -f ${ext_dir}/$agency/$node/node.nodeid ];then
-        echo "node.nodeid is not exist, agency => $agency, node => $node"
-        return 2
+        error_message "node.nodeid is not exist, agency => $agency, node => $node"
     fi
 
     cp ${ext_dir}/ca.crt $dst/node 2>/dev/null
@@ -135,38 +127,30 @@ function create_node_ca()
     src=$3
     dst=$4
 
-    echo "agency => "$agency
-    echo "node => "$node
-    echo "src => "$src
-    echo "dst => "$dst
+    echo "Create ca, agency=$agency, node=$node, src=$src, dst=$dst"
 
     cd $src
 
     bash chain.sh 1>/dev/null #ca for chain
     if [ ! -f "ca.key" ]; then
-        echo "ca.key is not exist, maybe \" bash chain.sh \" failed."
-        return 2
+        error_message "ca.key is not exist, maybe \" bash chain.sh \" failed."
     elif [ ! -f "ca.crt" ]; then
-        echo "ca.crt is not exist, maybe \" bash chain.sh \" failed."
-        return 2
+        error_message "ca.crt is not exist, maybe \" bash chain.sh \" failed."
     fi
 
     bash agency.sh $agency 1>/dev/null #ca for agent
     if [ ! -d $agency ]; then
-        echo "$agency dir is not exist, maybe \" bash agency.sh $agency\" failed."
-        return 2
+        error_message "$agency dir is not exist, maybe \" bash agency.sh $agency\" failed."
     fi
 
     bash node.sh $agency $node 1>/dev/null #ca for node
     if [ ! -d $agency/$node ]; then
-        echo "$agency/$node dir is not exist, maybe \" bash node.sh $agency $node \" failed."
-        return 2
+        error_message "$agency/$node dir is not exist, maybe \" bash node.sh $agency $node \" failed."
     fi
 
     bash sdk.sh $agency "sdk" 1>/dev/null #ca for sdk
     if [ ! -d $agency/sdk ]; then
-        echo "$agency/sdk dir is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
-        return 2
+        error_message "$agency/sdk dir is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
     fi
 
     mkdir -p $dst/node
@@ -185,12 +169,7 @@ function build_node_installation_package()
     local host_type=$4
     local agent_info=$5
 
-    echo "build_node_installation_package =>"
-    echo "p2p_ip = "$public_ip
-    echo "listen_ip = "$private_ip
-    echo "node_num = "$node_num_per_host
-    echo "host_type = "$host_type
-    echo "agent_info = "$agent_info
+    echo "Building package => p2p_ip=$public_ip ,listen_ip=$private_ip ,node_num=$node_num_per_host ,host_type=$host_type ,agent=$agent_info"
 
     public_ip_underline=$(replace_dot_with_underline $public_ip)
     private_ip_underline=$(replace_dot_with_underline $private_ip)
@@ -244,10 +223,8 @@ function build_node_installation_package()
 
         #g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
         #mkdir -p ${g_genesis_node_action_container_dir_path}/
-        #echo ${g_genesis_node_action_container_dir_path} > $CACHE_DIR_PATH/g_genesis_node_action_container_dir_path
 
         g_genesis_cert_dir_path=$current_node_path/dependencies/cert
-        echo ${g_genesis_cert_dir_path} > $CACHE_DIR_PATH/g_genesis_cert_dir_path
 
         #copy god info to address
         if [ -f $TEMP_BUILD_DIR/godInfo.txt ];then
@@ -289,22 +266,13 @@ function build_node_installation_package()
             node_cert_path=$current_node_path/dependencies/cert/
             node_ca_path=$current_node_rlp_dir/ca/
             create_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
-            if [ $? -ne 0 ];then
-                return 2;
-            fi
         else
             node_cert_path=${g_genesis_cert_dir_path}
             node_ca_path=$current_node_rlp_dir/ca/
             if [ ! -z "${CA_EXT_MODE}" ] && [ ${CA_EXT_MODE} -eq 1 ];then
                 build_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
-                if [ $? -ne 0 ];then
-                    return 2;
-                fi
             else
                 create_node_ca $agent_info $node_name ${node_cert_path} ${node_ca_path}
-                if [ $? -ne 0 ];then
-                    return 2;
-                fi
             fi
         fi
 
@@ -344,7 +312,6 @@ function build_node_installation_package()
         if [ $host_type -eq $TYPE_GENESIS_HOST ] && [ $node_index -eq 0 ]
         then
             g_genesis_node_info_path=$installation_build_dir/$node_dir_name/dependencies/rlp_dir/bootstrapnodes.json
-            echo $g_genesis_node_info_path > $CACHE_DIR_PATH/g_genesis_node_info_path
 
             export HOST_IP=$public_ip
             export HOST_PORT=$p2p_port
@@ -401,39 +368,32 @@ function build_base_info_dir()
 
 function build_temp_node()
 {
-    # it means the temp node have already build if the $TEMP_BUILD_DIR is exist, so no need build again.
-    if ! [ -d $TEMP_BUILD_DIR ]
-    then
-        #port checkcheck
-        check_port $RPC_PORT_NODE
-        if [ $? -ne 0 ];then
-            error_message "temp node rpc port check, $RPC_PORT_NODE is in use."
-        fi
+    #port checkcheck
+    check_port $RPC_PORT_NODE
+    if [ $? -ne 0 ];then
+        error_message "temp node rpc port check, $RPC_PORT_NODE is in use."
+    fi
 
-        check_port $CHANNEL_PORT_NODE
-        if [ $? -ne 0 ];then
-            error_message "temp node channel port check, $CHANNEL_PORT_NODE is in use."
-        fi
+    check_port $CHANNEL_PORT_NODE
+    if [ $? -ne 0 ];then
+        error_message "temp node channel port check, $CHANNEL_PORT_NODE is in use."
+    fi
 
-        check_port $P2P_PORT_NODE
-        if [ $? -ne 0 ];then
-            error_message "temp node p2p port check, $P2P_PORT_NODE is in use."
-        fi
+    check_port $P2P_PORT_NODE
+    if [ $? -ne 0 ];then
+        error_message "temp node p2p port check, $P2P_PORT_NODE is in use."
+    fi
 
-        #build temp node, in order to generate the genesis json file
-        local temp_node_num=1
-        local temp_agenct_info="temp"
-        build_node_installation_package "127.0.0.1" "127.0.0.1" $temp_node_num $TYPE_TEMP_HOST $temp_agenct_info
+    #build temp node, in order to generate the genesis json file
+    local temp_node_num=1
+    local temp_agent_info="temp"
+    build_node_installation_package "127.0.0.1" "127.0.0.1" $temp_node_num $TYPE_TEMP_HOST $temp_agent_info
 
-        if [ $? -eq 0 ];then
-            cd $installation_build_dir/$TEMP_NODE_NAME/
-            bash install_temp_node.sh install
-        else
-            return 2
-        fi
+    if [ $? -eq 0 ];then
+        cd $installation_build_dir/$TEMP_NODE_NAME/
+        bash install_temp_node.sh install
     else
-        alert_msg="temp node is already exist."
-        echo $alert_msg
+        return 2
     fi
 
     cd $installPWD
@@ -578,7 +538,7 @@ function clone_and_build_fisco()
     else
         #check TARGET_FISCO_BCOS_PATH version
         fisco_bcos_version_check ${require_version}
-        if [ $? -eq 0 ];then
+        if [ $? -ne 0 ];then
             error_message ""
         fi
     fi
@@ -595,12 +555,13 @@ function version()
 # initial 
 function initial()
 {
-    if [ -d $buildPWD ];then
-        error_message "build directory already exist, please remove it first."
-    fi
-
-     # version print
+    # version print.
     version
+
+    #check if build dir is exist. 
+    if [ -d $buildPWD ];then
+        error_message "Error - build directory already exist, please remove it first."
+    fi
 
     # sudo permission check
     request_sudo_permission
@@ -612,6 +573,9 @@ function initial()
     dependencies_install
     # check if dependensies install success
     dependencies_check
+
+    #debug message
+    toggle_debug
 
     # parser config.ini file
     parser_ini config.ini
@@ -626,6 +590,7 @@ function initial()
 
     #global varible init
     g_host_config_num=${NODE_COUNT}
+
     echo "host_config_num = "$g_host_config_num
     
     g_genesis_node_info_path=""
@@ -640,7 +605,7 @@ function build()
     # set g_status_process to PROCESS_INITIALIZATION
     g_status_process=${PROCESS_INITIALIZATION}
 
-    # build temp node env and deploy system contract 
+    # build temp node , then deploy system contract 
     build_temp_node
     local syaddress=$(cat $TEMP_BUILD_DIR/syaddress.txt  2>/dev/null)
     if [ -z $syaddress ];then
@@ -659,9 +624,7 @@ function build()
         build_host_type=$(get_host_type $i)
 
         build_node_installation_package $public_ip $private_ip $node_num_per_host $build_host_type $agency_info
-        if [ $? -ne 0 ];then
-            return $?
-        fi
+
     done
 
     # register all node to systemcontract and export the genesis file
@@ -717,9 +680,6 @@ function expand()
         local build_host_type=$(get_host_type $i)
 
         build_node_installation_package $public_ip $private_ip $node_num_per_host $build_host_type $agency_info
-        if [ $? -ne 0 ];then
-            return $?
-        fi
 
         local node_dir_name_local=$(get_node_dir_name $build_host_type $public_ip $private_ip)
         local current_node_path_local=$installation_build_dir/$node_dir_name_local

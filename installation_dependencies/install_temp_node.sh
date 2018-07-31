@@ -118,8 +118,7 @@ function install()
    
     local god_addr=$(cat $current_node_dir_base/godInfo.txt | grep address | awk -F ':' '{print $2}' 2>/dev/null)
     if [ -z ${god_addr} ];then
-        echo "WARNING : fisco-bcos --newaccount failed."
-        return 1
+        error_messaage " fisco-bcos --newaccount opr faild." "false"
     fi
 
     cp $current_node_dir_base/godInfo.txt $buildPWD
@@ -144,7 +143,6 @@ function install()
     echo "CLIENTCERT_PWD="${CLIENTCERT_PWD}
     MYVARS='${CLIENTCERT_PWD}:${KEYSTORE_PWD}:${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}:${WEB3SDK_SYSTEM_CONTRACT_ADDR}'
     envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > ${current_web3sdk}/conf/applicationContext.xml
-    # echo "${DEPENENCIES_DIR}/tpl_dir/applicationContext.xml.tpl > ${DEPENENCIES_DIR}/web3sdk/conf/applicationContext.xml"
 
     cd ${current_node_dir_base}
     bash start_node${Idx[0]}.sh
@@ -156,8 +154,7 @@ function install()
     # check if temp node is running
     check_port ${WEB3SDK_CONFIG_PORT}
     if [ $? -eq 0 ];then
-        echo "channel port $WEB3SDK_CONFIG_PORT is not listening, maybe temp node start failed."
-        return 1
+        error_messaage "channel port $WEB3SDK_CONFIG_PORT is not listening, temp node start not success."
     fi
 
     #deploy system contract
@@ -167,18 +164,16 @@ function install()
 
     #deploy system contract failed
     if [ ! -f ${current_web3sdk}/bin/output/SystemProxy.address ];then
-        echo "WARNING : SystemProxy.address is not exist, maybe deploy system contract failed."
         bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        return 1
+        error_messaage "system contract address file is not exist, web3sdk deploy system contract not success."
     fi 
 
-    #cp output/SystemProxy.address $buildPWD/syaddress.txt
     syaddress=$(cat ${current_web3sdk}/bin/output/SystemProxy.address)
     if [ -z $syaddress ];then
-        echo "WARNING : system contract address null, maybe deploy system contract failed."
         bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        return 2  
+        error_messaage "system contract address file is empty, web3sdk deploy system contract not success." 
     fi
+    
     cp ${current_web3sdk}/bin/output/SystemProxy.address $buildPWD/syaddress.txt
 
     sleep 1
