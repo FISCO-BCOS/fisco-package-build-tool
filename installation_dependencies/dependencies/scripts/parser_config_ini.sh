@@ -133,17 +133,17 @@ function parser_ini()
 
     local param="github_url"
     local github_url=$(ini_get $file $section $param)
-    echo "===>>> github_url is"${github_url}
+    echo "===>>> github_url = "${github_url}
     env_set "FISCO_BCOS_GIT" ${github_url}
 
     local param="fisco_bcos_src_local"
     local fisco_bcos_src_local=$(ini_get $file $section $param)
-    echo "===>>> fisco_bcos_src_local is"${fisco_bcos_src_local}
+    echo "===>>> fisco_bcos_src_local = "${fisco_bcos_src_local}
     env_set "FISCO_BCOS_LOCAL_PATH" ${fisco_bcos_src_local}
 
     local param="fisco_bcos_version"
     local fisco_bcos_version=$(ini_get $file $section $param)
-    echo "===>>> fisco_bcos_version is"${fisco_bcos_version}
+    echo "===>>> fisco_bcos_version = "${fisco_bcos_version}
     env_set "FISCO_BCOS_VERSION" ${fisco_bcos_version}
 
 # [docker]
@@ -156,17 +156,17 @@ function parser_ini()
 
     local param="docker_toggle"
     local docker_toggle=$(ini_get $file $section $param)
-    echo "===>>> docker_toggle is"${docker_toggle}
+    echo "===>>> docker_toggle = "${docker_toggle}
     env_set "DOCKER_TOGGLE" ${docker_toggle}
 
     local param="docker_repository"
     local docker_repository=$(ini_get $file $section $param)
-    echo "===>>> docker_repository is"${docker_repository}
+    echo "===>>> docker_repository = "${docker_repository}
     env_set "DOCKER_REPOSITORY" ${docker_repository}
 
     local param="docker_version"
     local docker_version=$(ini_get $file $section $param)
-    echo "===>>> docker_version is"${docker_version}
+    echo "===>>> docker_version = "${docker_version}
     env_set "DOCKER_VERSION" ${docker_version}
 
 # [web3sdk]
@@ -178,12 +178,12 @@ function parser_ini()
    
     local param="ca_pwd"
     local ca_pwd=$(ini_get $file $section $param)
-    echo "===>>> ca_pwd is"${ca_pwd}
+    echo "===>>> ca_pwd = "${ca_pwd}
     env_set "CA_PWD" ${ca_pwd}
 
     local param="jks_pwd"
     local jks_pwd=$(ini_get $file $section $param)
-    echo "===>>> jks_pwd is"${jks_pwd}
+    echo "===>>> jks_pwd = "${jks_pwd}
     env_set "JKS_PWD" ${jks_pwd}
 
 # [other]
@@ -193,7 +193,7 @@ function parser_ini()
    
     local param="ca_ext"
     local ca_ext=$(ini_get $file $section $param)
-    echo "===>>> ca_ext is"${ca_ext}
+    echo "===>>> ca_ext = "${ca_ext}
     env_set "CA_EXT_MODE" ${ca_ext}
 
 # [ports]
@@ -205,17 +205,17 @@ function parser_ini()
 
     local param="p2p_port"
     local p2p_port=$(ini_get $file $section $param)
-    echo "===>>> p2p_port is"${p2p_port}
+    echo "===>>> p2p_port = "${p2p_port}
     env_set "P2P_PORT_NODE" ${p2p_port}
 
     local param="rpc_port"
     local rpc_port=$(ini_get $file $section $param)
-    echo "===>>> rpc_port is"${rpc_port}
+    echo "===>>> rpc_port = "${rpc_port}
     env_set "RPC_PORT_NODE" ${rpc_port}
 
     local param="channel_port"
     local channel_port=$(ini_get $file $section $param)
-    echo "===>>> channel_port is"${channel_port}
+    echo "===>>> channel_port = "${channel_port}
     env_set "CHANNEL_PORT_NODE" ${channel_port}
 
 # [nodes]
@@ -393,22 +393,22 @@ function parser_expand_ini()
    
     local param="genesis_ca_dir"
     local genesis_ca_dir=$(ini_get $file $section $param)
-    echo "===>>> genesis_ca_dir is "${genesis_ca_dir}
+    echo "===>>> genesis_ca_dir = "${genesis_ca_dir}
     env_set "EXPAND_GENESIS_CA_DIR" ${genesis_ca_dir}
 
     local param="genesis_file"
     local genesis_file=$(ini_get $file $section $param)
-    echo "===>>> genesis_file is "${genesis_file}
+    echo "===>>> genesis_file = "${genesis_file}
     env_set "EXPAND_GENESIS_FILE" ${genesis_file}
 
     local param="system_address_file"
     local system_address_file=$(ini_get $file $section $param)
-    echo "===>>> system_address_file is "${system_address_file}
+    echo "===>>> system_address_file = "${system_address_file}
     env_set "EXPAND_SYSTEM_ADDRESS_FILE" ${system_address_file}
 
     local param="bootstrapnodes_file"
     local bootstrapnodes_file=$(ini_get $file $section $param)
-    echo "===>>> bootstrapnodes_file is "${bootstrapnodes_file}
+    echo "===>>> bootstrapnodes_file = "${bootstrapnodes_file}
     env_set "EXPAND_BOOTSTRAPNODES_FILE" ${bootstrapnodes_file}
 }
 

@@ -513,9 +513,9 @@ function get_host_type()
         else
             build_host_type_local=$TYPE_FOLLOWER_HOST
         fi
-    fi
 
-    echo $build_host_type_local
+        echo $build_host_type_local
+    fi
 }
 
 function build_fisco_bcos()
@@ -692,7 +692,7 @@ function expand()
     initial
 
     # load expand special config
-    parser_expand_ini
+    parser_expand_ini config.ini
 
     # check expand config invalid
     expand_param_check
@@ -721,7 +721,6 @@ function expand()
             return $?
         fi
 
-        local public_ip_underline=$(replace_dot_with_underline $public_ip)
         local node_dir_name_local=$(get_node_dir_name $build_host_type $public_ip $private_ip)
         local current_node_path_local=$installation_build_dir/$node_dir_name_local
 
