@@ -54,7 +54,9 @@ function fisco_bcos_version_check()
         return 0
     fi
 
-    error_message "Required version is $REQUIRE_VERSION, now fisco bcos version is $FISCO_VERSION"
+    error_message "Required version is $REQUIRE_VERSION, now fisco bcos version is $FISCO_VERSION" "false"
+
+    return 1
 }
 
 function get_node_dir_name()
@@ -512,7 +514,7 @@ function get_host_type()
             build_host_type_local=$TYPE_FOLLOWER_HOST
         fi
     fi
-    
+
     echo $build_host_type_local
 }
 
@@ -576,7 +578,9 @@ function clone_and_build_fisco()
     else
         #check TARGET_FISCO_BCOS_PATH version
         fisco_bcos_version_check ${require_version}
-        return $?
+        if [ $? -eq 0 ];then
+            error_message ""
+        fi
     fi
 }
 

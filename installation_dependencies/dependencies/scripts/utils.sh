@@ -7,7 +7,7 @@ function error_message()
     local is_exit=$2
     echo >&2 ${message}
 
-    if [ -z "$is_exit"] || [ "$is_exit" != "false" ];then
+    if [ -z "$is_exit" ] || [ "$is_exit" != "false" ];then
         exit 1
     fi
 }
