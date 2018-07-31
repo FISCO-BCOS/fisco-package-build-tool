@@ -140,7 +140,9 @@ function install()
     export WEB3SDK_CONFIG_IP=${listenip[0]}
     export WEB3SDK_CONFIG_PORT=${CHANNEL_PORT_VALUE_TPL}
     export WEB3SDK_SYSTEM_CONTRACT_ADDR=${DEFAULT_SYSTEM_CONTRACT_ADDRESS}
-    MYVARS='${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}:${WEB3SDK_SYSTEM_CONTRACT_ADDR}'
+    echo "KEYSTORE_PWD="${KEYSTORE_PWD}
+    echo "CLIENTCERT_PWD="${CLIENTCERT_PWD}
+    MYVARS='${CLIENTCERT_PWD}:${KEYSTORE_PWD}:${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}:${WEB3SDK_SYSTEM_CONTRACT_ADDR}'
     envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > ${current_web3sdk}/conf/applicationContext.xml
     # echo "${DEPENENCIES_DIR}/tpl_dir/applicationContext.xml.tpl > ${DEPENENCIES_DIR}/web3sdk/conf/applicationContext.xml"
 
