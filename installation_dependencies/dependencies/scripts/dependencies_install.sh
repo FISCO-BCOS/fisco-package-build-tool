@@ -150,3 +150,91 @@ function dependencies_install()
     esac
 }
 
+function simple_dependencies_install() 
+{
+    local myname=$1
+    if [ -z $myname ];then
+        myname=$module_name
+    fi
+
+    # Check for 'uname' and abort if it is not available.
+    uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
+
+    case $(uname -s) in 
+
+    #------------------------------------------------------------------------------
+    # macOS
+    #------------------------------------------------------------------------------
+    Darwin)
+        case $(sw_vers -productVersion | awk -F . '{print $1"."$2}') in
+            *)
+                /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+                brew install gettext
+                brew link --force gettext
+
+            ;;
+        esac #case $(sw_vers
+
+        ;; #Darwin)
+        
+    #------------------------------------------------------------------------------
+    # Linux
+    #------------------------------------------------------------------------------
+    Linux)
+
+        if [ ! -f "/etc/os-release" ];then
+            { echo >&2 "ERROR - Unsupported or unidentified Linux distro."; exit 1; }
+        fi
+
+        DISTRO_NAME=$(. /etc/os-release; echo $NAME)
+        # echo "Linux distribution: $DISTRO_NAME."
+
+        case $DISTRO_NAME in
+    #------------------------------------------------------------------------------
+    # Ubuntu  # At least 16.04
+    #------------------------------------------------------------------------------
+            Ubuntu*)
+
+                    sudo apt-get -y install lsof
+                    sudo apt-get -y install gettext
+                    sudo apt-get -y install bc
+                ;;
+    #------------------------------------------------------------------------------
+    # CentOS  # At least 7.2
+    #------------------------------------------------------------------------------
+            CentOS*)
+
+                    sudo yum -y install bc
+                    sudo yum -y install gettext
+                    sudo yum -y install lsof
+
+                ;;
+    #------------------------------------------------------------------------------
+    # Oracle Linux Server # At least 7.4
+    #------------------------------------------------------------------------------
+            Oracle*) 
+                   
+                    sudo yum -y install bc
+                    sudo yum -y install gettext
+                    sudo yum -y install lsof
+
+                ;;
+    #------------------------------------------------------------------------------
+    # Other Linux
+    #------------------------------------------------------------------------------
+            *)
+                { echo >&2 "ERROR - Unsupported Linux distribution: $DISTRO_NAME."; exit 1; }
+                ;;
+        esac # case $DISTRO_NAME
+
+        ;; #Linux)
+
+    #------------------------------------------------------------------------------
+    # Other platform (not Linux, FreeBSD or macOS).
+    #------------------------------------------------------------------------------
+    *)
+        #other
+        { echo >&2 "ERROR - Unsupported or unidentified operating system."; exit 1; }
+        ;;
+    esac
+}
