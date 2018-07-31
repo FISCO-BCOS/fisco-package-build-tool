@@ -41,8 +41,8 @@
 					<bean class="org.bcos.channel.handler.ChannelConnections">
 						<property name="caCertPath" value="classpath:ca.crt" />
 						<property name="clientKeystorePath" value="classpath:client.keystore" />
-						<property name="keystorePassWord" value="123456" />
-						<property name="clientCertPassWord" value="123456" />
+						<property name="keystorePassWord" value="${KEYSTOREPASSWORK}" />
+						<property name="clientCertPassWord" value="${CLIENTCERTPASSWORD}" />
                         <property name="connectionsStr">
 							<list>
 								<value>node1@${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}</value>  
