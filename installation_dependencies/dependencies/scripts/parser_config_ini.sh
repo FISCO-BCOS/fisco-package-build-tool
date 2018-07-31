@@ -375,3 +375,81 @@ function ini_param_check()
         node_index=$(($node_index+1))
     done
 }
+
+#load expand config in config.ini
+function parser_expand_ini()
+{
+    local file=$1
+
+# [expand]
+# genesis_ca_dir=cert
+# genesis_file=genesis.json
+# system_address_file=syaddress.txt
+# bootstrapnodes_file=bootstrapnodes.json
+
+# [expand]
+
+    local section="expand"
+   
+    local param="genesis_ca_dir"
+    local genesis_ca_dir=$(ini_get $file $section $param)
+    echo "===>>> genesis_ca_dir is "${genesis_ca_dir}
+    env_set "EXPAND_GENESIS_CA_DIR" ${genesis_ca_dir}
+
+    local param="genesis_file"
+    local genesis_file=$(ini_get $file $section $param)
+    echo "===>>> genesis_file is "${genesis_file}
+    env_set "EXPAND_GENESIS_FILE" ${genesis_file}
+
+    local param="system_address_file"
+    local system_address_file=$(ini_get $file $section $param)
+    echo "===>>> system_address_file is "${system_address_file}
+    env_set "EXPAND_SYSTEM_ADDRESS_FILE" ${system_address_file}
+
+    local param="bootstrapnodes_file"
+    local bootstrapnodes_file=$(ini_get $file $section $param)
+    echo "===>>> bootstrapnodes_file is "${bootstrapnodes_file}
+    env_set "EXPAND_BOOTSTRAPNODES_FILE" ${bootstrapnodes_file}
+}
+
+# check all env
+function expand_param_check()
+{
+    local section="expand"
+   
+    local genesis_ca_dir=${EXPAND_GENESIS_CA_DIR}
+    if [ -z ${genesis_ca_dir} ];then
+        { echo >&2 "ERROR - EXPAND_GENESIS_CA_DIR cannot find ,[expand] genesis_ca_dir may not set ."; exit 1; }
+    fi
+    
+    if [ ! -d "${genesis_ca_dir}" ];then
+        { echo >&2 "ERROR - genesis_ca_dir is not dir. genesis_ca_dir is "${genesis_ca_dir}; exit 1; }
+    fi
+
+    local genesis_file=${EXPAND_GENESIS_FILE}
+    if [ -z "${genesis_file}" ];then
+        { echo >&2 "ERROR - EXPAND_GENESIS_FILE cannot find ,[expand] genesis_file may not set ."; exit 1; }
+    fi
+    
+    if [ ! -f ${genesis_file} ];then
+        { echo >&2 "ERROR - genesis_file is not exist. genesis_file is "${genesis_file}; exit 1; }
+    fi
+
+    local system_address_file=${EXPAND_SYSTEM_ADDRESS_FILE}
+    if [ -z "${system_address_file}" ];then
+        { echo >&2 "ERROR - EXPAND_SYSTEM_ADDRESS_FILE cannot find ,[expand] system_address_file may not set ."; exit 1; }
+    fi
+    
+    if [ ! -f ${system_address_file} ];then
+        { echo >&2 "ERROR - system_address_file is not exist. system_address_file is "${system_address_file}; exit 1; }
+    fi
+
+    local bootstrapnodes_file=${EXPAND_BOOTSTRAPNODES_FILE}
+    if [ -z "${bootstrapnodes_file}" ];then
+        { echo >&2 "ERROR - EXPAND_BOOTSTRAPNODES_FILE cannot find ,[expand] bootstrapnodes_file may not set ."; exit 1; }
+    fi
+    
+    if [ ! -f ${bootstrapnodes_file} ];then
+        { echo >&2 "ERROR - bootstrapnodes_file is not exist. bootstrapnodes_file is "${system_address_file}; exit 1; }
+    fi
+}
