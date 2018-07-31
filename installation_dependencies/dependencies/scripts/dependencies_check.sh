@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# set -e
-
 #check user has sudo permission
 function request_sudo_permission() 
 {

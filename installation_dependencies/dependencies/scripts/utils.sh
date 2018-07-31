@@ -5,10 +5,21 @@ function error_message()
 {
     local message=$1
     local is_exit=$2
-    echo >&2 ${message}
+    echo ${message} >&2 
 
     if [ -z "$is_exit" ] || [ "$is_exit" != "false" ];then
         exit 1
+    fi
+}
+
+# print info message
+function info_message()
+{
+    echo ${message}
+
+    if [ ! -z "$IS_DEBUG" ] && [ $IS_DEBUG -eq 1 ];then
+        local message=$1
+        echo ${message} >>&3 
     fi
 }
 
@@ -81,13 +92,24 @@ function replace_dot_with_underline()
     echo $1 | sed -e "s/\./_/g"
 }
 
+#check if file exist
 function check_file_exist()
 {
     local file_name=$1
     if ! [ -f ${file_name} ]
     then
-        echo "${file_name} file is not exist"
-        return 2
+        return 1
     fi
+    return 0
+}
+
+#check if file empty
+function check_file_empty()
+{
+    local file_name=$1
+    if [ -s ${file_name} ];then
+        return 1
+    fi
+
     return 0
 }

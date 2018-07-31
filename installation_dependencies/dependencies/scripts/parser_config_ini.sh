@@ -368,7 +368,7 @@ function ini_param_check()
 
     local node_count=${NODE_COUNT}
     if [ -z "$node_count" ];then
-        { echo >&2 "ERROR - node_count invalid ,[nodes] invalid ."; exit 1; }
+        { echo >&2 "ERROR - node_count null ,[nodes] invalid ."; exit 1; }
     fi
 
     if [ $node_count -le 0 ];then

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#set -e
-
 module_name="install.sh"
 
 # uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
