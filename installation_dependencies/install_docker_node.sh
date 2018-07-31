@@ -9,6 +9,8 @@ dockerPWD=$installPWD/docker/
 DEPENENCIES_DIR=$installPWD/dependencies
 source $DEPENENCIES_DIR/scripts/utils.sh
 source $DEPENENCIES_DIR/scripts/public_config.sh
+source $DEPENENCIES_DIR/scripts/dependencies_install.sh
+source $DEPENENCIES_DIR/scripts/dependencies_check.sh
 
 source $DEPENENCIES_FOLLOW_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
@@ -118,18 +120,6 @@ function generate_stopallsh_func()
     return 0
 }
 
-#install dependency software
-function install_dependencies() 
-{ 
-    if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-        sudo apt-get -y install gettext
-        sudo apt-get -y install bc
-    else
-        sudo yum -y install bc
-        sudo yum -y install gettext
-    fi
-}
-
 function install()
 {
     echo "    Installing fisco-bcos docker environment start"
@@ -164,7 +154,7 @@ function install()
 
     print_dash
 
-    install_dependencies
+    simple_dependencies_install
 
     i=0
     while [ $i -lt $nodecount ]
