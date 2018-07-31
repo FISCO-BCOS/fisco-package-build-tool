@@ -53,7 +53,9 @@ ln -s /usr/bin/fromdos /usr/bin/dos2unix
 # 5. <a name="buildblockchain" id="buildblockchain">从零开始搭建区块链步骤</a>
 #### 5.1 准备
 * 获取fisco-package-build-tool工具包  
+```shell
 git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git  
+```
 然后执行下面命令:  
 ```shell
 chmod a+x format.sh ; dos2unix format.sh ; ./format.sh
