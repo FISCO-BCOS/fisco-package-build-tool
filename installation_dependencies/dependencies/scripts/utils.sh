@@ -1,5 +1,16 @@
 #!/bin/bash
-set +e
+
+# print message to stderr , if need and will exit
+function error_message()
+{
+    local message=$1
+    local is_exit=$2
+    echo >&2 ${message}
+
+    if [ -z "$is_exit"] || [ "$is_exit" != "false" ];then
+        exit 1
+    fi
+}
 
 #check if the port is used
 function check_port() 
