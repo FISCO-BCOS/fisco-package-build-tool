@@ -13,6 +13,10 @@ sealEngine="PBFT"
 networkid="12345"
 crypto_mode="0"
 
+# web3sdk
+keystore_pwd=${KEYSTORE_PWD}
+clientcert_pwd=${CLIENTCERT_PWD}
+
 #fisco-bcos docker repository, default "docker.io/fiscoorg/fiscobcos"
 docker_repository=${DOCKER_REPOSITORY_TPL}
 #fisco-bcos docker version, default "latest"

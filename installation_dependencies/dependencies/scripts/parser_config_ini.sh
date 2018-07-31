@@ -178,7 +178,7 @@ function parser_ini()
    
     local param="keystore_pwd"
     local keystore_pwd=$(ini_get $file $section $param)
-    echo "===>>> keystore_pwd = "${ca_pwd}
+    echo "===>>> keystore_pwd = "${keystore_pwd}
     env_set "KEYSTORE_PWD" ${keystore_pwd}
 
     local param="clientcert_pwd"
