@@ -170,21 +170,21 @@ function parser_ini()
     env_set "DOCKER_VERSION" ${docker_version}
 
 # [web3sdk]
-# ca_pwd=123456
-# jks_pwd=123456
+# keystore_pwd=123456
+# clientcert_pwd=123456
 
 # [web3sdk] section
     local section="web3sdk"
    
-    local param="ca_pwd"
-    local ca_pwd=$(ini_get $file $section $param)
-    echo "===>>> ca_pwd = "${ca_pwd}
-    env_set "CA_PWD" ${ca_pwd}
+    local param="keystore_pwd"
+    local keystore_pwd=$(ini_get $file $section $param)
+    echo "===>>> keystore_pwd = "${ca_pwd}
+    env_set "KEYSTORE_PWD" ${keystore_pwd}
 
-    local param="jks_pwd"
-    local jks_pwd=$(ini_get $file $section $param)
-    echo "===>>> jks_pwd = "${jks_pwd}
-    env_set "JKS_PWD" ${jks_pwd}
+    local param="clientcert_pwd"
+    local clientcert_pwd=$(ini_get $file $section $param)
+    echo "===>>> clientcert_pwd = "${clientcert_pwd}
+    env_set "CLIENTCERT_PWD" ${clientcert_pwd}
 
 # [other]
 # ca_ext=1
@@ -252,19 +252,19 @@ function valid_node()
     local count=${node[2]}
     local agent=${node[3]}
 
-    if [ -z ${p2pip} ];then
+    if [ -z "${p2pip}" ];then
         { echo >&2 "ERROR - [nodes] p2pip null . node => "$1; exit 1; }
     fi
 
-    if [ -z ${listenip} ];then
+    if [ -z "${listenip}" ];then
         { echo >&2 "ERROR - [nodes] listenip null . node => "$1; exit 1; }
     fi
 
-    if [ -z ${count} ];then
+    if [ -z "${count}" ];then
         { echo >&2 "ERROR - [nodes] count null . node => "$1; exit 1; }
     fi
 
-    if [ -z ${agent} ];then
+    if [ -z "${agent}" ];then
         { echo >&2 "ERROR - [nodes] agent null . node => "$1; exit 1; }
     fi
 
@@ -287,49 +287,61 @@ function ini_param_check()
 {
     # env FISCO_BCOS_GIT 
     local github_url=${FISCO_BCOS_GIT}
-    if [ -z ${github_url} ];then
+    if [ -z "${github_url}" ];then
         { echo >&2 "ERROR - FISCO_BCOS_GIT cannot find ,[common] github_url may not set ."; exit 1; }
     fi
 
     # env FISCO_BCOS_LOCAL_PATH 
     local fisco_bcos_src_local=${FISCO_BCOS_LOCAL_PATH}
-    if [ -z ${fisco_bcos_src_local} ];then
+    if [ -z "${fisco_bcos_src_local}" ];then
         { echo >&2 "ERROR - FISCO_BCOS_LOCAL_PATH cannot find ,[common] fisco_bcos_src_local may not set ."; exit 1; }
     fi
 
     # env FISCO_BCOS_VERSION 
     local fisco_bcos_version=${FISCO_BCOS_VERSION}
-    if [ -z ${fisco_bcos_version} ];then
+    if [ -z "${fisco_bcos_version}" ];then
         { echo >&2 "ERROR - FISCO_BCOS_VERSION cannot find ,[common] fisco_bcos_version may not set ."; exit 1; }
     fi
 
     # env DOCKER_TOGGLE 
     local docker_toggle=${DOCKER_TOGGLE}
-    if [ -z ${docker_toggle} ];then
+    if [ -z "${docker_toggle}" ];then
         { echo >&2 "ERROR - DOCKER_TOGGLE cannot find ,[docker] docker_toggle may not set ."; exit 1; }
     fi
 
     # env DOCKER_REPOSITORY 
     local docker_repository=${DOCKER_REPOSITORY}
-    if [ -z ${docker_repository} ];then
+    if [ -z "${docker_repository}" ];then
         { echo >&2 "ERROR - DOCKER_REPOSITORY cannot find ,[docker] docker_repository may not set ."; exit 1; }
     fi
 
     # env DOCKER_VERSION 
     local docker_version=${DOCKER_VERSION}
-    if [ -z ${docker_version} ];then
+    if [ -z "${docker_version}" ];then
         { echo >&2 "ERROR - DOCKER_VERSION cannot find ,[docker] docker_version may not set ."; exit 1; }
     fi
 
     # env CA_EXT_MODE 
     local ca_ext=${CA_EXT_MODE}
-    if [ -z ${ca_ext} ];then
+    if [ -z "${ca_ext}" ];then
         { echo >&2 "ERROR - CA_EXT_MODE cannot find ,[other] ca_ext may not set ."; exit 1; }
+    fi
+
+    # env KEYSTORE_PWD
+    local keystore_pwd=${KEYSTORE_PWD}
+    if [ -z "${keystore_pwd}" ];then
+        { echo >&2 "ERROR - KEYSTORE_PWD cannot find ,[web3sdk] keystore_pwd may not set ."; exit 1; }
+    fi
+
+    # env CLIENTCERT_PWD
+    local clientcert_pwd=${CLIENTCERT_PWD}
+    if [ -z "${clientcert_pwd}" ];then
+        { echo >&2 "ERROR - CLIENTCERT_PWD cannot find ,[web3sdk] clientcert_pwd may not set ."; exit 1; }
     fi
 
     # env P2P_PORT_NODE 
     local p2p_port=${P2P_PORT_NODE}
-    if [ -z ${p2p_port} ];then
+    if [ -z "${p2p_port}" ];then
         { echo >&2 "ERROR - P2P_PORT_NODE cannot find ,[port] p2p_port may not set ."; exit 1; }
     fi
     if [ ${p2p_port} -le 0 ] || [ ${p2p_port} -ge 65536 ];then
@@ -338,7 +350,7 @@ function ini_param_check()
 
     # env P2P_PORT_NODE 
     local rpc_port=${RPC_PORT_NODE}
-    if [ -z ${rpc_port} ];then
+    if [ -z "${rpc_port}" ];then
         { echo >&2 "ERROR - RPC_PORT_NODE cannot find ,[port] rpc_port may not set ."; exit 1; }
     fi
     if [ ${rpc_port} -le 0 ] || [ ${rpc_port} -ge 65536 ];then
@@ -347,7 +359,7 @@ function ini_param_check()
 
     # env CHANNEL_PORT_NODE 
     local channel_port=${CHANNEL_PORT_NODE}
-    if [ -z ${channel_port} ];then
+    if [ -z "${channel_port}" ];then
         { echo >&2 "ERROR - CHANNEL_PORT_NODE cannot find ,[ports] channel_port may not set ."; exit 1; }
     fi
     if [ ${channel_port} -le 0 ] || [ ${channel_port} -ge 65536 ];then
@@ -418,7 +430,7 @@ function expand_param_check()
     local section="expand"
    
     local genesis_ca_dir=${EXPAND_GENESIS_CA_DIR}
-    if [ -z ${genesis_ca_dir} ];then
+    if [ -z "${genesis_ca_dir}" ];then
         { echo >&2 "ERROR - EXPAND_GENESIS_CA_DIR cannot find ,[expand] genesis_ca_dir may not set ."; exit 1; }
     fi
     
