@@ -465,6 +465,7 @@ function deploy_system_contract_for_initialization()
         nohup ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/nodedir0/config.json --export-genesis $g_genesis_new_json_path  >$installation_build_dir/$TEMP_NODE_NAME/build/nodedir0/.log 1>/dev/null 2>&1 &
     fi
     echo "    exporting genesis file : "
+    chmod a+x $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 
     $installPWD/$INSTALLATION_DEPENENCIES_LIB_DIR_NAME/dependencies/scripts/percent_num_progress_bar.sh 3 &
     sleep 4
 
