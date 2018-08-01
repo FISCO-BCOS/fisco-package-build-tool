@@ -329,6 +329,7 @@ function install()
     ./start_node${Idx[0]}.sh
 
     echo "    Loading genesis file : "
+    chmod +x $DEPENENCIES_DIR/scripts/percent_num_progress_bar.sh
     $DEPENENCIES_DIR/scripts/percent_num_progress_bar.sh 24 &
     sleep 24
 
