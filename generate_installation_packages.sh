@@ -221,8 +221,8 @@ function build_node_installation_package()
         # copy node_manager.sh
         cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
 
-        #g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
-        #mkdir -p ${g_genesis_node_action_container_dir_path}/
+        g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
+        mkdir -p ${g_genesis_node_action_container_dir_path}/
 
         g_genesis_cert_dir_path=$current_node_path/dependencies/cert
 
@@ -307,6 +307,12 @@ function build_node_installation_package()
             mkdir -p $installation_build_dir/$node_dir_name/dependencies/node_action_info_dir/
             current_node_action_info_file_path=$installation_build_dir/$node_dir_name/dependencies/node_action_info_dir/nodeactioninfo_"$public_ip_underline"_"$node_index".json
             cp $node_ca_path/node/node.json $current_node_action_info_file_path
+
+            # copy all node action info files to the container dir which owned by genesis node
+            if [ ${g_status_process} -eq ${PROCESS_INITIALIZATION} ] || [ ${g_status_process} -eq ${PROCESS_EXPAND_NODE} ]
+            then
+                cp $current_node_action_info_file_path ${g_genesis_node_action_container_dir_path}
+            fi
         fi
 
         if [ $host_type -eq $TYPE_GENESIS_HOST ] && [ $node_index -eq 0 ]
@@ -442,12 +448,9 @@ function deploy_system_contract_for_initialization()
     # export the genesis file
     cd $installation_build_dir/$TEMP_NODE_NAME/build/node/
     bash stop_node0.sh 1>/dev/null
-    if [ ${IS_DEBUG} -eq 1 ]
-    then
-        ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 2>&1
-    else
-        ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 1>/dev/null 2>&1
-    fi
+
+    ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 2>&1
+
     echo "    exporting genesis file : "
     $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/scripts/percent_num_progress_bar.sh 2 &
     sleep 3
