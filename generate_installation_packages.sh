@@ -563,7 +563,7 @@ function initial()
 
     #check if build dir is exist. 
     if [ -d $buildPWD ];then
-        error_message "Error - build directory already exist, please remove it first."
+        error_message "build directory already exist, please remove it first."
     fi
 
     # sudo permission check
