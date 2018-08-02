@@ -33,7 +33,7 @@
 	
 	<bean id="channelService" class="org.bcos.channel.client.Service">
 		<property name="orgID" value="WB" />
-		<property name="connectSeconds" value="10" />
+		<property name="connectSeconds" value="100" />
 		<property name="connectSleepPerMillis" value="10" />
 		<property name="allChannelConnections">
 			<map>

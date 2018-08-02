@@ -579,6 +579,7 @@ function install_dependencies()
         sudo apt-get -y install libminiupnpc-dev
         sudo apt-get -y install libssl-dev libkrb5-dev
         sudo apt-get -y install lsof
+	sudo apt-get -y install vim-common
     else
         sudo yum -y install bc
         sudo yum -y install gettext
@@ -588,6 +589,7 @@ function install_dependencies()
         sudo yum -y install boost-devel leveldb-devel curl-devel 
         sudo yum -y install libmicrohttpd-devel gmp-devel 
         sudo yum -y install lsof
+        sudo yum -y install  vim-common
     fi
 }
 

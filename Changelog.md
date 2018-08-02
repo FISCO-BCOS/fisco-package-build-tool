@@ -19,3 +19,14 @@
 2. 文档更新.  
 3. 新的连接管理导致的证书管理机制修改, 每个节点证书在构建安装包过程中生成. 
 4. 添加uuid库, 支持FISCO BCOS 1.3.1. 
+
+### V1.1.1 (2018-07-09)
+* Update:  
+1. 适配FISCO-BCOS v1.3.1版本.  
+2. 构建过程中, 生成god账号过程使用fisco-bcos --newaccount命令, 不再使用nodejs命令, 加快生成速度.
+
+### V1.1.2 (2018-08-02)
+* Update:  
+1. 添加vim-common的安装, 解决xxd未安装生成私钥为空问题.  
+2. applicationContext.xml中connoctSeconds字段默认值修改为100, 之前偶发的web3sdk无法连接到节点.  
+3. README.md更新.

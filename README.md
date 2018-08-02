@@ -30,22 +30,23 @@
 git 
 dos2unix 
 lsof 
-java[1.8+]
+Oracle JDK [1.8]
 
 [CentOS Install]
 sudo yum -y install git 
 sudo yum -y install dos2unix
-sudo yum -y install java 
 sudo yum -y install lsof
 
 [Ubuntu Install]
 sudo apt install git
 sudo apt install lsof
-sudo apt install openjdk-8-jre-headless
 sudo apt install tofrodos
 ln -s /usr/bin/todos /usr/bin/unix2dos 
 ln -s /usr/bin/fromdos /usr/bin/dos2unix 
 ```
+**注意**
+- CentOS/Ubuntu默认安装或者使用yum/apt安装的是openJDK, 并不符合使用要求, Oracle JDK 1.8 的安装链接.  
+[[ Oracle JDK 1.8 安装]](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/Oracle%20JAVA%201.8%20%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md)
 
 - [x]    其他依赖  
   sudo权限, 需要当前执行的用户具有sudo权限
@@ -53,16 +54,16 @@ ln -s /usr/bin/fromdos /usr/bin/dos2unix
 # 5. <a name="buildblockchain" id="buildblockchain">从零开始搭建区块链步骤</a>
 #### 5.1 准备
 * 获取fisco-package-build-tool工具包  
-git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git  
+``` git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git ``` 
 然后执行下面命令:  
 ```shell
-chmod a+x format.sh ; dos2unix format.sh ; ./format.sh
+$ cd fisco-package-build-tool
+$ chmod a+x format.sh ; dos2unix format.sh ; ./format.sh
 ```
 
 #### 5.2 配置新建区块链的节点信息
 
 ```shell
-$ cd fisco-package-build-tool
 $ vim installation_config.sh
 ```
 
