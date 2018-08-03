@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#if genesis host
+is_genesis_host=${IS_GENESIS_HOST_TPL}
+
 #node num
 nodecount=${NODE_NUM_TPL}
 
@@ -9,6 +12,10 @@ god="${GOD_ADDRESS_TPL}"
 sealEngine="PBFT"
 networkid="12345"
 crypto_mode="0"
+
+# web3sdk
+keystore_pwd=${KEYSTORE_PWD}
+clientcert_pwd=${CLIENTCERT_PWD}
 
 #fisco-bcos docker repository, default "docker.io/fiscoorg/fiscobcos"
 docker_repository=${DOCKER_REPOSITORY_TPL}

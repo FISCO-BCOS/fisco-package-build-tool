@@ -17,33 +17,9 @@ function toggle_debug()
 
 #public config
 installPWD=$PWD
-DEPENENCIES_DIR=$installPWD/dependencies
-source $DEPENENCIES_DIR/scripts/utils.sh
-source $DEPENENCIES_DIR/scripts/public_config.sh
-
-DEFAULT_SYSTEM_CONTRACT_ADDRESS="0x919868496524eedc26dbb81915fa1547a20f8998"
-
-help_str="please pass ip like: $0 internal_ip external_ip to install"
-
-function check_param()
-{
-    is_internal_ip_valid=$(is_valid_ip $1)
-    is_external_ip_valid=$(is_valid_ip $2)
-
-    if [ "$is_internal_ip_valid" = "false" ] || [ "$is_external_ip_valid" = "false" ]
-    then
-        echo "miss internal ip and external ip as parameter!"
-        echo $help_str
-        return
-        #exit
-    else 
-        if [ "$is_internal_ip_valid" = "false" ];then
-            echo "internal ip invalid ,ip is "$is_internal_ip_valid
-        else
-            echo "external ip invalid ,ip is "$is_external_ip_valid
-        fi
-    fi
-}
+source $installPWD/dependencies/scripts/utils.sh
+source $installPWD/dependencies/scripts/public_config.sh
+source $installPWD/dependencies/scripts/dependencies_check.sh
 
 #check_param $1 $2
 source $DEPENENCIES_FOLLOW_DIR/config.sh
@@ -87,149 +63,11 @@ function generate_startsh()
     echo "$startsh"
 }
 
-#enviroment for node in node.sh
-function build_node_sh()
-{
-    node_str="
-    export NODE_HOME=$buildPWD/nodejs;
-    export PATH=\$PATH:\$NODE_HOME/bin;
-    export NODE_PATH=\$NODE_HOME/lib/node_modules:\$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
-    "
-    echo $node_str > $buildPWD/node.sh
-    echo "source $buildPWD/node.sh" >> ~/.bashrc
-    source ~/.bashrc
-}
-
-#install node
-function install_nodejs()
-{
-    print_install_result "nodejs"
-
-    mkdir -p $buildPWD/nodejs/bin/
-    cd $installPWD/dependencies/nodejs/
-    tar --strip-components 1 -xzvf node-v*tar.gz -C $buildPWD/nodejs/ 1>>/dev/null
-
-    export NODE_HOME=$buildPWD/nodejs
-    export PATH=$PATH:$NODE_HOME/bin
-
-    #install node js enviroment in web3lib tool systemcontractv dictionary
-    cd ../web3lib
-    npm install >/dev/null 2>&1
-    cd ../tool
-    npm install >/dev/null 2>&1
-    #cd ../systemcontract
-    #npm install
-
-    #cd $installPWD
-    return 0
-}
-
-#install ethconsole
-function install_ethconsole()
-{
-    print_install_result "ethconsole"
-
-    #mkdir -p $installPWD/build/nodejs/
-    mkdir -p $NODE_MODULES_DIR/
-    mkdir -p $buildPWD/nodejs/bin/
-    rm -rf $NODE_MODULES_DIR/ethereum-console/
-
-    cd $installPWD/dependencies/nodejs/
-    tar -xzvf ethereum-console.tar.gz 1>>/dev/null
-    mv ethereum-console $NODE_MODULES_DIR/
-
-    cd $buildPWD/nodejs/bin/
-    rm -f ethconsole
-    ln -s $NODE_MODULES_DIR/ethereum-console/main.js ethconsole
-    cd $installPWD
-    return 0
-}
-
-# install babel js, which is needed by process of deploy contract
-function install_babel()
-{
-    print_install_result "babel.js"
-
-    #cd $NODE_MODULES_DIR
-    #npm install --save-dev babel-cli babel-preset-es2017 async
-    cd $installPWD/dependencies/nodejs/
-
-    #cp babelrc ~/.babelrc
-    echo '{ "presets": ["es2017"]  }' > .babelrc
-    #source .babelrc
-
-    mkdir -p $NODE_MODULES_DIR/
-    tar -xzvf babel.tar.gz 1>>/dev/null
-    rm -rf $NODE_MODULES_DIR/babel-cli
-    rm -rf $NODE_MODULES_DIR/babel-preset-es2017
-    mv babel-cli $NODE_MODULES_DIR/
-    mv babel-preset-es2017 $NODE_MODULES_DIR/
-    cd $buildPWD/nodejs/bin/
-    rm -f babel babel-doctor babel-external-helper babel-node
-
-    ln -s $NODE_MODULES_DIR/babel-cli/bin/babel.js babel
-    ln -s $NODE_MODULES_DIR/babel-cli/bin/babel-doctor.js babel-doctor
-    ln -s $NODE_MODULES_DIR/babel-cli/bin/babel-external-helpers.js babel-external-helper
-    ln -s $NODE_MODULES_DIR/babel-cli/bin/babel-node.js  babel-node
-
-    cd $installPWD
-    return 0
-}
-
-function copy_and_link_if_not_same()
-{
-    # $1 from  
-    # $2 to
-    # $3 link name (can be null)
-    if  [ ! -f "$2" ] || [ "`md5sum $1 | awk '{print $1}'`" != "`md5sum $2 | awk '{print $1}'`" ];then
-        sudo cp $1 $2
-        if [ -n "$3" ];then
-            sudo ln -s $1 $3
-        fi
-    #else
-        #echo "copy: jump the same file " $2
-    fi
-}
-
-#install dependency software
-function install_dependencies() 
-{
-    if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-        sudo apt-get -y install openssl
-        sudo apt-get -y install build-essential
-        sudo apt-get -y install libcurl4-openssl-dev libgmp-dev
-        sudo apt-get -y install libleveldb-dev  libmicrohttpd-dev
-        sudo apt-get -y install libminiupnpc-dev
-        sudo apt-get -y install libssl-dev libkrb5-dev
-        sudo apt-get -y install lsof
-
-        wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-ubuntu -O $DEPENENCIES_DIR/tool/fisco-solc
-        sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
-        sudo chmod a+x /usr/local/bin/fisco-solc
-
-    else
-        sudo yum -y install git gcc-c++
-        sudo yum -y install openssl openssl-devel
-        sudo yum -y install leveldb-devel curl-devel 
-        sudo yum -y install libmicrohttpd-devel gmp-devel 
-        sudo yum -y install lsof
-
-        wget https://github.com/FISCO-BCOS/fisco-solc/raw/master/fisco-solc-centos -O $DEPENENCIES_DIR/tool/fisco-solc
-        sudo cp $DEPENENCIES_DIR/tool/fisco-solc /usr/local/bin/
-        sudo chmod a+x /usr/local/bin/fisco-solc
-    fi
-}
-
 #install
 function install()
 {
     echo "    Installing temp fisco-bcos environment start"
     request_sudo_permission
-    ret=$?
-    if [ $ret -ne 0 ]
-    then
-        return -1
-    fi
 
     sudo chown -R $(whoami) $installPWD
 
@@ -262,9 +100,8 @@ function install()
     export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${current_node_dir}/keys.info
     export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${current_node_dir}/keystore/
     export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${current_node_dir}/fisco-data/
-    export CONFIG_JSON_NETWORK_ID_TPL=${DEFAULT_NETWORK_ID}
 
-    MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_NETWORK_ID_TPL}'
+    MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}'
     envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > ${current_node_dir}/config.json
     
     # generate log.conf from tpl
@@ -281,8 +118,7 @@ function install()
    
     local god_addr=$(cat $current_node_dir_base/godInfo.txt | grep address | awk -F ':' '{print $2}' 2>/dev/null)
     if [ -z ${god_addr} ];then
-        echo "WARNING : fisco-bcos --newaccount failed."
-        return 1
+        error_messaage " fisco-bcos --newaccount opr faild." "false"
     fi
 
     cp $current_node_dir_base/godInfo.txt $buildPWD
@@ -303,9 +139,10 @@ function install()
     export WEB3SDK_CONFIG_IP=${listenip[0]}
     export WEB3SDK_CONFIG_PORT=${CHANNEL_PORT_VALUE_TPL}
     export WEB3SDK_SYSTEM_CONTRACT_ADDR=${DEFAULT_SYSTEM_CONTRACT_ADDRESS}
-    MYVARS='${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}:${WEB3SDK_SYSTEM_CONTRACT_ADDR}'
+    echo "KEYSTORE_PWD="${KEYSTORE_PWD}
+    echo "CLIENTCERT_PWD="${CLIENTCERT_PWD}
+    MYVARS='${CLIENTCERT_PWD}:${KEYSTORE_PWD}:${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}:${WEB3SDK_SYSTEM_CONTRACT_ADDR}'
     envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > ${current_web3sdk}/conf/applicationContext.xml
-    # echo "${DEPENENCIES_DIR}/tpl_dir/applicationContext.xml.tpl > ${DEPENENCIES_DIR}/web3sdk/conf/applicationContext.xml"
 
     cd ${current_node_dir_base}
     bash start_node${Idx[0]}.sh
@@ -317,8 +154,7 @@ function install()
     # check if temp node is running
     check_port ${WEB3SDK_CONFIG_PORT}
     if [ $? -eq 0 ];then
-        echo "channel port $WEB3SDK_CONFIG_PORT is not listening, maybe temp node start failed."
-        return 1
+        error_messaage "channel port $WEB3SDK_CONFIG_PORT is not listening, temp node start not success."
     fi
 
     #deploy system contract
@@ -328,18 +164,16 @@ function install()
 
     #deploy system contract failed
     if [ ! -f ${current_web3sdk}/bin/output/SystemProxy.address ];then
-        echo "WARNING : SystemProxy.address is not exist, maybe deploy system contract failed."
         bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        return 1
+        error_messaage "system contract address file is not exist, web3sdk deploy system contract not success."
     fi 
 
-    #cp output/SystemProxy.address $buildPWD/syaddress.txt
     syaddress=$(cat ${current_web3sdk}/bin/output/SystemProxy.address)
     if [ -z $syaddress ];then
-        echo "WARNING : system contract address null, maybe deploy system contract failed."
         bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        return 2  
+        error_messaage "system contract address file is empty, web3sdk deploy system contract not success." 
     fi
+    
     cp ${current_web3sdk}/bin/output/SystemProxy.address $buildPWD/syaddress.txt
 
     sleep 1
@@ -363,11 +197,11 @@ function install()
     MYVARS='${IDX_TPL}:${PORT_TPL}:${IDENTITYTYPE_TPL}:${PEERIP_TPL}:${GODMINERSTART_TPL}:${GODMINEREND_TPL}:${NODEID_TPL}:${NODEDESC_TPL}:${AGENCYINFO_TPL}'
     envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/godminer.json.tpl > ${current_node_dir}/godminer.json
 
-    sed -i "s/${DEFAULT_SYSTEM_CONTRACT_ADDRESS}/$syaddress/g" ${current_web3sdk}/conf/applicationContext.xml
+    sed -i.bu "s/${DEFAULT_SYSTEM_CONTRACT_ADDRESS}/$syaddress/g" ${current_web3sdk}/conf/applicationContext.xml
     echo "system contract deployed ,syaddress => "${syaddress}
     
     #replace system contract address
-    sed -i "s/$DEFAULT_SYSTEM_CONTRACT_ADDRESS/$syaddress/g" ${current_node_dir}/config.json
+    sed -i.bu "s/$DEFAULT_SYSTEM_CONTRACT_ADDRESS/$syaddress/g" ${current_node_dir}/config.json
 
     #sleep 6
     bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
