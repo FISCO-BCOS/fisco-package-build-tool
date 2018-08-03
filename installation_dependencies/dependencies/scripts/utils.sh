@@ -1,27 +1,25 @@
 #!/bin/bash
 
-#check ubuntu os or not
-function is_ubuntu_os()
+# print message to stderr , if need and will exit
+function error_message()
 {
-    if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-        return 1
-    else
-        return 0
+    local message=$1
+    local is_exit=$2
+    echo "ERROR - ${message}" >&2 
+
+    if [ -z "$is_exit" ] || [ "$is_exit" != "false" ];then
+        exit 1
     fi
 }
 
-#check if $1 install
-function check_if_install()
+# print info message
+function info_message()
 {
-    echo " ===>> $1 checking >>"
-    type $1 >/dev/null 2>&1
-    ret=$?
-    if [ $ret -eq 0  ];then
-        echo "       $1 installed."
-        return 1
-    else
-        echo "      XXXXXXX $1 not installed."
-        return 0
+    echo ${message}
+
+    if [ ! -z "$IS_DEBUG" ] && [ $IS_DEBUG -eq 1 ];then
+        local message=$1
+        echo ${message} >>&3 
     fi
 }
 
@@ -35,21 +33,6 @@ function check_port()
     else
         return 1
     fi
-}
-
-function request_sudo_permission() 
-{
-    echo "    checking permission..."
-    sudo echo -n " "
-
-    if [ $? -ne 0 ]
-    then
-        echo "no sudo permission, please add youself in the sudoers"
-        #exit
-        return 2
-    fi
-
-    return 0
 }
 
 function is_valid_ip()
@@ -102,4 +85,31 @@ spinner()
     done
     printf "    \b\b\b\b"
     echo
+}
+
+function replace_dot_with_underline()
+{
+    echo $1 | sed -e "s/\./_/g"
+}
+
+#check if file exist
+function check_file_exist()
+{
+    local file_name=$1
+    if ! [ -f ${file_name} ]
+    then
+        return 1
+    fi
+    return 0
+}
+
+#check if file empty
+function check_file_empty()
+{
+    local file_name=$1
+    if [ -s ${file_name} ];then
+        return 1
+    fi
+
+    return 0
 }

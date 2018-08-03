@@ -33,9 +33,9 @@ else
 
     cd $sdk
     mv ca-agency.crt ca.crt
-    echo ${CA_PASSWD} > pwd.conf
+    echo ${CLIENTCERT_PWD} > pwd.conf
     openssl pkcs12 -export -name client -in sdk.crt -inkey sdk.key -out keystore.p12 -password file:pwd.conf 
-    keytool -importkeystore -destkeystore client.keystore -srckeystore keystore.p12 -srcstoretype pkcs12 -alias client -srcstorepass ${CA_PASSWD} -deststorepass ${CA_PASSWD}
+    keytool -importkeystore -destkeystore client.keystore -srckeystore keystore.p12 -srcstoretype pkcs12 -alias client -srcstorepass ${CLIENTCERT_PWD} -deststorepass ${KEYSTORE_PWD}
 
     echo "Build  $sdk Crt suc!!!"
 fi
