@@ -6,6 +6,7 @@
 function toggle_debug()
 {
     mkdir -p build/
+    sudo chown -R $(whoami) build
     # exec 1>>build/stdout.log
     exec 2>>build/stderr.log
     # exec 3>>build/stdinfo.log
