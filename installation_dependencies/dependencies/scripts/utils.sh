@@ -12,16 +12,6 @@ function error_message()
     fi
 }
 
-# print info message
-function info_message()
-{
-    echo ${message}
-
-    if [ ! -z "$IS_DEBUG" ] && [ $IS_DEBUG -eq 1 ];then
-        local message=$1
-        echo ${message} >>&3 
-    fi
-}
 
 #check if the port is used
 function check_port() 

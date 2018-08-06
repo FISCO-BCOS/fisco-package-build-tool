@@ -155,7 +155,7 @@ function create_node_ca()
     fi
 
     mkdir -p $dst/node
-    cp $agency/$node/* $dst/node
+    mv $agency/$node/* $dst/node
     mv $agency/sdk $dst
 
     return 0
