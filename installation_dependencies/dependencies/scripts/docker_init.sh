@@ -8,4 +8,4 @@ cp $currentPWD/node/ext/conf/applicationContext.xml $currentPWD/web3sdk/conf/ >/
 cp $currentPWD/node/ext/conf/config.js $currentPWD/web3lib/ >/dev/null 2>&1
 sudo cp $currentPWD/node/ext/fisco-bcos/* /usr/bin/ >/dev/null 2>&1
 
-echo "system_address => "$(cat $currentPWD/node/ext/conf/syaddress.txt)echo "system_address => "$(cat $currentPWD/node/ext/conf/syaddress.txt)
+echo "system_address => "$(cat $currentPWD/node/ext/conf/syaddress.txt)
