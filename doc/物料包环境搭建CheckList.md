@@ -1,6 +1,8 @@
 [toc]
 # 物料包搭建FISCO BCOS环境CheckList
-通常我们推荐使用物料包[[FISCO BCOS物料包]](https://github.com/FISCO-BCOS/fisco-package-build-tool)搭建FISCO BCOS的环境, 可以屏蔽搭建过程中的一些繁琐细节。 物料包使用时, 本身即有一些依赖, FISCO BCOS环境也有一些其他的依赖, 为减少搭建过程中遇到的问题,建议在使用之前对整个搭建的环境有个前置的检查, 特别是生产环境的搭建, 尤其推荐CheckList作为一个必备的流程。  
+通常我们推荐使用物料包[[FISCO BCOS物料包]](https://github.com/FISCO-BCOS/fisco-package-build-tool)搭建FISCO BCOS的环境, 可以屏蔽搭建过程中的一些繁琐细节。   
+物料包使用时, 本身即有一些依赖, FISCO BCOS对网络、yum源等外部环境也存在依赖, 为减少搭建过程中遇到的问题,建议在使用之前对整个搭建的环境进行检查, 特别是生产环境的搭建, 尤其推荐CheckList作为一个必备的流程。  
+
 ## 检查项
 - 操作系统
 - 网络
@@ -43,24 +45,24 @@ $ BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
 FISCO BCOS单节点需要使用三个端口： rpc_port、channel_port、p2p_port.  
 - rpc_port不会有远程访问.  
 - channel_port需要被使用web3sdk的服务访问.  
-- p2p_port节点之间互联需要使用.  
+- p2p_port 节点之间通过互联组成p2p网络.  
 - 
-**实际中, 需要考虑channel_port、p2p_port的网络访问策略, 节点的channel_port需要被使用区块链服务的应用所在服务器的ip连接, 
-p2p_port需要能被其他节点所在服务器的ip连接.**
+**实际中, 需要考虑channel_port、p2p_port的网络访问策略, 节点的channel_port需要被使用区块链服务的应用所在服务器连接, 
+每个节点的p2p_port需要能被其他节点所在服务器的连接.**
 
 检查服务器A某一个端口p能够被另一台服务器B访问的简单方法：
 - 1. 在服务器A上执行.
 ```
-sudo nc -l p    //实际检查时, 将p替换为实际端口
+sudo nc -l p    //实际检查时, 将p替换为实际端口.
 ```
 - 2. 在服务器B上面执行telnet明林.
 ```
-$ telnet A p
+$ telnet A p  //实际检查时, 将A替换服务器ip, 将p替换为实际端口.
 Trying A...
 Connected to A.
 Escape character is '^]'.
 ```
-上面的结构说明成功, 服务器B确实可以访问服务器A的端口p.
+上面的结果说明成功, 服务器B确实可以访问服务器A的端口p.
 
 - 3. 网络不通, 通常需要运维工程师协助解决.
 
@@ -97,6 +99,7 @@ $ OpenSSL 1.0.2k-fips  26 Jan 2017
 ```
 sudo yum/apt -y install openssl
 ```
+yum/apt不存在openssl, 可以参考下面的替换apt/yum源.
 
 ### ***yum/apt源检查***  
 物料包工作过程中会使用yum/apt安装一些依赖项, 当前yum/apt源无法下载到相关依赖时, 工作工程中可能会出现一些问题(fisco-bcos-package-tool内部已经做了相关处理, 在异常执行时给用户提示, 并停止工作, 但实际环境更加复杂, 不排除有遗漏).   
@@ -137,6 +140,8 @@ Ubuntu 依赖
         sudo apt-get -y install uuid-dev
 
 ```
+
+如果apt/yum安装某些项失败, 说明apt/yum源不存在该依赖项.
 
 #### 替换yum/apt源
 yum/apt源如果不满足要求, 可以考虑将源替换为阿里云的源.
