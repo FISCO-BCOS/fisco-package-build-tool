@@ -1,11 +1,18 @@
-# 物料包环境搭建准备阶段CheckList
-使用物料包搭建FISCO-BCOS时, 为减少搭建过程中遇到的问题, 建议在使用fisco-package-build-tool之前对整个搭建的环境有个前置的检查, 特别是生产环境的搭建, 尤其推荐CheckList作为一个必备的流程。  
-## 检查的内容包含以下项：  
-### **操作系统**  
-支持操作系统:  
-CentOS 7.2 64位  
-Ubuntu 16.04 64位
+[toc]
+# 物料包搭建FISCO BCOS环境CheckList
+通常我们推荐使用物料包[[FISCO BCOS物料包]](https://github.com/FISCO-BCOS/fisco-package-build-tool)搭建FISCO BCOS的环境, 可以屏蔽搭建过程中的一些繁琐细节。 物料包使用时, 本身即有一些依赖, FISCO BCOS环境也有一些其他的依赖, 为减少搭建过程中遇到的问题,建议在使用之前对整个搭建的环境有个前置的检查, 特别是生产环境的搭建, 尤其推荐CheckList作为一个必备的流程。  
+## 检查项
+- 操作系统
+- 网络
+- java环境
+- openssl版本
+- yum/apt源检查
 
+### **操作系统**  
+```
+支持操作系统：
+CentOS 7.2 64位 、 Ubuntu 16.04 64位
+```
 - 检查系统是否为64位系统：  
 使用**uname -m**命令, 64位系统的输出为x86_64, 32位系统的输出为i386或者i686.
 ```
@@ -32,7 +39,31 @@ $ SUPPORT_URL="http://help.ubuntu.com/"
 $ BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
 ```
 
-### **网络**
+### **网络**  
+FISCO BCOS单节点需要使用三个端口： rpc_port、channel_port、p2p_port.  
+- rpc_port不会有远程访问.  
+- channel_port需要被使用web3sdk的服务访问.  
+- p2p_port节点之间互联需要使用.  
+- 
+**实际中, 需要考虑channel_port、p2p_port的网络访问策略, 节点的channel_port需要被使用区块链服务的应用所在服务器的ip连接, 
+p2p_port需要能被其他节点所在服务器的ip连接.**
+
+检查服务器A某一个端口p能够被另一台服务器B访问的简单方法：
+- 1. 在服务器A上执行.
+```
+sudo nc -l p    //实际检查时, 将p替换为实际端口
+```
+- 2. 在服务器B上面执行telnet明林.
+```
+$ telnet A p
+Trying A...
+Connected to A.
+Escape character is '^]'.
+```
+上面的结构说明成功, 服务器B确实可以访问服务器A的端口p.
+
+- 3. 网络不通, 通常需要运维工程师协助解决.
+
 ### **java环境**  
 #### 1. 版本检查
 FISCO BCOS需求版本Oracle JDK 1.8(java 1.8)
@@ -52,7 +83,7 @@ $ OpenJDK Runtime Environment (build 1.8.0_171-b10)
 $ OpenJDK 64-Bit Server VM (build 25.171-b10, mixed mode)
 ```
 
-#### 2. 安装
+#### 2. Oracle JDK安装
 当前系统如果没有安装JDK, 或者JDK的版本不符合预期, 可以参考[[Oracle JAVA 1.8 安装教程]](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/Oracle%20JAVA%201.8%20%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md)。
 
 ### ***openssl版本***
@@ -64,27 +95,37 @@ $ OpenSSL 1.0.2k-fips  26 Jan 2017
 
 服务器如果没有安装openssl, 可以使用yum/apt进行安装.
 ```
-sudo yum -y install openssl
+sudo yum/apt -y install openssl
 ```
 
 ### ***yum/apt源检查***  
-物料包工作过程中会使用yum/apt安装一些依赖项, 如果当前的yum/apt不存在依赖时, 工作过程会出现问题.  
+物料包工作过程中会使用yum/apt安装一些依赖项, 当前yum/apt源无法下载到相关依赖时, 工作工程中可能会出现一些问题(fisco-bcos-package-tool内部已经做了相关处理, 在异常执行时给用户提示, 并停止工作, 但实际环境更加复杂, 不排除有遗漏).   
+对此建议可以提前检查yum/apt源。 
+#### 检查列表
+在服务器上面依次执行下面命令:
 ```
 CentOS 依赖
         sudo yum -y install bc
         sudo yum -y install gettext
         sudo yum -y install cmake3
-        sudo yum -y install git gcc-c++
-        sudo yum -y install openssl openssl-devel
-        sudo yum -y install boost-devel leveldb-devel curl-devel 
-        sudo yum -y install libmicrohttpd-devel gmp-devel 
+        sudo yum -y install git
+        sudo yum -y install gcc-c++
+        sudo yum -y install openssl
+        sudo yum -y install openssl-devel
+        sudo yum -y install leveldb-devel
+        sudo yum -y install curl-devel
+        sudo yum -y install libmicrohttpd-devel
+        sudo yum -y install gmp-devel
         sudo yum -y install lsof
+        sudo yum -y install crudini
+        sudo yum -y install libuuid-devel
 
 Ubuntu 依赖
         sudo apt-get -y install gettext
         sudo apt-get -y install bc
         sudo apt-get -y install cmake
         sudo apt-get -y install git
+        sudo apt-get -y install gcc-c++
         sudo apt-get -y install openssl
         sudo apt-get -y install build-essential libboost-all-dev
         sudo apt-get -y install libcurl4-openssl-dev libgmp-dev
@@ -92,5 +133,49 @@ Ubuntu 依赖
         sudo apt-get -y install libminiupnpc-dev
         sudo apt-get -y install libssl-dev libkrb5-dev
         sudo apt-get -y install lsof
+        sudo apt-get -y install crudini
+        sudo apt-get -y install uuid-dev
 
+```
+
+#### 替换yum/apt源
+yum/apt源如果不满足要求, 可以考虑将源替换为阿里云的源.
+
+- CentOS更换阿里云yum源
+```
+1. 备份   
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base-bak.repo
+2. 下载   
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+3. 更新yum缓存   
+yum makecache
+```
+- Ubuntu 16.04更换阿里云源  
+```
+1. 备份  
+sudo cp /etc/apt/sources.list /etc/apt/sources.list.old
+2. 修改source.list 
+sudo vim /etc/apt/source.list
+添加以下信息
+# deb cdrom:[Ubuntu 16.04 LTS _Xenial Xerus_ - Release amd64 (20160420.1)]/ xenial main restricted
+deb-src http://archive.ubuntu.com/ubuntu xenial main restricted #Added by software-properties
+deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted
+deb-src http://mirrors.aliyun.com/ubuntu/ xenial main restricted multiverse universe #Added by software-properties
+deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted
+deb-src http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted multiverse universe #Added by software-properties
+deb http://mirrors.aliyun.com/ubuntu/ xenial universe
+deb http://mirrors.aliyun.com/ubuntu/ xenial-updates universe
+deb http://mirrors.aliyun.com/ubuntu/ xenial multiverse
+deb http://mirrors.aliyun.com/ubuntu/ xenial-updates multiverse
+deb http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse #Added by software-properties
+deb http://archive.canonical.com/ubuntu xenial partner
+deb-src http://archive.canonical.com/ubuntu xenial partner
+deb http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted
+deb-src http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted multiverse universe #Added by software-properties
+deb http://mirrors.aliyun.com/ubuntu/ xenial-security universe
+deb http://mirrors.aliyun.com/ubuntu/ xenial-security multiverse
+
+3. 更新apt缓存    
+sudo apt-get update
 ```
