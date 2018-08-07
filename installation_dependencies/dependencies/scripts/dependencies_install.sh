@@ -92,6 +92,7 @@ function dependencies_install()
                     sudo apt-get -y install libminiupnpc-dev
                     sudo apt-get -y install libssl-dev libkrb5-dev
                     sudo apt-get -y install uuid-dev
+                    sudo apt-get -y install vim-common
 
                 ;;
     #------------------------------------------------------------------------------
@@ -109,6 +110,7 @@ function dependencies_install()
                     sudo yum -y install lsof
                     sudo yum -y install crudini
                     sudo yum -y install libuuid-devel
+                    sudo yum -y install  vim-common
 
                 ;;
     #------------------------------------------------------------------------------
