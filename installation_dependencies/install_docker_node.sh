@@ -180,8 +180,10 @@ function install()
         mkdir -p $dockerPWD/nodedir${Idx[$index]}/log/
         mkdir -p $dockerPWD/nodedir${Idx[$index]}/keystore/
         mkdir -p $dockerPWD/nodedir${Idx[$index]}/fisco-data/
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/web3sdk_ca/
-        #mkdir -p $dockerPWD/nodedir${Idx[$index]}/dependencies/
+        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/
+        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/conf
+        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/script
+        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/fisco-bcos/
 
         if [ $i -eq 0 ];then
             if [ $g_is_genesis_host -eq 1 ];then
@@ -193,20 +195,33 @@ function install()
             cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
         fi
 
-        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* $dockerPWD/nodedir${Idx[$index]}/web3sdk_ca/
-        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* $dockerPWD/nodedir${Idx[$index]}/fisco-data/
-        # cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+        cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk $dockerPWD/nodedir${Idx[$index]}/ext/
+        cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/ $dockerPWD/nodedir${Idx[$index]}/ext/
         cp $DEPENENCIES_FOLLOW_DIR/genesis.json $dockerPWD/nodedir${Idx[$index]}/ >/dev/null 2>&1
+        cp $DEPENENCIES_FOLLOW_DIR/syaddress.txt $dockerPWD/nodedir${Idx[$index]}/ext/conf/ >/dev/null 2>&1
+        cp $DEPENENCIES_DIR/scripts/docker_init.sh $dockerPWD/nodedir${Idx[$index]}/ext/script/ >/dev/null 2>&1
+        cp $DEPENENCIES_DIR/fisco-bcos/fisco-bcos $dockerPWD/nodedir${Idx[$index]}/ext/fisco-bcos/ >/dev/null 2>&1
 
-        # cp -r $DEPENENCIES_DIR/node_action_info_dir $dockerPWD/node${Idx[$index]}/dependencies/
-        cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk $dockerPWD/nodedir${Idx[$index]}/dependencies/
         cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $dockerPWD/nodedir${Idx[$index]}/
         sudo chmod a+x $dockerPWD/nodedir${Idx[$index]}/node_manager.sh
 
-        cd $dockerPWD/nodedir${Idx[$index]}/fisco-data/
+        cd $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/
         nodeid=$(cat node.nodeid)
         echo "node id is "$nodeid
-    
+
+        #web3sdk config
+        export WEB3SDK_CONFIG_IP=${listenip[$index]}
+        export WEB3SDK_CONFIG_PORT=${channelPort[$index]}
+        export WEB3SDK_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)
+        export KEYSTORE_PWD=${keystore_pwd}
+        export CLIENTCERT_PWD=${clientcert_pwd}
+        MYVARS='${CLIENTCERT_PWD}:${KEYSTORE_PWD}:${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}:${WEB3SDK_SYSTEM_CONTRACT_ADDR}'
+        echo "WEB3SDK_CONFIG_PORT=${channelPort[$index]}"
+        echo "WEB3SDK_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)"
+        echo "KEYSTORE_PWD="${KEYSTORE_PWD}
+        echo "CLIENTCERT_PWD="${CLIENTCERT_PWD}
+        envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $dockerPWD/nodedir${Idx[$index]}/ext/conf/applicationContext.xml
+        
         export CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)
         export CONFIG_JSON_LISTENIP_TPL=${listenip[$index]}
         export CRYPTO_MODE_TPL=${crypto_mode}
@@ -220,6 +235,10 @@ function install()
 
         MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}'
         envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > $dockerPWD/nodedir${Idx[$index]}/config.json
+
+        #config.js
+        cp $installPWD/dependencies/tpl_dir/config.js.tpl $dockerPWD/nodedir${Idx[$index]}/ext/conf/config.js
+        sed -i.bu "s/ip:port/${listenip[$index]}:${rpcport[$index]}/g"  $dockerPWD/nodedir${Idx[$index]}/ext/conf/config.js
 
         # generate log.conf from tpl
         export OUTPUT_LOG_FILE_PATH_TPL=${g_docker_fisco_path}"log"
