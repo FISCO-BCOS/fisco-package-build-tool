@@ -50,74 +50,11 @@ sudo apt -y install docker
 - [x]    其他依赖  
   sudo权限, 当前执行的用户需要具有sudo权限
 
-# 二. 部署区块链sample 
-这里提供一个非常简单的例子, 用来示例使用本工具如何以最快的速度搭建一条在单台服务器上运行4个节点的FISCO BCOS的测试环境，
-如果需要手动配置部署区块链请转到第三章。
+# 二 部署区块链
+本章节会通过一个示例说明如何使用物料包工具, 也会介绍使用物料包构建好的环境中比较重要的一些目录
+如果你希望快速搭建并使用fisco bcos，请转至第四章部署区块链sample
+## 2.1 下载物料包  
 
-假设当前用户的环境比较干净, 并没有修改配置文件config.ini。
-
-## 2.1 下载物料包
-```
-$ git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git
-```
-
-## 2.2 生成安装包
-```
-$ cd fisco-package-build-tool
-$ ./generate_installation_packages.sh build
-......
-//中间会有FISCO-BCOS下载、编译、安装, 时间会比较久, 执行成功最终在当前目录下会生成build目录.
-......
-```
-查看生成的build目录结构
-```
-$ tree -L 1 build
-build/
-├── 127.0.0.1_with_0.0.0.0_genesis_installation_package
-├── stderr.log
-└── temp
-```
-其中 127.0.0.1_with_0.0.0.0_genesis_installation_package 即是生成的安装包.
-
-## 2.3 安装
-假定需要将FISCO BCOS安装在当前用户home目录下, 安装的目录名fisco-bcos。
-```
-$ mv build/127.0.0.1_with_0.0.0.0_genesis_installation_package ~/fisco-bcos
-$ cd ~/fisco-bcos
-$ ./install_node.sh install
-..........
-执行成功会生成build目录
-```
-
-## 2.4 启动  
-```
-$ cd build
-$ ./start_all.sh
-start node0 ...
-start node1 ...
-start node2 ...
-start node3 ...
-check all node status => 
-node0 is running.
-node1 is running.
-node2 is running.
-node3 is running.
-```
-
-## 2.5 验证  
-```
-$ tail -f node/nodedir0/log/log_2018080116.log | egrep "seal"
-INFO|2018-08-01 16:52:18:362|+++++++++++++++++++++++++++ Generating seal on5b14215cff11d4b8624246de63bda850bcdead20e193b24889a5dff0d0e8a3c3#1tx:0,maxtx:1000,tq.num=0time:1533113538362
-INFO|2018-08-01 16:52:22:432|+++++++++++++++++++++++++++ Generating seal on5e7589906bcbd846c03f5c6e806cced56f0a17526fb1e0c545b855b0f7722e14#1tx:0,maxtx:1000,tq.num=0time:1533113542432
-```
-
-## 2.6 部署成功  
-Ok, 一条简单的测试链已经搭建成功。
-
-# 三. <a name="buildblockchain" id="buildblockchain">fisco bcos部署流程</a>  
-
-上面部署sample流程即是搭建区块链的主要流程,  本章节会通过一个更复杂的示例说明如何使用物料包工具, 也会介绍使用物料包构建好的环境中比较重要的一些目录。
-## 3.1 下载物料包  
 
 ```shell
 $ git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git
@@ -136,7 +73,7 @@ fisco-package-build-tool
 └── release_note.txt                   版本号文件
 ```
 
-## 3.2 配置
+## 2.2 配置
 
 ```shell
 $ cd fisco-package-build-tool
@@ -220,7 +157,7 @@ node1=***REMOVED***  0.0.0.0  2  agent_1
 node2=***REMOVED***  0.0.0.0  2  agent_2
 ```
 
-## 3.3 创建安装包  
+## 2.3 创建安装包  
 ```
 $ ./generate_installation_packages.sh build
 ```
@@ -236,11 +173,11 @@ build/
 
 * 其中带有**genesis**字样的为创世节点所在服务器的安装包。 
 
-## 3.4 上传  
+## 2.4 上传  
 * 将安装包上传到对应的服务器, 注意上传的安装包必须与服务器相对应, 否则部署过程会出错。
 * 一定要确认各个服务器之间的网络可连通, p2p网段的端口网络策略已经放开。
 
-## 3.5 安装  
+## 2.5 安装  
 进入安装目录, 执行
 ```sh
 $ ./install_node.sh install
@@ -288,7 +225,7 @@ build/
 
 [[web3sdk使用说明链接]](https://github.com/FISCO-BCOS/web3sdk)  
 [[web3lib、systemcontract、 tool目录作用参考用户手册]](https://github.com/FISCO-BCOS/FISCO-BCOS/tree/master/doc/manual)
-## 3.6 启动节点
+## 2.6 启动节点
 
 在build目录执行start_all.sh脚本  
 **注意:要先启动创世块节点所在的服务器上的节点!!!**
@@ -302,12 +239,12 @@ node0 is running.
 node1 is running.
 ```
 
-## 3.7 验证
+## 2.7 验证
 
 在所有的服务器的节点都启动之后, 验证区块链是否正常。
 - **一定要所有服务器正常启动之后.**
 
-### 3.7.1 日志
+### 2.7.1 日志
 
 ```shell
 tail -f node/nodedir0/log/log_*.log  | egrep "Generating seal"
@@ -316,7 +253,7 @@ INFO|2018-08-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona9878
 ```
 可看到周期性的出现上面的日志，表示节点间在周期性的进行共识，整个链正常。
 
-### 3.7.2 部署合约
+### 2.7.2 部署合约
 
 每个服务器执行install_node install之后, 都会在安装目录下安装nodejs、babel-node、ethconsole, 环境变量会写入当前安装用户的.bashrc文件, 用户需要使用这些工具可以：  
 1. 退出当前登录, 重新登录一次.  
@@ -348,6 +285,7 @@ cns add operation => cns_name = HelloWorld
 send transaction success: 0x769e4ea7742b451e33cbb0d2a7d3126af8f277a52137624b3d4ae41681d58687
 ```
 合约部署成功。
+
 
 # 四. 扩容流程
 
@@ -447,7 +385,73 @@ INFO|2018-07-10 10:49:35:863|+++++++++++++++++++++++++++ Generating seal one23f1
 INFO|2018-07-10 10:49:41:914|+++++++++++++++++++++++++++ Generating seal on2448f00f295210c07b25090b70f0b610e3b8303fe0a6ec0f8939656c25309b2f#4tx:0,maxtx:1000,tq.num=0time:1531190981914
 INFO|2018-07-10 1
 ```
+# 二. 部署区块链sample 
+这里提供一个非常简单的例子, 用来示例使用本工具如何以最快的速度搭建一条在单台服务器上运行4个节点的FISCO BCOS的测试环境，
+如果需要手动配置部署区块链请转到第三章。
 
+假设当前用户的环境比较干净, 并没有修改配置文件config.ini。
+
+## 2.1 下载物料包
+```
+$ git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git
+```
+
+## 2.2 生成安装包
+```
+$ cd fisco-package-build-tool
+$ ./generate_installation_packages.sh build
+......
+//中间会有FISCO-BCOS下载、编译、安装, 时间会比较久, 执行成功最终在当前目录下会生成build目录.
+......
+```
+查看生成的build目录结构
+```
+$ tree -L 1 build
+build/
+├── 127.0.0.1_with_0.0.0.0_genesis_installation_package
+├── stderr.log
+└── temp
+```
+其中 127.0.0.1_with_0.0.0.0_genesis_installation_package 即是生成的安装包.
+
+## 2.3 安装
+假定需要将FISCO BCOS安装在当前用户home目录下, 安装的目录名fisco-bcos。
+```
+$ mv build/127.0.0.1_with_0.0.0.0_genesis_installation_package ~/fisco-bcos
+$ cd ~/fisco-bcos
+$ ./install_node.sh install
+..........
+执行成功会生成build目录
+```
+
+## 2.4 启动  
+```
+$ cd build
+$ ./start_all.sh
+start node0 ...
+start node1 ...
+start node2 ...
+start node3 ...
+check all node status => 
+node0 is running.
+node1 is running.
+node2 is running.
+node3 is running.
+```
+
+## 2.5 验证  
+```
+$ tail -f node/nodedir0/log/log_2018080116.log | egrep "seal"
+INFO|2018-08-01 16:52:18:362|+++++++++++++++++++++++++++ Generating seal on5b14215cff11d4b8624246de63bda850bcdead20e193b24889a5dff0d0e8a3c3#1tx:0,maxtx:1000,tq.num=0time:1533113538362
+INFO|2018-08-01 16:52:22:432|+++++++++++++++++++++++++++ Generating seal on5e7589906bcbd846c03f5c6e806cced56f0a17526fb1e0c545b855b0f7722e14#1tx:0,maxtx:1000,tq.num=0time:1533113542432
+```
+
+## 2.6 部署成功  
+Ok, 一条简单的测试链已经搭建成功。
+
+# 三. <a name="buildblockchain" id="buildblockchain">fisco bcos部署流程</a>  
+
+上面部署sample流程即是搭建区块链的主要流程,  本章节会通过一个更复杂的示例说明如何使用物料包工具, 也会介绍使用物料包构建好的环境中比较重要的一些目录。
 # FAQ 
 ## generate_installation_packages.sh build/expand 报错提示.
 - ERROR - build directory already exist, please remove it first.  
