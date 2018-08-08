@@ -319,10 +319,11 @@ INFO|2018-08-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona9878
 ### 3.7.2 部署合约
 
 每个服务器执行install_node install之后, 都会在安装目录下安装nodejs、babel-node、ethconsole, 其环境变量会写入当前安装用户的.bashrc文件，使用这些工具之前需要使环境变量生效，有两种使环境变量生效的方式，选择其中一种即可：
+
 方式1：退出当前登录, 重新登录一次.
 方式2：执行node.sh脚本中的内容, 首先cat node.sh, 将显示的内容执行一遍.
 ```
- $ cat node.sh 
+$ cat node.sh 
 export NODE_HOME=/root/octo/fisco-bcos/build/nodejs; export PATH=$PATH:$NODE_HOME/bin; export NODE_PATH=$NODE_HOME/lib/node_modules:$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
 $ export NODE_HOME=/root/octo/fisco-bcos/build/nodejs; export PATH=$PATH:$NODE_HOME/bin; export NODE_PATH=$NODE_HOME/lib/node_modules:$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
 ```
