@@ -49,8 +49,8 @@ sudo apt -y install docker
 
 - [x]    其他依赖  
   sudo权限, 当前执行的用户需要具有sudo权限
-
-# 二 部署区块链
+  
+# 二. <a name="buildblockchain" id="buildblockchain">部署区块链</a>  
 本章节会通过一个示例说明如何使用物料包工具, 也会介绍使用物料包构建好的环境中比较重要的一些目录
 如果你希望快速搭建并使用fisco bcos，请转至第四章部署区块链sample
 ## 2.1 下载物料包  
@@ -449,9 +449,7 @@ INFO|2018-08-01 16:52:22:432|+++++++++++++++++++++++++++ Generating seal on5e758
 ## 4.6 部署成功  
 Ok, 一条简单的测试链已经搭建成功。
 
-# 三. <a name="buildblockchain" id="buildblockchain">fisco bcos部署流程</a>  
 
-上面部署sample流程即是搭建区块链的主要流程,  本章节会通过一个更复杂的示例说明如何使用物料包工具, 也会介绍使用物料包构建好的环境中比较重要的一些目录。
 # FAQ 
 ## generate_installation_packages.sh build/expand 报错提示.
 - ERROR - build directory already exist, please remove it first.  
