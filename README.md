@@ -373,8 +373,8 @@ dependencies/node_action_info_dir/
 
 注册
 ```
-$ ./node_manager.sh registerNode `pwd` ../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_0.json 
-$ ./node_manager.sh registerNode `pwd` ../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_1.json
+$ ./node_manager.sh registerNode `pwd`/../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_0.json 
+$ ./node_manager.sh registerNode `pwd`/../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_1.json
 ```
 
 验证,注册的节点是否正常:
