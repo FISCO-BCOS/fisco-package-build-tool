@@ -183,7 +183,6 @@ function install()
         mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/
         mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/conf
         mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/script
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/fisco-bcos/
 
         if [ $i -eq 0 ];then
             if [ $g_is_genesis_host -eq 1 ];then
@@ -200,7 +199,6 @@ function install()
         cp $DEPENENCIES_FOLLOW_DIR/genesis.json $dockerPWD/nodedir${Idx[$index]}/ >/dev/null 2>&1
         cp $DEPENENCIES_FOLLOW_DIR/syaddress.txt $dockerPWD/nodedir${Idx[$index]}/ext/conf/ >/dev/null 2>&1
         cp $DEPENENCIES_DIR/scripts/docker_init.sh $dockerPWD/nodedir${Idx[$index]}/ext/script/ >/dev/null 2>&1
-        cp $DEPENENCIES_DIR/fisco-bcos/fisco-bcos $dockerPWD/nodedir${Idx[$index]}/ext/fisco-bcos/ >/dev/null 2>&1
 
         cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $dockerPWD/nodedir${Idx[$index]}/
         sudo chmod a+x $dockerPWD/nodedir${Idx[$index]}/node_manager.sh
