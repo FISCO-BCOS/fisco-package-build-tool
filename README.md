@@ -370,7 +370,7 @@ dependencies/node_action_info_dir/
 ```
 
 **确保节点先启动.**   
-
+用户在build目录下，进行注册操作
 注册
 ```
 $ ./node_manager.sh registerNode `pwd`/../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_0.json 
@@ -379,7 +379,7 @@ $ ./node_manager.sh registerNode `pwd`/../dependencies/node_action_info_dir/node
 
 验证,注册的节点是否正常:
 ```
-$ tail -f node/nodedir0/log/log_2018071010.log   | egrep "Generating seal"
+$ tail -f node/nodedir0/log/*   | egrep "Generating seal"
 INFO|2018-07-10 10:49:29:818|+++++++++++++++++++++++++++ Generating seal oncf8e56468bab78ae807b392a6f75e881075e5c5fc034cec207c1d1fe96ce79a1#4tx:0,maxtx:1000,tq.num=0time:1531190969818
 INFO|2018-07-10 10:49:35:863|+++++++++++++++++++++++++++ Generating seal one23f1af0174daa4c4353d00266aa31a8fcb58d3e7fbc17915d95748a3a77c540#4tx:0,maxtx:1000,tq.num=0time:1531190975863
 INFO|2018-07-10 10:49:41:914|+++++++++++++++++++++++++++ Generating seal on2448f00f295210c07b25090b70f0b610e3b8303fe0a6ec0f8939656c25309b2f#4tx:0,maxtx:1000,tq.num=0time:1531190981914
