@@ -1,3 +1,4 @@
+﻿
 [toc]
 <center> <h1>FISCO BCOS物料包工具使用指南</h1> </center>
 
@@ -169,7 +170,7 @@ clientcert_pwd=123456
 
 [other]
 ; 是否采用CA拓展模式
-; 一般情况不需要关系, 需要自己分配CA的情况下, 才需要打开。
+; 一般情况不需要关心, 需要自己分配CA的情况下, 才需要打开。
 ca_ext=0
 
 ; 扩容使用的一些参数
@@ -317,11 +318,12 @@ INFO|2018-08-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona9878
 
 ### 3.7.2 部署合约
 
-每个服务器执行install_node install之后, 都会在安装目录下安装nodejs、babel-node、ethconsole, 环境变量会写入当前安装用户的.bashrc文件, 用户需要使用这些工具可以：  
-1. 退出当前登录, 重新登录一次.  
-2. 执行node.sh脚本中的内容, 首先cat node.sh, 将显示的内容执行一遍.
+每个服务器执行install_node install之后, 都会在安装目录下安装nodejs、babel-node、ethconsole, 其环境变量会写入当前安装用户的.bashrc文件，使用这些工具之前需要使环境变量生效，有两种使环境变量生效的方式，选择其中一种即可：
+
+方式1：退出当前登录, 重新登录一次.
+方式2：执行node.sh脚本中的内容, 首先cat node.sh, 将显示的内容执行一遍.
 ```
- $ cat node.sh 
+$ cat node.sh 
 export NODE_HOME=/root/octo/fisco-bcos/build/nodejs; export PATH=$PATH:$NODE_HOME/bin; export NODE_PATH=$NODE_HOME/lib/node_modules:$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
 $ export NODE_HOME=/root/octo/fisco-bcos/build/nodejs; export PATH=$PATH:$NODE_HOME/bin; export NODE_PATH=$NODE_HOME/lib/node_modules:$NODE_HOME/lib/node_modules/ethereum-console/node_modules;
 ```
@@ -440,7 +442,7 @@ $ ./node_manager.sh registerNode `pwd` ../dependencies/node_action_info_dir/node
 
 验证,注册的节点是否正常:
 ```
-$ tail -f node/nodedir0/log/log_2018071010.log   | egrep "Generating seal"
+$ tail -f node/nodedir0/log/log_*.log   | egrep "Generating seal"
 INFO|2018-07-10 10:49:29:818|+++++++++++++++++++++++++++ Generating seal oncf8e56468bab78ae807b392a6f75e881075e5c5fc034cec207c1d1fe96ce79a1#4tx:0,maxtx:1000,tq.num=0time:1531190969818
 INFO|2018-07-10 10:49:35:863|+++++++++++++++++++++++++++ Generating seal one23f1af0174daa4c4353d00266aa31a8fcb58d3e7fbc17915d95748a3a77c540#4tx:0,maxtx:1000,tq.num=0time:1531190975863
 INFO|2018-07-10 10:49:41:914|+++++++++++++++++++++++++++ Generating seal on2448f00f295210c07b25090b70f0b610e3b8303fe0a6ec0f8939656c25309b2f#4tx:0,maxtx:1000,tq.num=0time:1531190981914
