@@ -154,8 +154,8 @@ function create_node_ca()
         error_message "$agency/sdk dir is not exist, maybe \" bash sdk.sh $agency sdk \" failed."
     fi
 
-    mkdir -p $dst/node
-    cp $agency/$node/* $dst/node
+    mkdir -p $dst
+    mv $agency/$node $dst/node
     mv $agency/sdk $dst
 
     return 0
