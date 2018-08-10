@@ -181,7 +181,7 @@ build/
 ## 2.5 安装  
 进入安装目录, 执行
 ```sh
-$ ./install_node.sh install
+$ ./install_node.sh 
 ```
 正确执行在当前目录会多一个build目录, 目录结构如下：：
 ```
@@ -338,7 +338,7 @@ node1=172.20.245.46  0.0.0.0  2  agent_4
 ```
 ./generate_installation_packages.sh expand
 ```
-成功之后会在build目录对应服务器上面的安装包
+成功之后会输出`Expanding end!`并在build目录生成对应安装包
 ```
 build
 ├── ***REMOVED***_with_0.0.0.0_installation_package
@@ -350,7 +350,7 @@ build
 将安装包分别上传至对应服务器, 分别在每台服务器上面执行下列命令：  
 - 执行安装
 ```
-./install_node.sh install
+./install_node.sh
 ```
 - 启动节点
 ```
@@ -421,7 +421,7 @@ build/
 ```
 $ mv build/127.0.0.1_with_0.0.0.0_genesis_installation_package ~/fisco-bcos
 $ cd ~/fisco-bcos
-$ ./install_node.sh install
+$ ./install_node.sh
 ..........
 执行成功会生成build目录
 ```
