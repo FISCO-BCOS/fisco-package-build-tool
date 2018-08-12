@@ -198,6 +198,7 @@ function simple_dependencies_install()
                     sudo apt-get -y install lsof
                     sudo apt-get -y install gettext
                     sudo apt-get -y install bc
+                    sudo apt-get -y install docker.io
                 ;;
     #------------------------------------------------------------------------------
     # CentOS  # At least 7.2
@@ -207,6 +208,7 @@ function simple_dependencies_install()
                     sudo yum -y install bc
                     sudo yum -y install gettext
                     sudo yum -y install lsof
+                    sudo yum -y install docker
 
                 ;;
     #------------------------------------------------------------------------------
@@ -217,6 +219,7 @@ function simple_dependencies_install()
                     sudo yum -y install bc
                     sudo yum -y install gettext
                     sudo yum -y install lsof
+                    sudo yum -y install docker
 
                 ;;
     #------------------------------------------------------------------------------
