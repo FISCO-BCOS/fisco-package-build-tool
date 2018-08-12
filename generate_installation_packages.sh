@@ -66,9 +66,9 @@ function get_node_dir_name()
         node_dir_name_local=$TEMP_NODE_NAME
     elif [ $host_type_local -eq $TYPE_GENESIS_HOST ]
     then
-        node_dir_name_local=$public_ip_underline_local"_with_"$private_ip_underline_local"_genesis_installation_package"
+        node_dir_name_local=$public_ip_underline_local"_genesis"
     else
-        node_dir_name_local=$public_ip_underline_local"_with_"$private_ip_underline_local"_installation_package"
+        node_dir_name_local=$public_ip_underline_local
     fi
     echo $node_dir_name_local
 }
