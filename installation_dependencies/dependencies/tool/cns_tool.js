@@ -211,9 +211,11 @@ function cnsList(is_simple) {
 //添加cns
 function cnsAdd(contract, version) {
     var cns_info = getAbi(contract);
-    if (version == "") {
+    if ((typeof version == "undefined") || (version == "")) {
         if(cns_info[4]["getVersion"]) {
             version = cns_info[4].getVersion();
+        } else {
+            version = ""
         }
     }
 
@@ -224,9 +226,11 @@ function cnsAdd(contract, version) {
 function cnsUpdate(contract, version) {
     var cns_info = getAbi(contract);
 
-    if (version == "") {
+    if ((typeof version == "undefined") || (version == "")) {
         if(cns_info[4]["getVersion"]) {
             version = cns_info[4].getVersion();
+        } else {
+            version = ""
         }
     }
 
