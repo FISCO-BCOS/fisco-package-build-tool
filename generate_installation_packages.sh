@@ -90,7 +90,7 @@ function copy_genesis_related_info()
     #copy genesis json file to node dir
     build_base_info_dir $current_node_path
 
-    tar_tool $current_node_path
+    #tar_tool $current_node_path
 }
 
 #build node for node of the server
@@ -649,6 +649,7 @@ function build()
     echo
     print_dash
 
+    echo " "
     echo "    Building end!"
     return 0
 }
@@ -700,7 +701,7 @@ function expand()
         # copy bootstrapnodes.json
         cp ${bootstrapnodes_file} $node_base_info_dir/
 
-        tar_tool $current_node_path_local
+        #tar_tool $current_node_path_local
     done
 
     echo

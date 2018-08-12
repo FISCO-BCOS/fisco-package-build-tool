@@ -111,6 +111,6 @@ function tar_tool()
     if [ -f $current_node_path".tgz" ];then
         echo $current_node_path".tgz already exist ~"
     else
-        tar -zcvf $current_node_path".tgz" $current_node_path
+        tar -zcf $current_node_path".tgz" $current_node_path
     fi
 }
