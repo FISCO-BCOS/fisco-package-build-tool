@@ -314,7 +314,7 @@ function install_build()
         mkdir -p $current_node_dir/fisco-data/
 
         if [ $i -eq 0 ];then
-            #copy web3sdk 
+            #copy web3sdk
             cp -r $DEPENENCIES_WEB3SDK_DIR ${buildPWD}
             sudo chmod a+x ${buildPWD}/web3sdk/bin/web3sdk
             cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* ${buildPWD}/web3sdk/conf/ >/dev/null 2>&1 #ca info copy
@@ -323,7 +323,7 @@ function install_build()
             else
                 cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
             fi
-        else    
+        else
             cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
         fi
 
@@ -441,16 +441,5 @@ function info()
     echo "****************************"
 }
 
-case "$1" in
-    'install')
-        install_build
-        ;;
-    'info')
-        info
-        ;;
-    *)
-        echo "invalid option!"
-        echo "Usage: $0 {install|info}"
-        #exit 1
-esac
+install_build
 
