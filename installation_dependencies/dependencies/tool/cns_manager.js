@@ -11,8 +11,8 @@ var cns_tool=require('./cns_tool.js');
 function Usage() {
     console.log(' cns_manager.js Usage: ');
     console.log('\t babel-node cns_manager.js get    contractName [contractVersion]');
-    console.log('\t babel-node cns_manager.js add    contractName');
-    console.log('\t babel-node cns_manager.js update contractName');
+    console.log('\t babel-node cns_manager.js add    contractName [contractVersion]');
+    console.log('\t babel-node cns_manager.js update contractName [contractVersion]');
     console.log('\t babel-node cns_manager.js list [simple]');
     console.log('\t babel-node cns_manager.js historylist contractName [contractVersion] [simple]');
     console.log('\t babel-node cns_manager.js reset contractName [contractVersion] index');
@@ -34,8 +34,15 @@ switch (mod) {
                 Usage();
             }
 
+            var version = "";
             var contract = options[3];
-            cns_tool.cnsAdd(contract);
+            if(options.length > 4) {
+                version = options[4];
+            }
+            
+            console.log('cns_manager.js  add opr , contract =>' + contract + " ,version => " + version);
+
+            cns_tool.cnsAdd(contract,version);
             break;
         }
     case "update":
@@ -44,8 +51,15 @@ switch (mod) {
                 Usage();
             }
 
+            var version = "";
             var contract = options[3];
-            cns_tool.cnsUpdate(contract);
+            if(options.length > 4) {
+                version = options[4];
+            }
+
+            console.log('cns_manager.js  update opr , contract =>' + contract + " ,version => " + version);
+
+            cns_tool.cnsUpdate(contract,version);
             break;
         }
     case "list":

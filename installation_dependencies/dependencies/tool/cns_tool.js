@@ -209,22 +209,25 @@ function cnsList(is_simple) {
 }
 
 //添加cns
-function cnsAdd(contract) {
+function cnsAdd(contract, version) {
     var cns_info = getAbi(contract);
-    var version = "";
-    if (cns_info[4]["getVersion"]) {
-        version = cns_info[4].getVersion();
+    if (version == "") {
+        if(cns_info[4]["getVersion"]) {
+            version = cns_info[4].getVersion();
+        }
     }
 
     cnsAddBase(contract, version, cns_info[1], cns_info[0]);
 }
 
 //更新cns
-function cnsUpdate(contract) {
+function cnsUpdate(contract, version) {
     var cns_info = getAbi(contract);
-    var version = "";
-    if (cns_info[4]["getVersion"]) {
-        version = cns_info[4].getVersion();
+
+    if (version == "") {
+        if(cns_info[4]["getVersion"]) {
+            version = cns_info[4].getVersion();
+        }
     }
 
     cnsUpdateBase(contract, version, cns_info[1], cns_info[0]);
