@@ -142,6 +142,17 @@ function cnsUpdateBase(contract, version, abi, address) {
     cnsParamsCheck(contract, version, abi, address);
 
     if(cnsIsExist(contract, version)) {
+        console.log(" ====> update the cns of the contract .");
+        var cns_name = toCNSname(contract,version);
+        console.log("cns update operation => cns_name = " + cns_name);
+        cnsParamsLog(cns_name, contract, version, abi, address);
+        var reciept = web3sync.sendRawTransactionByNameService(config.account, config.privKey, "ContractAbiMgr", "updateAbi", "", [cns_name, contract, version, abi, address]);
+
+    } else {
+        console.log(" [WARNING] cns update operation failed , ====> contract => " + contract + " ,version => " + version + " ,is not exist. If you need , please add it first.");
+    }
+
+    /*if(cnsIsExist(contract, version)) {
         console.log(" ====> Are you sure update the cns of the contract ?(Y/N)");
         process.stdin.on('readable', () => {
             const read = process.stdin.read();
@@ -161,7 +172,7 @@ function cnsUpdateBase(contract, version, abi, address) {
         });
     } else {
         console.log(" [WARNING] cns update operation failed , ====> contract => " + contract + " ,version => " + version + " ,is not exist. If you need , please add it first.");
-    }
+    }*/
 }
 
 //通过索引获取cns信息
