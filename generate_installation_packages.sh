@@ -87,11 +87,10 @@ function copy_genesis_related_info()
     node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
     current_node_path=$installation_build_dir/$node_dir_name
 
-    if [ $host_type -ne $TYPE_TEMP_HOST ]
-    then
-        #copy genesis json file to node dir
-        build_base_info_dir $current_node_path
-    fi
+    #copy genesis json file to node dir
+    build_base_info_dir $current_node_path
+
+    tar_tool $current_node_path
 }
 
 #build node for node of the server
@@ -644,6 +643,7 @@ function build()
         local build_host_type=$(get_host_type $i)
 
         copy_genesis_related_info $public_ip $private_ip $node_num_per_host $build_host_type
+
     done
 
     echo
@@ -700,6 +700,7 @@ function expand()
         # copy bootstrapnodes.json
         cp ${bootstrapnodes_file} $node_base_info_dir/
 
+        tar_tool $current_node_path_local
     done
 
     echo

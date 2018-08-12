@@ -5,8 +5,8 @@ function error_message()
 {
     local message=$1
     local is_exit=$2
-    echo "ERROR - ${message}" >&2 
-
+#    echo "ERROR - ${message}" >&2 
+    echo "ERROR - ${message}"
     if [ -z "$is_exit" ] || [ "$is_exit" != "false" ];then
         exit 1
     fi
@@ -102,4 +102,15 @@ function check_file_empty()
     fi
 
     return 0
+}
+
+#tar file or dictionary
+function tar_tool()
+{
+    local file=$1
+    if [ -f $current_node_path".tgz" ];then
+        echo $current_node_path".tgz already exist ~"
+    else
+        tar -zcvf $current_node_path".tgz" $current_node_path
+    fi
 }
