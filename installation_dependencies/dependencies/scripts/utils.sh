@@ -4,14 +4,18 @@
 function error_message()
 {
     local message=$1
-    local is_exit=$2
 #    echo "ERROR - ${message}" >&2 
     echo "ERROR - ${message}"
-    if [ -z "$is_exit" ] || [ "$is_exit" != "false" ];then
-        exit 1
-    fi
+    exit 1
 }
 
+# print message to stderr , if need and will exit
+function error_message_without_exit()
+{
+    local message=$1
+#    echo "ERROR - ${message}" >&2 
+    echo "ERROR - ${message}"
+}
 
 #check if the port is used
 function check_port() 
