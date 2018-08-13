@@ -278,7 +278,10 @@ function install_build()
         return -1
     fi
 
+    # operation system check
     os_version_check
+    # java version check
+    java_version_check
 
     sudo chown -R $(whoami) $installPWD
 
