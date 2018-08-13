@@ -50,7 +50,7 @@ function fisco_bcos_version_check()
         return 0
     fi
 
-    error_message "Required version is $REQUIRE_VERSION, now fisco bcos version is $FISCO_VERSION" "false"
+    error_message_without_exit "Required version is $REQUIRE_VERSION, now fisco bcos version is $FISCO_VERSION"
 
     return 1
 }
@@ -222,8 +222,8 @@ function build_node_installation_package()
         # copy node_manager.sh
         cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
 
-        g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
-        mkdir -p ${g_genesis_node_action_container_dir_path}/
+        #g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
+        #mkdir -p ${g_genesis_node_action_container_dir_path}/
 
         g_genesis_cert_dir_path=$current_node_path/dependencies/cert
 
@@ -310,10 +310,10 @@ function build_node_installation_package()
             cp $node_ca_path/node/node.json $current_node_action_info_file_path
 
             # copy all node action info files to the container dir which owned by genesis node
-            if [ ${g_status_process} -eq ${PROCESS_INITIALIZATION} ] || [ ${g_status_process} -eq ${PROCESS_EXPAND_NODE} ]
-            then
-                cp $current_node_action_info_file_path ${g_genesis_node_action_container_dir_path}
-            fi
+            #if [ ${g_status_process} -eq ${PROCESS_INITIALIZATION} ] || [ ${g_status_process} -eq ${PROCESS_EXPAND_NODE} ]
+            #then
+            #    cp $current_node_action_info_file_path ${g_genesis_node_action_container_dir_path}
+            #fi
         fi
 
         if [ $host_type -eq $TYPE_GENESIS_HOST ] && [ $node_index -eq 0 ]

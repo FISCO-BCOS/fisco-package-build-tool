@@ -5,7 +5,10 @@ COMMAND_REGISTER_NODE='registerNode'
 COMMAND_DELETE_NODE='cancelNode'
 
 dirpath="$(cd "$(dirname "$0")" && pwd)"
+source $dirpath/../dependencies/scripts/dependencies_check.sh
 cd $dirpath/web3sdk/bin
+
+java_version_check
 
 chmod a+x system_contract_tools.sh
 
