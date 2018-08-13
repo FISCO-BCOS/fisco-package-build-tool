@@ -291,16 +291,4 @@ function info()
     echo "****************************"
 }
 
-case "$1" in
-    'install')
-        install
-        ;;
-    'info')
-        info
-        ;;
-    *)
-        echo "invalid option!"
-        echo "Usage: $0 {install|info}"
-        #exit 1
-esac
-
+install
