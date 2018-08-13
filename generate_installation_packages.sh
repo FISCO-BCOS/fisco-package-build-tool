@@ -60,15 +60,16 @@ function get_node_dir_name()
     local host_type_local=$1
     local public_ip_underline_local=$2
     local private_ip_underline_local=$3
+    local agency=$4
 
     if [ $host_type_local -eq $TYPE_TEMP_HOST ]
     then
         node_dir_name_local=$TEMP_NODE_NAME
     elif [ $host_type_local -eq $TYPE_GENESIS_HOST ]
     then
-        node_dir_name_local=$public_ip_underline_local"_genesis"
+        node_dir_name_local=$public_ip_underline_local"_"$agency"_genesis"
     else
-        node_dir_name_local=$public_ip_underline_local
+        node_dir_name_local=$public_ip_underline_local"_$agency"
     fi
     echo $node_dir_name_local
 }
@@ -77,14 +78,14 @@ function copy_genesis_related_info()
 {
     local public_ip=$1
     local private_ip=$2
-    #local node_num_per_host=$3
+    local agency=$3
     local host_type=$4
 
     public_ip_underline=$(replace_dot_with_underline $public_ip)
     private_ip_underline=$(replace_dot_with_underline $private_ip)
 
     #create node dir
-    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
+    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip $agency)
     current_node_path=$installation_build_dir/$node_dir_name
 
     #copy genesis json file to node dir
@@ -185,7 +186,7 @@ function build_node_installation_package()
         alert_msg="$current_node_path is already exist, it means the installation package for ip($public_ip with $private_ip) have already build. "
     fi
 
-    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
+    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip $agent_info)
     current_node_path=$installation_build_dir/$node_dir_name
 
     if [ -d $current_node_path ]
@@ -429,8 +430,9 @@ function deploy_system_contract_for_initialization()
         local public_ip=${sub_arr[0]}
         local private_ip=${sub_arr[1]}
         local node_num_per_host=${sub_arr[2]}
+        local agency_info=${sub_arr[3]}
         local host_type=$(get_host_type $i)
-        local node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
+        local node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip $agency_info)
         local current_node_path=$installation_build_dir/$node_dir_name
         local public_ip_underline=$(replace_dot_with_underline $public_ip)
         for ((j=0; j<$node_num_per_host; j++))
@@ -641,8 +643,9 @@ function build()
         local private_ip=${sub_arr[1]}
         local node_num_per_host=${sub_arr[2]}
         local build_host_type=$(get_host_type $i)
+        local agency_info=${sub_arr[3]}
 
-        copy_genesis_related_info $public_ip $private_ip $node_num_per_host $build_host_type
+        copy_genesis_related_info $public_ip $private_ip $agency_info $build_host_type
 
     done
 
@@ -686,7 +689,7 @@ function expand()
 
         build_node_installation_package $public_ip $private_ip $node_num_per_host $build_host_type $agency_info
 
-        local node_dir_name_local=$(get_node_dir_name $build_host_type $public_ip $private_ip)
+        local node_dir_name_local=$(get_node_dir_name $build_host_type $public_ip $private_ip $agency_info)
         local current_node_path_local=$installation_build_dir/$node_dir_name_local
 
         local node_base_info_dir=$current_node_path_local/dependencies/follow/
