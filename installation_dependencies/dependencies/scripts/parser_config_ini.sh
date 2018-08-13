@@ -1,8 +1,5 @@
 #!/bin/bash
 
-dirpath="$(cd "$(dirname "$0")" && pwd)"
-source $dirpath/utils.sh
-
 #set -e
 # init function , install crudini
 function parser_ini_init() 

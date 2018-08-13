@@ -1,8 +1,5 @@
 #!/bin/bash
 
-dirpath="$(cd "$(dirname "$0")" && pwd)"
-source $dirpath/utils.sh
-
 #check user has sudo permission
 function request_sudo_permission() 
 {

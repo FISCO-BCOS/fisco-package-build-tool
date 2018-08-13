@@ -2,9 +2,6 @@
 
 module_name="install.sh"
 
-dirpath="$(cd "$(dirname "$0")" && pwd)"
-source $dirpath/utils.sh
-
 # uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 # case $(uname -s) in 
 #   Darwin)
