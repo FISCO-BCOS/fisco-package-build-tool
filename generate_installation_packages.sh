@@ -710,6 +710,7 @@ function expand()
     echo
     print_dash
 
+    echo " "
     echo "    Expanding end!"
     return 0
 }
