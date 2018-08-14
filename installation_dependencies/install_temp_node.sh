@@ -35,7 +35,7 @@ function generate_startgodsh()
 {
     startsh="#!/bin/bash
     ulimit -c unlimited
-    nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  --godminer ${NODE_INSTALL_DIR}/node${Idx[$index]}/godminer.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
+    nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  --godminer ${NODE_INSTALL_DIR}/node${Idx[$index]}/godminer.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
     echo "$startsh"
 }
 
@@ -44,7 +44,7 @@ function generate_startsh()
 {
     startsh="#!/bin/bash
     ulimit -c unlimited
-    nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
+    nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
     echo "$startsh"
 }
 
@@ -133,9 +133,9 @@ function install()
     cd ${current_node_dir_base}
     bash node${Idx[0]}/start.sh
 
-    echo "    Loading genesis file : "
-    $DEPENENCIES_DIR/scripts/percent_num_progress_bar.sh 8 &
-    sleep 10
+    echo "    Waiting for temp node starting ..."
+    # $DEPENENCIES_DIR/scripts/percent_num_progress_bar.sh 8 &
+    sleep 5
 
     # check if temp node is running
     check_port ${WEB3SDK_CONFIG_PORT}
