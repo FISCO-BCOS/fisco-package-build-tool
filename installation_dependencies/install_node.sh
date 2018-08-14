@@ -53,7 +53,7 @@ function generate_startsh_func()
         echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
     else
         echo \"start node${Idx[$index]} ...\"
-        nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
+        nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
     fi"
     echo "$startsh"
     return 0

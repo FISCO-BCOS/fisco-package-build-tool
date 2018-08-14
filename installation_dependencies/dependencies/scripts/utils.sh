@@ -17,6 +17,12 @@ function error_message_without_exit()
     echo "ERROR - ${message}"
 }
 
+#exit direct
+function error_exit()
+{
+    exit 1
+}
+
 #check if the port is used
 function check_port() 
 {
