@@ -118,7 +118,7 @@ function install()
    
     local god_addr=$(cat $current_node_dir_base/godInfo.txt | grep address | awk -F ':' '{print $2}' 2>/dev/null)
     if [ -z ${god_addr} ];then
-        error_messaage " fisco-bcos --newaccount opr faild." "false"
+        error_message " fisco-bcos --newaccount opr faild." "false"
     fi
 
     cp $current_node_dir_base/godInfo.txt $buildPWD
@@ -154,7 +154,7 @@ function install()
     # check if temp node is running
     check_port ${WEB3SDK_CONFIG_PORT}
     if [ $? -eq 0 ];then
-        error_messaage "channel port $WEB3SDK_CONFIG_PORT is not listening, temp node start not success."
+        error_message "channel port $WEB3SDK_CONFIG_PORT is not listening, temp node start not success."
     fi
 
     #deploy system contract
@@ -165,13 +165,13 @@ function install()
     #deploy system contract failed
     if [ ! -f ${current_web3sdk}/bin/output/SystemProxy.address ];then
         bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        error_messaage "system contract address file is not exist, web3sdk deploy system contract not success."
+        error_message "system contract address file is not exist, web3sdk deploy system contract not success."
     fi 
 
     syaddress=$(cat ${current_web3sdk}/bin/output/SystemProxy.address)
     if [ -z $syaddress ];then
         bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        error_messaage "system contract address file is empty, web3sdk deploy system contract not success." 
+        error_message "system contract address file is empty, web3sdk deploy system contract not success." 
     fi
     
     cp ${current_web3sdk}/bin/output/SystemProxy.address $buildPWD/syaddress.txt
