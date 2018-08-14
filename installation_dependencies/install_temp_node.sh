@@ -135,7 +135,7 @@ function install()
 
     echo "    Loading genesis file : "
     $DEPENENCIES_DIR/scripts/percent_num_progress_bar.sh 8 &
-    sleep 8
+    sleep 10
 
     # check if temp node is running
     check_port ${WEB3SDK_CONFIG_PORT}
