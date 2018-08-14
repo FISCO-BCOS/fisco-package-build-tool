@@ -3,11 +3,11 @@
 # bash check.sh      =>    check all node 
 # bash check.sh IDX  =>    check the IDX node
 
-local index=$1;
+index=$1;
 
 if [ -z $index ];then
-	local total=999
-	local index=0
+	total=999
+	index=0
 	echo "check all node status ... "
 	while [ $index -le $total ]
 	do
