@@ -3,32 +3,32 @@
 # bash start.sh      =>    start all node 
 # bash start.sh IDX  =>    start the IDX node
 
-local index=$1;
+index=$1;
 
 if [ -z $index ];then
-	local total=999
-    local index=0
+    total=999
+    index=0
     echo "start all node ... "
-	while [ $index -le $total ]
-	do
-		if [ -d node$index ];then
-			bash node$index/start.sh
-		else	
-			break
-		fi
-		index=$(($index+1))
-	done
+    while [ $index -le $total ]
+    do
+        if [ -d node$index ];then
+            bash node$index/start.sh
+        else	
+            break
+        fi
+        index=$(($index+1))
+    done
 
     sleep 3
 
     bash check.sh
 else
     echo "start node$index ... "
-	if [ -d node$index ];then
-		bash node$index/start.sh
+    if [ -d node$index ];then
+        bash node$index/start.sh
         sleep 3
         bash check.sh $index
-	else
-		echo "node$index is not exist."
-	fi
+    else
+        echo "node$index is not exist."
+    fi
 fi
