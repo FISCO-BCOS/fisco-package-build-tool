@@ -411,9 +411,9 @@ function build_temp_node()
 #deploy system contract
 function deploy_system_contract_for_initialization()
 {
-    cd $installation_build_dir/$TEMP_NODE_NAME/build/node0
-    bash start_godminer.sh
-    sleep 8
+    cd $installation_build_dir/$TEMP_NODE_NAME/build/
+    bash node0/start_godminer.sh
+    sleep 5
     # check if temp node is running
     check_port $CHANNEL_PORT_NODE
     if [ $? -eq 0 ];then
@@ -448,10 +448,10 @@ function deploy_system_contract_for_initialization()
     bash system_contract_tools.sh NodeAction all
 
     # export the genesis file
-    cd $installation_build_dir/$TEMP_NODE_NAME/build/node0/
-    bash stop.sh 1>/dev/null
+    cd $installation_build_dir/$TEMP_NODE_NAME/build/
+    bash node0/stop.sh 1>/dev/null
 
-    ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/node0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/node0/fisco-bcos.log 2>&1
+    ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node0/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node0/fisco-bcos.log 2>&1
 
     echo "    exporting genesis file : "
     $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/scripts/percent_num_progress_bar.sh 2 &

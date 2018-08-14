@@ -4,7 +4,7 @@ COMMAND_SHOW_ALL_NODE='all'
 COMMAND_REGISTER_NODE='registerNode'
 COMMAND_DELETE_NODE='cancelNode'
 
-cd $dirpath/web3sdk/bin
+cd web3sdk/bin
 
 chmod a+x system_contract_tools.sh
 
