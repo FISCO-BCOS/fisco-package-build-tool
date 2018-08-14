@@ -23,7 +23,7 @@ if [ -z $index ];then
 
     bash check.sh
 else
-    echo "start node$index ... "
+    #echo "start node$index ... "
     if [ -d node$index ];then
         bash node$index/start.sh
         sleep 3

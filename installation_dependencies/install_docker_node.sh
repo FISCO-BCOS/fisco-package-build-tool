@@ -16,14 +16,8 @@ source $DEPENENCIES_FOLLOW_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
 
 g_docker_repository=${docker_repository}
-if [ -z ${g_docker_repository} ];then
-    g_docker_repository="docker.io/fiscoorg/fiscobcos"
-fi
 
 g_docker_ver=${docker_version}
-if [ -z ${g_docker_ver} ];then
-    g_docker_ver="latest"
-fi
 
 g_docker_fisco_path="/fisco-bcos/node/"
 
@@ -98,7 +92,7 @@ function generate_startallsh_func()
     i=0
     while [ \$i -lt $nodecount ]
     do
-        bash start_node\$i.sh
+        bash start\$i.sh
         sleep 3
         i=\$((\$i+1))
     done"
@@ -113,7 +107,7 @@ function generate_stopallsh_func()
     i=0
     while [ \$i -lt $nodecount ]
     do
-        bash stop_node\$i.sh
+        bash stop\$i.sh
         i=\$((\$i+1))
     done"
     echo "$stoptallsh"
@@ -124,20 +118,11 @@ function install()
 {
     echo "    Installing fisco-bcos docker environment start"
     request_sudo_permission
-    ret=$?
-    if [ $ret -ne 0 ]
-    then
-        return -1
-    fi
 
     sudo chown -R $(whoami) $installPWD
 
-    if [ -d $dockerPWD ]
-    then
-        echo "you already install the fisco-bcos docker node in this directory!"
-        echo "if you wanna re install the fisco-bcos docker node, please remove the directory: $dockerPWD"
-        echo "if you wanna install another fisco-bcos docker node(whether it is on the same host as before or not), you need to contact the administrator for a whole new intallation package!"
-        return 2
+    if [ -d $dockerPWD ];then
+        error_message "docker dictionary already exist, remove it first."
     fi
 
     sudo docker pull $g_docker_repository:$g_docker_ver
@@ -145,11 +130,11 @@ function install()
         echo "docker pull fisco-bcos failed."
         echo "repository is "$g_docker_repository
         echo "version is "$g_docker_ver
+        error_exit
     fi
 
-    if [ -z $nodecount ] || [ $nodecount -le 0 ]; then
-        echo "there has no docker node on this server, count is "$nodecount
-        return
+    if [ -z $nodecount ] ||[ $nodecount -le 0 ]; then
+        error_message "there has no node on this server, count is "$nodecount
     fi
 
     print_dash
@@ -159,17 +144,16 @@ function install()
     i=0
     while [ $i -lt $nodecount ]
     do
-	index=$i
+	    index=$i
         container_id=`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v "CONTAINER ID" | awk '{print $1}'`
         echo "check if fisco-node$index"_"${rpcport[$index]} exist."
         if [ -z ${container_id} ];then
 	    i=$(($i+1))
             continue
         else
-            echo "there is already fisco-bcos docker named fisco-node"$index"_"${rpcport[$index]}" ,container_id is "$container_id
-            return
+            error_message "there is already fisco-bcos docker named fisco-node"$index"_"${rpcport[$index]}" ,container_id is "$container_id
         fi
-	i=$(($i+1))
+	    i=$(($i+1))
     done
 
     i=0
@@ -235,7 +219,7 @@ function install()
         export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${g_docker_fisco_path}"keys.info"
         export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${g_docker_fisco_path}"keystore/"
         export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${g_docker_fisco_path}"data/"
-        export CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL=${g_docker_fisco_path}/log.conf
+        export CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL=${g_docker_fisco_path}log.conf
 
         MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}'
         envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > $dockerPWD/node${Idx[$index]}/config.json
@@ -245,34 +229,34 @@ function install()
         sed -i.bu "s/ip:port/${listenip[$index]}:${rpcport[$index]}/g"  $dockerPWD/node${Idx[$index]}/ext/conf/config.js
 
         generate_startsh=`generate_startsh_docker_func`
-        echo "${generate_startsh}" > $dockerPWD/start_node${Idx[$index]}.sh
+        echo "${generate_startsh}" > $dockerPWD/start${Idx[$index]}.sh
         generate_stopsh=`generate_stopsh_docker_func`
-        echo "${generate_stopsh}" > $dockerPWD/stop_node${Idx[$index]}.sh
+        echo "${generate_stopsh}" > $dockerPWD/stop${Idx[$index]}.sh
 
-        sudo chmod +x $dockerPWD/start_node${Idx[$index]}.sh
-        sudo chmod +x $dockerPWD/stop_node${Idx[$index]}.sh
+        sudo chmod +x $dockerPWD/start${Idx[$index]}.sh
+        sudo chmod +x $dockerPWD/stop${Idx[$index]}.sh
 
         generate_sh=`generate_startsh_func`
         echo "${generate_sh}" > $dockerPWD/node${Idx[$index]}/start.sh
         sudo chmod +x $dockerPWD/node${Idx[$index]}/start.sh
 	
 	    register_sh=`generate_registersh_func`
-        echo "${register_sh}" > $dockerPWD/register_node${Idx[$index]}.sh
-	    sudo chmod +x $dockerPWD/register_node${Idx[$index]}.sh
+        echo "${register_sh}" > $dockerPWD/register${Idx[$index]}.sh
+	    sudo chmod +x $dockerPWD/register${Idx[$index]}.sh
 
         unregister_sh=`generate_unregistersh_func`
-        echo "${unregister_sh}" > $dockerPWD/unregister_node${Idx[$index]}.sh
-	    sudo chmod +x $dockerPWD/unregister_node${Idx[$index]}.sh
+        echo "${unregister_sh}" > $dockerPWD/unregister${Idx[$index]}.sh
+	    sudo chmod +x $dockerPWD/unregister${Idx[$index]}.sh
 
         i=$(($i+1))
     done
 
     generate_startallsh=`generate_startallsh_func`
-    echo "${generate_startallsh}" > $dockerPWD/start_all.sh
+    echo "${generate_startallsh}" > $dockerPWD/start.sh
     sudo chmod a+x $dockerPWD/start_all.sh
 
     generate_stopallsh=`generate_stopallsh_func`
-    echo "${generate_stopallsh}" > $dockerPWD/stop_all.sh
+    echo "${generate_stopallsh}" > $dockerPWD/stop.sh
     sudo chmod a+x $dockerPWD/stop_all.sh
 
     cd $installPWD
