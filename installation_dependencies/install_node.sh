@@ -370,9 +370,9 @@ function install_build()
     mkdir -p $buildPWD/web3lib/node_modules
     mkdir -p $buildPWD/tool/node_modules
     mkdir -p $buildPWD/systemcontract/node_modules
-    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/web3lib/node_modules/ 1>>/dev/null
-    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/tool/node_modules/ 1>>/dev/null
-    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/systemcontract/node_modules/ 1>>/dev/null
+    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/web3lib/node_modules/ >/dev/null 2>&1
+    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/tool/node_modules/ >/dev/null 2>&1
+    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/systemcontract/node_modules/ >/dev/null 2>&1
 
     #config.js
     cp $installPWD/dependencies/tpl_dir/config.js.tpl $buildPWD/web3lib/config.js
