@@ -253,11 +253,11 @@ function install()
 
     generate_startallsh=`generate_startallsh_func`
     echo "${generate_startallsh}" > $dockerPWD/start.sh
-    sudo chmod a+x $dockerPWD/start_all.sh
+    sudo chmod a+x $dockerPWD/start.sh
 
     generate_stopallsh=`generate_stopallsh_func`
     echo "${generate_stopallsh}" > $dockerPWD/stop.sh
-    sudo chmod a+x $dockerPWD/stop_all.sh
+    sudo chmod a+x $dockerPWD/stop.sh
 
     cd $installPWD
 
