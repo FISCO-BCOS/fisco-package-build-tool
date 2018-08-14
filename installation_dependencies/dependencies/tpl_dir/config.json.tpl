@@ -14,5 +14,5 @@
     "coverlog":"OFF",
     "eventlog":"ON",
     "statlog":"ON",
-    "logconf":"${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}/log.conf"
+    "logconf":"${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}"
 }

@@ -34,7 +34,7 @@ echo "docker version => "${g_docker_ver}
 function generate_registersh_func()
 {
     registersh="#!/bin/bash
-    sudo docker exec fisco-node$index"_"${rpcport[$index]} bash -c \"source /etc/profile && cd /fisco-bcos && bash node_manager.sh registerNode /fisco-bcos/node/fisco-data/node.json\"
+    sudo docker exec fisco-node$index"_"${rpcport[$index]} bash -c \"source /etc/profile && cd /fisco-bcos && bash node_manager.sh registerNode /fisco-bcos/node/data/node.json\"
     "
     echo "$registersh"
     return 0
@@ -44,7 +44,7 @@ function generate_registersh_func()
 function generate_unregistersh_func()
 {
     registersh="#!/bin/bash
-    sudo docker exec fisco-node$index"_"${rpcport[$index]} bash -c \"source /etc/profile && cd /fisco-bcos && bash node_manager.sh cancelNode /fisco-bcos/node/fisco-data/node.json\"
+    sudo docker exec fisco-node$index"_"${rpcport[$index]} bash -c \"source /etc/profile && cd /fisco-bcos && bash node_manager.sh cancelNode /fisco-bcos/node/data/node.json\"
     "
     echo "$registersh"
     return 0
@@ -83,7 +83,7 @@ function generate_startsh_docker_func()
     container_id=\`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v \"CONTAINER ID\" | awk '{print \$1}'\`
     echo \"start node${Idx[$index]} ...\"
     if [ -z \${container_id} ];then
-        sudo docker run -d -v \`pwd\`/nodedir$index:/fisco-bcos/node --name=fisco-node$index"_"${rpcport[$index]} --net=host -i ${g_docker_repository}:${g_docker_ver} /fisco-bcos/start_node.sh
+        sudo docker run -d -v \`pwd\`/node$index:/fisco-bcos/node --name=fisco-node$index"_"${rpcport[$index]} --net=host -i ${g_docker_repository}:${g_docker_ver} /fisco-bcos/start_node.sh
     else
         sudo docker start \${container_id}
     fi"
@@ -176,32 +176,32 @@ function install()
     while [ $i -lt $nodecount ]
     do
         index=$i
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/log/
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/keystore/
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/fisco-data/
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/conf
-        mkdir -p $dockerPWD/nodedir${Idx[$index]}/ext/script
+        mkdir -p $dockerPWD/node${Idx[$index]}/
+        mkdir -p $dockerPWD/node${Idx[$index]}/log/
+        mkdir -p $dockerPWD/node${Idx[$index]}/keystore/
+        mkdir -p $dockerPWD/node${Idx[$index]}/data/
+        mkdir -p $dockerPWD/node${Idx[$index]}/ext/
+        mkdir -p $dockerPWD/node${Idx[$index]}/ext/conf
+        mkdir -p $dockerPWD/node${Idx[$index]}/ext/script
 
         if [ $i -eq 0 ];then
             if [ $g_is_genesis_host -eq 1 ];then
-                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/bootstrapnodes.json >/dev/null 2>&1
+                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/bootstrapnodes.json >/dev/null 2>&1
             else
-                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
             fi
         else    
-            cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/nodedir${Idx[$index]}/fisco-data/ >/dev/null 2>&1
+            cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
         fi
 
-        cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk $dockerPWD/nodedir${Idx[$index]}/ext/
-        cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/ $dockerPWD/nodedir${Idx[$index]}/ext/
-        cp $DEPENENCIES_FOLLOW_DIR/genesis.json $dockerPWD/nodedir${Idx[$index]}/ >/dev/null 2>&1
-        cp $DEPENENCIES_FOLLOW_DIR/syaddress.txt $dockerPWD/nodedir${Idx[$index]}/ext/conf/ >/dev/null 2>&1
-        cp $DEPENENCIES_DIR/scripts/docker_init.sh $dockerPWD/nodedir${Idx[$index]}/ext/script/ >/dev/null 2>&1
+        cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk $dockerPWD/node${Idx[$index]}/ext/
+        cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/ $dockerPWD/node${Idx[$index]}/ext/
+        cp $DEPENENCIES_FOLLOW_DIR/genesis.json $dockerPWD/node${Idx[$index]}/ >/dev/null 2>&1
+        cp $DEPENENCIES_FOLLOW_DIR/syaddress.txt $dockerPWD/node${Idx[$index]}/ext/conf/ >/dev/null 2>&1
+        cp $DEPENENCIES_DIR/scripts/docker_init.sh $dockerPWD/node${Idx[$index]}/ext/script/ >/dev/null 2>&1
 
-        cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $dockerPWD/nodedir${Idx[$index]}/
-        sudo chmod a+x $dockerPWD/nodedir${Idx[$index]}/node_manager.sh
+        cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $dockerPWD/node${Idx[$index]}/
+        sudo chmod a+x $dockerPWD/node${Idx[$index]}/node_manager.sh
 
         cd $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/
         nodeid=$(cat node.nodeid)
@@ -218,8 +218,13 @@ function install()
         echo "WEB3SDK_SYSTEM_CONTRACT_ADDR=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)"
         echo "KEYSTORE_PWD="${KEYSTORE_PWD}
         echo "CLIENTCERT_PWD="${CLIENTCERT_PWD}
-        envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $dockerPWD/nodedir${Idx[$index]}/ext/conf/applicationContext.xml
-        
+        envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > $dockerPWD/node${Idx[$index]}/ext/conf/applicationContext.xml
+
+        # generate log.conf from tpl
+        export OUTPUT_LOG_FILE_PATH_TPL=${g_docker_fisco_path}"log"
+        MYVARS='${OUTPUT_LOG_FILE_PATH_TPL}'
+        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/log.conf.tpl > $dockerPWD/node${Idx[$index]}/log.conf
+
         export CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)
         export CONFIG_JSON_LISTENIP_TPL=${listenip[$index]}
         export CRYPTO_MODE_TPL=${crypto_mode}
@@ -229,19 +234,15 @@ function install()
 
         export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${g_docker_fisco_path}"keys.info"
         export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${g_docker_fisco_path}"keystore/"
-        export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${g_docker_fisco_path}"fisco-data/"
+        export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${g_docker_fisco_path}"data/"
+        export CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL=${g_docker_fisco_path}/log.conf
 
-        MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}'
-        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > $dockerPWD/nodedir${Idx[$index]}/config.json
+        MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}'
+        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > $dockerPWD/node${Idx[$index]}/config.json
 
         #config.js
-        cp $installPWD/dependencies/tpl_dir/config.js.tpl $dockerPWD/nodedir${Idx[$index]}/ext/conf/config.js
-        sed -i.bu "s/ip:port/${listenip[$index]}:${rpcport[$index]}/g"  $dockerPWD/nodedir${Idx[$index]}/ext/conf/config.js
-
-        # generate log.conf from tpl
-        export OUTPUT_LOG_FILE_PATH_TPL=${g_docker_fisco_path}"log"
-        MYVARS='${OUTPUT_LOG_FILE_PATH_TPL}'
-        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/log.conf.tpl > $dockerPWD/nodedir${Idx[$index]}/fisco-data/log.conf
+        cp $installPWD/dependencies/tpl_dir/config.js.tpl $dockerPWD/node${Idx[$index]}/ext/conf/config.js
+        sed -i.bu "s/ip:port/${listenip[$index]}:${rpcport[$index]}/g"  $dockerPWD/node${Idx[$index]}/ext/conf/config.js
 
         generate_startsh=`generate_startsh_docker_func`
         echo "${generate_startsh}" > $dockerPWD/start_node${Idx[$index]}.sh
@@ -252,8 +253,8 @@ function install()
         sudo chmod +x $dockerPWD/stop_node${Idx[$index]}.sh
 
         generate_sh=`generate_startsh_func`
-        echo "${generate_sh}" > $dockerPWD/nodedir${Idx[$index]}/start.sh
-        sudo chmod +x $dockerPWD/nodedir${Idx[$index]}/start.sh
+        echo "${generate_sh}" > $dockerPWD/node${Idx[$index]}/start.sh
+        sudo chmod +x $dockerPWD/node${Idx[$index]}/start.sh
 	
 	    register_sh=`generate_registersh_func`
         echo "${register_sh}" > $dockerPWD/register_node${Idx[$index]}.sh

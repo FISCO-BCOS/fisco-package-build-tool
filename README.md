@@ -234,16 +234,16 @@ build/
 │   ├── check_node.sh      检查节点是否启动的脚本 
 │   ├── fisco-bcos         fisco-bcos可执行程序
 │   ├── genesis.json       创世块文件
-│   ├── nodedir0           node0目录 
+│   ├── node0           node0目录 
 │   │   ├── config.json    node0 config.json配置文件
-│   │   ├── fisco-data     node0 数据目录
+│   │   ├── data     node0 数据目录
 │   │   └── log            node0 日志目录
-│   ├── nodedir1           node1目录
+│   ├── node1           node1目录
 │   │   ├── config.json    node1 config.json配置文件
-│   │   ├── fisco-data     node1 数据目录
+│   │   ├── data     node1 数据目录
 │   │   └── log            node1 日志目录
-│   ├── start_node0.sh     node0的启动脚本
-│   ├── start_node1.sh     node1的启动脚本
+│   ├── start.sh     node0的启动脚本
+│   ├── start.sh     node1的启动脚本
 │   ├── stop_node0.sh      node0的停止脚本
 │   └── stop_node1.sh      node1的停止脚本
 ├── nodejs                 nodejs的安装目录
@@ -258,9 +258,9 @@ build/
 ```
 
 说明:
-- nodedirIDX : 节点nodeIDX的目录, IDX表示索引, 从0开始.
-- nodedirIDX/fisco-data : 节点nodeIDX的数据目录.
-- nodedirIDX/log        : 节点nodeIDX的日志目录.
+- nodeIDX : 节点nodeIDX的目录, IDX表示索引, 从0开始.
+- nodeIDX/fisco-data : 节点nodeIDX的数据目录.
+- nodeIDX/log        : 节点nodeIDX的日志目录.
 - start_all.sh          : 启动所有的节点.  
 - stop_all.sh           : 停止所有的节点.  
 - systemcontract        : nodejs系统合约工具.  
@@ -292,7 +292,7 @@ node1 is running.
 ### 2.7.1 日志
 
 ```shell
-tail -f node/nodedir0/log/log_*.log  | egrep "Generating seal"
+tail -f node/node0/log/log_*.log  | egrep "Generating seal"
 INFO|2018-08-03 14:16:42:588|+++++++++++++++++++++++++++ Generating seal on8e5add00c337398ac5e9058432037aa646c20fb0d1d0fb7ddb4c6092c9d654fe#1tx:0,maxtx:1000,tq.num=0time:1522736202588
 INFO|2018-08-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona98781aaa737b483c0eb24e845d7f352a943b9a5de77491c0cb6fd212c2fa7a4#1tx:0,maxtx:1000,tq.num=0time:1522736203595
 ```
@@ -427,7 +427,7 @@ $ ./node_manager.sh registerNode `pwd`/../dependencies/node_action_info_dir/node
 
 验证,注册的节点是否正常:
 ```
-$ tail -f node/nodedir0/log/log_*.log   | egrep "Generating seal"
+$ tail -f node/node0/log/log_*.log   | egrep "Generating seal"
 INFO|2018-07-10 10:49:29:818|+++++++++++++++++++++++++++ Generating seal oncf8e56468bab78ae807b392a6f75e881075e5c5fc034cec207c1d1fe96ce79a1#4tx:0,maxtx:1000,tq.num=0time:1531190969818
 INFO|2018-07-10 10:49:35:863|+++++++++++++++++++++++++++ Generating seal one23f1af0174daa4c4353d00266aa31a8fcb58d3e7fbc17915d95748a3a77c540#4tx:0,maxtx:1000,tq.num=0time:1531190975863
 INFO|2018-07-10 10:49:41:914|+++++++++++++++++++++++++++ Generating seal on2448f00f295210c07b25090b70f0b610e3b8303fe0a6ec0f8939656c25309b2f#4tx:0,maxtx:1000,tq.num=0time:1531190981914
@@ -493,7 +493,7 @@ node3 is running.
 
 ## 4.5 验证  
 ```
-$ tail -f node/nodedir0/log/log_2018080116.log | egrep "seal"
+$ tail -f node/node0/log/log_2018080116.log | egrep "seal"
 INFO|2018-08-01 16:52:18:362|+++++++++++++++++++++++++++ Generating seal on5b14215cff11d4b8624246de63bda850bcdead20e193b24889a5dff0d0e8a3c3#1tx:0,maxtx:1000,tq.num=0time:1533113538362
 INFO|2018-08-01 16:52:22:432|+++++++++++++++++++++++++++ Generating seal on5e7589906bcbd846c03f5c6e806cced56f0a17526fb1e0c545b855b0f7722e14#1tx:0,maxtx:1000,tq.num=0time:1533113542432
 ```
@@ -559,13 +559,13 @@ build/
 进入安装目录, 执行``` ./install_node ```, 成功之后会生成 **docker** 目录.
 ```
 docker/
-├── nodedir0
+├── node0
 │   ├── config.json
 │   ├── fisco-data
 │   ├── genesis.json
 │   ├── log
 │   └── start.sh
-├── nodedir1
+├── node1
 │   ├── config.json
 │   ├── fisco-data
 │   ├── genesis.json
@@ -583,8 +583,8 @@ docker/
 └── unregister_node1.sh
 ```
 
-- nodedirIDX : 第IDX个节点的目录, 该目录会被映射到docker的/fisco-bcos/node/目录, 这两个目录中的内容是一致的.
-- nodedirIDX/log : 日志目录.
+- nodeIDX : 第IDX个节点的目录, 该目录会被映射到docker的/fisco-bcos/node/目录, 这两个目录中的内容是一致的.
+- nodeIDX/log : 日志目录.
 - start_all.sh 启动所有的节点.
 - stop_all.sh 停止所有的节点.
 - start_nodeIDX.sh 启动第IDX个节点.
@@ -617,7 +617,7 @@ be8bd964322a        fiscoorg/fisco-octo:v1.3.x-latest   "/fisco-bcos/start_n…"
 
 #### 日志验证
 ```
-tail -f nodedir0/log/log_*.log | egrep "seal"
+tail -f node0/log/log_*.log | egrep "seal"
 INFO|2018-08-13 11:52:38:534|PBFTClient.cpp:343|+++++++++++++++++++++++++++ Generating seal onec61bbf7cb6152d523f391dfe65dd1f858ec3daa7b6df697308a0ad5219cf232#1tx:0,maxtx:1000,tq.num=0time:1534161158534
 INFO|2018-08-13 11:52:40:550|PBFTClient.cpp:343|+++++++++++++++++++++++++++ Generating seal on127962f94ccb075a448ae741e69718ffc0bee4f97ccddb7bd5e8a0310f4b8980#1tx:0,maxtx:1000,tq.num=0time:1534161160550
 INFO|2018-08-13 11:52:42:564|PBFTClient.cpp:343|+++++++++++++++++++++++++++ Generating seal on29ccca512d7e2bac34760e8c17807896dac914b426884a0bc28499a556811467#1tx:0,maxtx:1000,tq.num=0time:1534161162564
@@ -717,7 +717,7 @@ node.json=file:/fisco-bcos/node/fisco-data/node.json
 #### 1.8.4 验证
 查看log
 ```
- tail -f nodedir0/log/log*.log | egrep "seal"
+ tail -f node0/log/log*.log | egrep "seal"
 INFO|2018-08-13 12:00:18:710|PBFTClient.cpp:343|+++++++++++++++++++++++++++ Generating seal on26c826ad8d275cd2c3c53a034818acce222ad7dc8ef455de64efbf193748c9ef#1tx:0,maxtx:1000,tq.num=0time:1534161618710
 INFO|2018-08-13 13:00:02:040|PBFTClient.cpp:343|+++++++++++++++++++++++++++ Generating seal onb7a72e68cbc43293dac635b3c868e83ecbe24c3f1b72e0d57a809ee72bad9ca5#4tx:0,maxtx:0,tq.num=0time:1534165202040
 INFO|2018-08-13 13:54:25:054|PBFTClient.cpp:343|+++++++++++++++++++++++++++ Generating seal one2d93621481bf613b065f254519bbc32689d3b2eb8c5a1680c0f4d57531f7ef5#5tx:0,maxtx:0,tq.num=0time:1534168465054
@@ -803,7 +803,7 @@ temp节点部署系统合约失败.
 
 
 ## start_all.sh 显示nodeIDX is not running.  
-这个提示是说nodeIDX启动失败, 可以ps -aux | egrep fisco 查看是否正常启动. 可以执行`cat node/nodedirIDX/log/log`查看节点启动失败的原因. 
+这个提示是说nodeIDX启动失败, 可以ps -aux | egrep fisco 查看是否正常启动. 可以执行`cat node/nodeIDX/log/log`查看节点启动失败的原因. 
 常见的原因:
 - libleveldb.so No such file or directory.
 ```

@@ -10,7 +10,7 @@ installation_build_dir=$installPWD/build
 TEMP_NODE_NAME="temp"
 TEMP_BUILD_DIR=$installation_build_dir/$TEMP_NODE_NAME/build
 
-NODE_INSTALL_DIR=$buildPWD/node
+NODE_INSTALL_DIR=$buildPWD
 WEB3SDK_INSTALL_DIR=$buildPWD/web3sdk
 NODEJS_INSTALL_DIR=$buildPWD/nodejs
 
@@ -20,6 +20,7 @@ DEPENENCIES_DIR=$installPWD/dependencies
 DEPENENCIES_WEB3SDK_DIR=$installPWD/dependencies/web3sdk
 DEPENENCIES_WEB3LIB_DIR=$installPWD/dependencies/web3lib
 DEPENENCIES_FOLLOW_DIR=$installPWD/dependencies/follow
+DEPENENCIES_SCRIPTES_DIR=$installPWD/dependencies/scripts
 DEPENENCIES_FISCO_DIR=$installPWD/dependencies/fisco-bcos
 DEPENENCIES_SC_DIR=$installPWD/dependencies/systemcontract
 DEPENENCIES_TOOL_DIR=$installPWD/dependencies/tool
