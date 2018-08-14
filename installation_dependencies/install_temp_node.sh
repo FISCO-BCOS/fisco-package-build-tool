@@ -44,7 +44,7 @@ function generate_startsh()
 {
     startsh="#!/bin/bash
     ulimit -c unlimited
-    nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
+    nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
     echo "$startsh"
 }
 
