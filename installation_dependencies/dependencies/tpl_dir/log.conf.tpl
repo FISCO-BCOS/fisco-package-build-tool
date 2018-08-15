@@ -2,7 +2,7 @@
     ENABLED                 =   true
     TO_FILE                 =   true
     TO_STANDARD_OUTPUT      =   false
-    FORMAT                  =   "%level|%datetime{%Y-%M-%d %H:%m:%s:%g}|%msg"
+    FORMAT                  =   "%level|%datetime{%Y-%M-%d %H:%m:%s:%g}|%fbase:%line|%msg"
     FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/log_%datetime{%Y%M%d%H}.log"
     MILLISECONDS_WIDTH      =   3
     PERFORMANCE_TRACKING    =   false
@@ -11,11 +11,11 @@
 
 * TRACE:
     FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/trace_log_%datetime{%Y%M%d%H}.log"
-    ENABLED                 =   true
+    ENABLED                 =   false
 
 * DEBUG:
     FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/debug_log_%datetime{%Y%M%d%H}.log"
-    ENABLED                 =   true
+    ENABLED                 =   false
 
 * FATAL:
     ENABLED                 =   false

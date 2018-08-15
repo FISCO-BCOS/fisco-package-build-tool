@@ -67,7 +67,7 @@ function dependencies_install()
     Linux)
 
         if [ ! -f "/etc/os-release" ];then
-            { echo >&2 "ERROR - Unsupported or unidentified Linux distro."; exit 1; }
+            error_message "ERROR - Unsupported or unidentified Linux distro."
         fi
 
         DISTRO_NAME=$(. /etc/os-release; echo $NAME)
@@ -134,7 +134,7 @@ function dependencies_install()
     # Other Linux
     #------------------------------------------------------------------------------
             *)
-                { echo >&2 "ERROR - Unsupported Linux distribution: $DISTRO_NAME."; exit 1; }
+                error_message "ERROR - Unsupported Linux distribution: $DISTRO_NAME."
                 ;;
         esac # case $DISTRO_NAME
 
@@ -145,7 +145,7 @@ function dependencies_install()
     #------------------------------------------------------------------------------
     *)
         #other
-        { echo >&2 "ERROR - Unsupported or unidentified operating system."; exit 1; }
+        error_message "ERROR - Unsupported or unidentified operating system."
         ;;
     esac
 }
@@ -183,7 +183,7 @@ function simple_dependencies_install()
     Linux)
 
         if [ ! -f "/etc/os-release" ];then
-            { echo >&2 "ERROR - Unsupported or unidentified Linux distro."; exit 1; }
+            error_message "ERROR - Unsupported or unidentified Linux distro."
         fi
 
         DISTRO_NAME=$(. /etc/os-release; echo $NAME)
@@ -226,7 +226,7 @@ function simple_dependencies_install()
     # Other Linux
     #------------------------------------------------------------------------------
             *)
-                { echo >&2 "ERROR - Unsupported Linux distribution: $DISTRO_NAME."; exit 1; }
+                error_message "ERROR - Unsupported Linux distribution: $DISTRO_NAME."
                 ;;
         esac # case $DISTRO_NAME
 
@@ -237,7 +237,7 @@ function simple_dependencies_install()
     #------------------------------------------------------------------------------
     *)
         #other
-        { echo >&2 "ERROR - Unsupported or unidentified operating system."; exit 1; }
+        error_message "ERROR - Unsupported or unidentified operating system."
         ;;
     esac
 }
