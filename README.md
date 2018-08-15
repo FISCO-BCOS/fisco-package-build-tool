@@ -13,8 +13,7 @@
 * **创世节点**：搭建一条新链时, 配置文件的第一台服务器上的第一个节点为创世节点, 创世节点是需要第一个启动的节点, 其他节点需要主动连接创世节点, 通过与创世节点的连接, 所有节点同步连接信息, 最终构建正常的网络。
 * **非创世节点**：除去创世节点的其它节点。
 
-## 1.3. 依赖  
-- [x]    机器配置  
+## 1.4. 依赖  - [&radic;]    机器配置  
 
    参考FISCO BCOS[机器配置](https://github.com/FISCO-BCOS/FISCO-BCOS/tree/master/doc/manual#第一章-部署fisco-bcos环境)  
    ```
@@ -24,7 +23,7 @@
    Ubuntu 16.04 64位
    ```
   
-- [x]    软件依赖  
+- [&radic;]    软件依赖  
 
 ```shell
 Oracle JDK[1.8]
@@ -34,7 +33,7 @@ Oracle JDK[1.8]
 - FISCO BCOS搭建过程中需要的其他依赖会自动安装, 用户不需要再手动安装.
 - CentOS/Ubuntu默认安装或者使用yum/apt安装的是openJDK, 并不符合使用要求, Oracle JDK 1.8 的安装链接[[ Oracle JDK 1.8 安装]](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/Oracle%20JAVA%201.8%20%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md).
 
-- [x]    其他依赖  
+- [&radic;]    其他依赖  
   sudo权限, 当前执行的用户需要具有sudo权限
 
 ## 1.4 版本支持
@@ -380,7 +379,7 @@ send transaction success: 0x769e4ea7742b451e33cbb0d2a7d3126af8f277a52137624b3d4a
   * genesis.json 
   * bootstrapnodes.json  
   * syaddress.txt  
-- [x]  也可以将创世节点的fisco-bcos文件放入物料包工具的/usr/local/bin目录.  
+- [&radic;]  也可以将创世节点的fisco-bcos文件放入物料包工具的/usr/local/bin目录.  
 
 - 从创世节点所在服务器上取出dependencies/cert目录, 该目录包含创建时分配的根证书、机构证书, 放到物料包工具所在的机器。
 
