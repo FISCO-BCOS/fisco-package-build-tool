@@ -91,6 +91,11 @@ function copy_genesis_related_info()
     #copy genesis json file to node dir
     build_base_info_dir $current_node_path
 
+    #copy all ca info to genesis node
+    if [ $host_type -eq $TYPE_GENESIS_HOST ];then
+        cp -r $g_genesis_cert_dir_path  $current_node_path/dependencies/follow
+    fi
+
     #tar_tool $current_node_path
 }
 
