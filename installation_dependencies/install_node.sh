@@ -316,6 +316,7 @@ function install_build()
 
         chmod +x ${current_node_dir}/start.sh
         chmod +x ${current_node_dir}/stop.sh
+        chmod +x ${current_node_dir}/check.sh
 
         i=$(($i+1))
     done
