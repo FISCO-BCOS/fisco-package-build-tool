@@ -12,7 +12,7 @@ source $DEPENENCIES_DIR/scripts/os_version_check.sh
 source $DEPENENCIES_DIR/scripts/dependencies_install.sh
 source $DEPENENCIES_DIR/scripts/dependencies_check.sh
 
-source $DEPENENCIES_FOLLOW_DIR/config.sh
+source $DEPENENCIES_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
 
 # build stop_node*.sh
