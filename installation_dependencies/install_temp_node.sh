@@ -7,7 +7,7 @@ source $installPWD/dependencies/scripts/public_config.sh
 source $installPWD/dependencies/scripts/dependencies_check.sh
 
 #check_param $1 $2
-source $DEPENENCIES_FOLLOW_DIR/config.sh
+source $installPWD/dependencies/config.sh
 
 #genesis.json generator
 function generate_genesisBlock()

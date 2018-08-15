@@ -219,9 +219,6 @@ function build_node_installation_package()
             chmod +x $current_node_path/install_node.sh
         fi
 
-        # copy node_manager.sh
-        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
-
         #g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
         #mkdir -p ${g_genesis_node_action_container_dir_path}/
 
@@ -233,8 +230,7 @@ function build_node_installation_package()
         fi
     else 
         export IS_GENESIS_HOST_TPL=0
-        # copy node_manager.sh
-        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
+       
         if [ ! -z "${DOCKER_TOGGLE}" ] && [ ${DOCKER_TOGGLE} -eq 1 ];then
             cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
@@ -353,7 +349,7 @@ function build_node_installation_package()
     export DOCKER_VERSION_TPL=${DOCKER_VERSION}
 
     MYVARS='${KEYSTORE_PWD}:${CLIENTCERT_PWD}:${IS_GENESIS_HOST_TPL}:${DOCKER_REPOSITORY_TPL}:${DOCKER_VERSION_TPL}:${NODE_NUM_TPL}:${GOD_ADDRESS_TPL}:${LISTEN_IP_TPL}:${RPC_PORT_TPL}:${CHANNEL_PORT_VALUE_TPL}:${P2P_PORT_TPL}:${NODE_DESC_TPL}:${AGENCY_INFO_TPL}:${IDX_TPL}'
-    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/follow/config.sh
+    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/config.sh
     return 0
 }
 
@@ -695,8 +691,6 @@ function expand()
         local node_base_info_dir=$current_node_path_local/dependencies/follow/
         mkdir -p $node_base_info_dir/
 
-        # copy node_manager.sh
-        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $node_base_info_dir/
         # copy genesis.json
         cp ${genesis_file} $node_base_info_dir/
         # copy syaddress.txt

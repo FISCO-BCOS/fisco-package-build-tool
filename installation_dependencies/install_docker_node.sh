@@ -178,13 +178,14 @@ function install()
             cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
         fi
 
+
         cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk $dockerPWD/node${Idx[$index]}/ext/
         cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/ $dockerPWD/node${Idx[$index]}/ext/
         cp $DEPENENCIES_FOLLOW_DIR/genesis.json $dockerPWD/node${Idx[$index]}/ >/dev/null 2>&1
         cp $DEPENENCIES_FOLLOW_DIR/syaddress.txt $dockerPWD/node${Idx[$index]}/ext/conf/ >/dev/null 2>&1
         cp $DEPENENCIES_DIR/scripts/docker_init.sh $dockerPWD/node${Idx[$index]}/ext/script/ >/dev/null 2>&1
 
-        cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $dockerPWD/node${Idx[$index]}/
+        cp $DEPENENCIES_DIR/scripts/node_manager.sh $dockerPWD/node${Idx[$index]}/
         sudo chmod a+x $dockerPWD/node${Idx[$index]}/node_manager.sh
 
         cd $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/
