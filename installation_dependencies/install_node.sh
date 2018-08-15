@@ -330,6 +330,12 @@ function install_build()
     cp $DEPENENCIES_SCRIPTES_DIR/check.sh $buildPWD/
     sudo chmod a+x $buildPWD/check.sh
 
+    cp $DEPENENCIES_SCRIPTES_DIR/register.sh $buildPWD/
+    sudo chmod a+x $buildPWD/register.sh
+
+    cp $DEPENENCIES_SCRIPTES_DIR/unregister.sh $buildPWD/
+    sudo chmod a+x $buildPWD/unregister.sh
+
     cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $buildPWD/
     sudo chmod a+x $buildPWD/node_manager.sh
 
