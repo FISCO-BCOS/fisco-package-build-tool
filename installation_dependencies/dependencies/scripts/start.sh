@@ -16,6 +16,7 @@ if [ -z $index ];then
         else	
             break
         fi
+	sleep 3
         index=$(($index+1))
     done
 
