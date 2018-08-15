@@ -336,7 +336,7 @@ function install_build()
     cp $DEPENENCIES_SCRIPTES_DIR/unregister.sh $buildPWD/
     sudo chmod a+x $buildPWD/unregister.sh
 
-    cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $buildPWD/
+    cp $DEPENENCIES_SCRIPTES_DIR/node_manager.sh $buildPWD/
     sudo chmod a+x $buildPWD/node_manager.sh
 
     #fisco-bcos
