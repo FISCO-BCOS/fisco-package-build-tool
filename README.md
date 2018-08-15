@@ -1,10 +1,10 @@
-
+﻿
 [toc]
 <center> <h1>FISCO BCOS物料包工具使用指南</h1> </center>
 
 # 一. 介绍
 ## 1.1 功能简介        
-通过简单配置 ,可以在指定服务器上构建FISCO BCOS的区块链, 构成FISCO BCOS的节点既可以直接运行于服务器, 也可以是docker节点。 即可以非常快速的搭建临时使用的测试环境, 又能满足生产环境的需求。  
+通过简单配置 ,可以在指定服务器上构建FISCO BCOS的区块链, 构成FISCO BCOS的节点既可以直接运行于服务器, 也可以是docker节点。 可以非常快速的搭建临时使用的测试环境, 又能满足生产环境的需求。  
 例如：  
 配置三台服务器, 每台启动两个FISCO BCOS节点, 则将生成三个安装包, 对应三台服务器, 将安装包上传到对应的服务器上, 继续按照指引安装, 在每台服务器上启动节点, 就可以组成一个区块链网络。
 
@@ -41,7 +41,7 @@ Oracle JDK[1.8]
 
 物料包与FISCO BCOS之间存在版本对应关系,
 **物料包1.2.X版本对应支持FISCO BCOS的版本为: 1.3.X  
-即物料包1.2的大版本兼容支持FISCO BCOS1.3的大版本.**
+即物料包1.2的版本兼容支持FISCO BCOS1.3的版本.**
 
 ## 1.5 CheckList
 [CheckList](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/%E7%89%A9%E6%96%99%E5%8C%85%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BACheckList.md)使用物料包之前可以使用CheckList文档对当前环境进行检查, 尤其是生产环境时建议将CheckList作为一个必备的流程.
@@ -60,13 +60,13 @@ $ git clone https://github.com/FISCO-BCOS/fisco-package-build-tool.git
 fisco-package-build-tool
 ├── Changelog.md                       更新记录       
 ├── config.ini                         配置文件
-├── doc                                附属文档
+├── doc                                附加文档
 ├── ext                                拓展目录
-├── generate_installation_packages.sh  主shell
+├── generate_installation_packages.sh  启动shell文件
 ├── installation_dependencies          依赖目录
 ├── LICENSE                            license文件
 ├── README.md                          使用手册
-└── release_note.txt                   版本号文件
+└── release_note.txt                   版本号
 ```
 
 ## 2.2 配置
@@ -79,9 +79,9 @@ $ vim config.ini
 配置文件config.ini
 ```
 [common]
-; 物料包拉取FISCO-BCOS源码的github地址.
+; 物料包拉取FISCO-BCOS源码的github地址, 用户一般不需要修改.
 github_url=https://github.com/FISCO-BCOS/FISCO-BCOS.git
-; 物料包拉取FISCO-BCOS源码之后, 会将源码保存在本地的目录, 保存的目录名称为FISCO-BCOS.
+; 物料包拉取FISCO-BCOS源码之后, 会将源码保存在本地的目录, 保存的目录名称为FISCO-BCOS, 默认拉取的代码会放入物料包同级的目录.
 fisco_bcos_src_local=../
 ; 需要使用FISCO-BCOS的版本号, 使用物料包时需要将该值改为需要使用FISCO-BCOS的版本号.
 ; 版本号可以是FISCO-BCOS已经发布的版本之一, 链接： https://github.com/FISCO-BCOS/FISCO-BCOS/releases
@@ -102,7 +102,6 @@ keystore_pwd=123456
 clientcert_pwd=123456
 
 [other]
-
 ; CA拓展模式, 目前不使用
 ca_ext=0
 
@@ -212,8 +211,8 @@ build/
 ├── ***REMOVED***_agent_0_genesis  //***REMOVED***服务器的安装包
 ├── ***REMOVED***_agent_1          //***REMOVED***服务器的安装包
 ├── ***REMOVED***_agent_2          //***REMOVED***服务器的安装包
-├── stderr.log      //标准错误的重定向文件, 可以帮忙查看问题.
-└── temp            //temp节点安装目录, 不用关心.
+├── stderr.log      //标准错误的重定向文件.
+└── temp            //temp节点安装目录, 用户不用关心不用关心.
 ```
 
 * 其中带有**genesis**字样的为创世节点所在服务器的安装包。 
@@ -227,72 +226,107 @@ build/
 ```sh
 $ ./install_node.sh 
 ```
-正确执行在当前目录会多一个build目录, 目录结构如下：：
+正确执行在当前目录会多一个build目录, 目录结构如下：
 ```
-build/
-├── node                   节点文件夹, 包含各个节点的目录、相关操作脚本
-│   ├── check_node.sh      检查节点是否启动的脚本 
-│   ├── fisco-bcos         fisco-bcos可执行程序
-│   ├── genesis.json       创世块文件
-│   ├── node0           node0目录 
-│   │   ├── config.json    node0 config.json配置文件
-│   │   ├── data     node0 数据目录
-│   │   └── log            node0 日志目录
-│   ├── node1           node1目录
-│   │   ├── config.json    node1 config.json配置文件
-│   │   ├── data     node1 数据目录
-│   │   └── log            node1 日志目录
-│   ├── start.sh     node0的启动脚本
-│   ├── start.sh     node1的启动脚本
-│   ├── stop_node0.sh      node0的停止脚本
-│   └── stop_node1.sh      node1的停止脚本
-├── nodejs                 nodejs的安装目录
-├── node_manager.sh        节点管理脚本, 用于添加、删除、查询节点
-├── node.sh                nodejs的环境变量
-├── start_all.sh           启动所有节点脚本
-├── stop_all.sh            停止所有节点脚本
-├── systemcontract         nodejs系统合约工具
-├── tool                   nodejs工具
-├── web3lib                nodejs基础库
-└── web3sdk                web3sdk环境
+
+build
+├── check.sh          #检查脚本, 可以检查节点是否启动
+├── fisco-bcos        #fisco-bcos二进制程序
+├── node0             #节点0的目录
+├── node1             #节点1的目录
+├── nodejs            #nodejs相关安装目录
+├── node_manager.sh   #节点管理脚本
+├── node.sh           #nodejs相关环境变量
+├── register.sh       #注册节点入网脚本, 扩容使用
+├── start.sh          #启动脚本
+├── stop.sh           #停止搅拌
+├── systemcontract    #nodejs系统合约工具
+├── tool              #nodejs工具
+├── unregister.sh     #从节点管理合约删除某个节点
+├── web3lib           #nodejs基础库
+└── web3sdk           #web3sdk环境
 ```
 
 说明:
-- nodeIDX : 节点nodeIDX的目录, IDX表示索引, 从0开始.
-- nodeIDX/fisco-data : 节点nodeIDX的数据目录.
-- nodeIDX/log        : 节点nodeIDX的日志目录.
-- start_all.sh          : 启动所有的节点.  
-- stop_all.sh           : 停止所有的节点.  
-- systemcontract        : nodejs系统合约工具.  
-- tool                  : nodejs工具.  
-- web3lib               : nodejs基础库.  
-- web3sdk               : web3sdk环境.
+- nodeIDX
+节点IDX的目录, 示例中每台服务器启动两个节点, 所以有node0, node1两个目录.
+nodeIDX的目录结构如下：
+```
+build/node0/
+├── check.sh     #检查当前节点是否启动
+├── config.json  #配置文件
+├── data         #数据目录
+├── genesis.json #创世块文件
+├── keystore
+├── log          #log日志目录
+├── log.conf     #log配置文件
+├── start.sh     #启动当前节点
+└── stop.sh      #停止当前节点
+```
+
+- node.sh
+记录nodejs相关依赖的环境变量.
+
+- start.sh
+节点启动脚本, 使用方式：
+```
+start.sh       启动所有的节点
+或者
+start.sh IDX   启动指定的节点, IDX为节点的索引, 从0开始, 比如: start.sh 0表示启动第0个节点.
+```
+
+- stop.sh
+节点停止脚本, 使用方式：
+```
+stop.sh       停止所有的节点
+或者
+stop.sh IDX   停止指定的节点, IDX为节点的索引, 从0开始, 比如: stop.sh 0表示停止第0个节点.
+```
+
+- register.sh
+注册指定节点信息到节点管理合约, 扩容时使用
+```
+register.sh IDX
+```
+
+- unregister.sh
+将指定节点从节点管理合约中删除.
+```
+unregister.sh IDX
+```
+
+- node_manager.sh
+查看当前节点管理合约中的节点信息.
+```
+./node_manager.sh all
+```
 
 [[web3sdk使用说明链接]](https://github.com/FISCO-BCOS/web3sdk)  
 [[web3lib、systemcontract、 tool目录作用参考用户手册]](https://github.com/FISCO-BCOS/FISCO-BCOS/tree/master/doc/manual)
+
 ## 2.6 启动节点
 
-在build目录执行start_all.sh脚本  
+在build目录执行start.sh脚本.  
 **注意:要先启动创世块节点所在的服务器上的节点!!!**
 
 ```sh
-$ ./start_all.sh
+$ ./start.sh 
+start all node ... 
 start node0 ...
 start node1 ...
-check all node status => 
-node0 is running.
-node1 is running.
+check all node status ... 
+node is running.
+node is running.
 ```
 
 ## 2.7 验证
 
-在所有的服务器的节点都启动之后, 验证区块链是否正常。
 - **一定要所有服务器上的节点正常启动之后.**
 
 ### 2.7.1 日志
 
 ```shell
-tail -f node/node0/log/log_*.log  | egrep "Generating seal"
+tail -f node0/log/log_*.log  | egrep "Generating seal"
 INFO|2018-08-03 14:16:42:588|+++++++++++++++++++++++++++ Generating seal on8e5add00c337398ac5e9058432037aa646c20fb0d1d0fb7ddb4c6092c9d654fe#1tx:0,maxtx:1000,tq.num=0time:1522736202588
 INFO|2018-08-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona98781aaa737b483c0eb24e845d7f352a943b9a5de77491c0cb6fd212c2fa7a4#1tx:0,maxtx:1000,tq.num=0time:1522736203595
 ```
@@ -300,7 +334,7 @@ INFO|2018-08-03 14:16:43:595|+++++++++++++++++++++++++++ Generating seal ona9878
 
 ### 2.7.2 部署合约
 
-每个服务器执行install_node install之后, 都会在安装目录下安装nodejs、babel-node、ethconsole, 其环境变量会写入当前安装用户的.bashrc文件，使用这些工具之前需要使环境变量生效，有两种使环境变量生效的方式，选择其中一种即可：
+每个服务器执行install_node时, 都会在安装目录下安装nodejs、babel-node、ethconsole, 其环境变量会写入当前安装用户的.bashrc文件，使用这些工具之前需要使环境变量生效，有两种使环境变量生效的方式，选择其中一种即可：
 
 方式1：退出当前登录, 重新登录一次.
 方式2：执行node.sh脚本中的内容, 首先cat node.sh, 将显示的内容执行一遍.
@@ -401,7 +435,7 @@ build
 - 启动节点
 ```
 cd build
-./start_all.sh
+./start.sh
 ```
 
 ## 3.6 节点入网  
@@ -410,24 +444,17 @@ cd build
 
 以***REMOVED***这台服务器为例进行操作, 172.20.245.46操作类似：
 
-节点的注册信息位于dependencies/node_action_info_dir目录下：
-```
-dependencies/node_action_info_dir/
-├── nodeactioninfo_172_20_245_45_0.json
-└── nodeactioninfo_172_20_245_45_1.json
-```
-
 **确保节点先启动.**   
-用户在build目录下，使用node_manager.sh脚本进行注册操作
+用户在build目录下，使用register.sh脚本进行注册操作
 注册
 ```
-$ ./node_manager.sh registerNode `pwd`/../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_0.json 
-$ ./node_manager.sh registerNode `pwd`/../dependencies/node_action_info_dir/nodeactioninfo_172_20_245_45_1.json
+$ ./register.sh 0  # 注册第一个节点
+$ ./register.sh 1  # 注册第二个节点
 ```
 
 验证,注册的节点是否正常:
 ```
-$ tail -f node/node0/log/log_*.log   | egrep "Generating seal"
+$ tail -f node0/log/log_*.log   | egrep "Generating seal"
 INFO|2018-07-10 10:49:29:818|+++++++++++++++++++++++++++ Generating seal oncf8e56468bab78ae807b392a6f75e881075e5c5fc034cec207c1d1fe96ce79a1#4tx:0,maxtx:1000,tq.num=0time:1531190969818
 INFO|2018-07-10 10:49:35:863|+++++++++++++++++++++++++++ Generating seal one23f1af0174daa4c4353d00266aa31a8fcb58d3e7fbc17915d95748a3a77c540#4tx:0,maxtx:1000,tq.num=0time:1531190975863
 INFO|2018-07-10 10:49:41:914|+++++++++++++++++++++++++++ Generating seal on2448f00f295210c07b25090b70f0b610e3b8303fe0a6ec0f8939656c25309b2f#4tx:0,maxtx:1000,tq.num=0time:1531190981914
@@ -479,7 +506,7 @@ $ ./install_node.sh
 ## 4.4 启动  
 ```
 $ cd build
-$ ./start_all.sh
+$ ./start.sh
 start node0 ...
 start node1 ...
 start node2 ...
@@ -493,7 +520,7 @@ node3 is running.
 
 ## 4.5 验证  
 ```
-$ tail -f node/node0/log/log_2018080116.log | egrep "seal"
+$ tail -f node0/log/log_2018080116.log | egrep "seal"
 INFO|2018-08-01 16:52:18:362|+++++++++++++++++++++++++++ Generating seal on5b14215cff11d4b8624246de63bda850bcdead20e193b24889a5dff0d0e8a3c3#1tx:0,maxtx:1000,tq.num=0time:1533113538362
 INFO|2018-08-01 16:52:22:432|+++++++++++++++++++++++++++ Generating seal on5e7589906bcbd846c03f5c6e806cced56f0a17526fb1e0c545b855b0f7722e14#1tx:0,maxtx:1000,tq.num=0time:1533113542432
 ```
@@ -511,8 +538,8 @@ Ok, 一条简单的测试链已经搭建成功。
 ### 1.2 配置
 ```
 [docker]
-; 当前是否构建docker节点的安装包.
-docker_toggle=0
+; 当前是否构建docker节点的安装包. 0：否    1：是
+docker_toggle=1
 ; docker仓库地址.
 docker_repository=fiscoorg/fisco-octo
 ; docker版本号.
@@ -560,40 +587,30 @@ build/
 ```
 docker/
 ├── node0
-│   ├── config.json
-│   ├── fisco-data
-│   ├── genesis.json
-│   ├── log
-│   └── start.sh
 ├── node1
-│   ├── config.json
-│   ├── fisco-data
-│   ├── genesis.json
-│   ├── log
-│   └── start.sh
-├── register_node0.sh
-├── register_node1.sh
-├── start_all.sh
-├── start_node0.sh
-├── start_node1.sh
-├── stop_all.sh
-├── stop_node0.sh
-├── stop_node1.sh
-├── unregister_node0.sh
-└── unregister_node1.sh
+├── register0.sh
+├── register1.sh
+├── start0.sh
+├── start1.sh
+├── start.sh
+├── stop0.sh
+├── stop1.sh
+├── stop.sh
+├── unregister0.sh
+└── unregister1.sh
 ```
 
 - nodeIDX : 第IDX个节点的目录, 该目录会被映射到docker的/fisco-bcos/node/目录, 这两个目录中的内容是一致的.
 - nodeIDX/log : 日志目录.
-- start_all.sh 启动所有的节点.
-- stop_all.sh 停止所有的节点.
-- start_nodeIDX.sh 启动第IDX个节点.
-- stop_nodeIDX.sh 停止第IDX个节点.
-- register_nodeIDX.sh 扩容时使用, 将第IDX个节点注册入节点管理合约, 调用的是docker中的node_manager.sh脚本.
-- unregister_nodeIDX.sh 将IDX个节点从节点管理合约删除, 调用的是node_manager.sh脚本.
+- start.sh 启动所有的docker节点.
+- stop.sh 停止所有的docker节点.
+- startIDX.sh 启动第IDX个docker节点.
+- stopIDX.sh 停止第IDX个节点.
+- registerIDX.sh 扩容时使用, 将第IDX个节点注册入节点管理合约, 调用的是docker中的node_manager.sh脚本, 扩容时使用.
+- unregisterIDX.sh 将IDX个节点从节点管理合约删除, 调用的是node_manager.sh脚本.
 
 ### 1.6 启动
-在build目录执行start_all.sh脚本  
+在build目录执行start.sh脚本  
 **注意:要先启动创世块节点所在的服务器上的节点!!!**
 ```
  ./start_all.sh 
@@ -629,8 +646,6 @@ docker运行之后, docker镜像内部是一个完整的fisco-bcos的运行环�
 以be8bd964322a为例.
 ```
 $ sudo docker exec -it be8bd964322a /bin/bash
-..... 进入docker镜像
-$ source /etc/profile   //
 ```
 
 #### 加载环境变量
@@ -658,9 +673,9 @@ $ cd /fisco-bcos
 ├── web3lib
 └── nodejs
 ```
-- /fisco-bcos/node   :节点目录
+- /fisco-bcos/node             : 节点目录
 - /fisco-bcos/node/fisco-data  : 数据目录
-- /fisco-bcos/node/log         :日志目录
+- /fisco-bcos/node/log         : 日志目录
 - /fisco-bcos/systemcontract   : nodejs系统合约工具.  
 - /fisc-bcos/tool              : nodejs工具.  
 - /fisco-bcos/web3lib          : nodejs基础库.  
@@ -701,14 +716,17 @@ send transaction success: 0xa280d823346e1b7ea332a2b4d7a7277ae380b0cc7372bef396c5
 启动docker节点
 ```
 $ cd docker
-$ ./start_all.sh
+$ ./start.sh
 ```
 
 #### 1.8.3 节点入网
-docker目录下``` register_nodeIDX.sh ```脚本为注册脚本.
+docker目录下``` registerIDX.sh ```脚本为注册脚本.
 ```
-$ ./register_node0.sh
-/register_node0.sh 
+$ ./register0.sh
+===================================================================
+=====INIT ECDSA KEYPAIR From private key===
+node.json=file:/fisco-bcos/node/fisco-data/node.json
+$ ./register1.sh
 ===================================================================
 =====INIT ECDSA KEYPAIR From private key===
 node.json=file:/fisco-bcos/node/fisco-data/node.json
@@ -802,8 +820,8 @@ temp节点部署系统合约失败.
 查看build/stderr.log内容, 看错误信息.
 
 
-## start_all.sh 显示nodeIDX is not running.  
-这个提示是说nodeIDX启动失败, 可以ps -aux | egrep fisco 查看是否正常启动. 可以执行`cat node/nodeIDX/log/log`查看节点启动失败的原因. 
+## start.sh 显示nodeIDX is not running.  
+这个提示是说nodeIDX启动失败, 可以ps -aux | egrep fisco 查看是否正常启动. 可以执行`cat node/nodedirIDX/log/log`查看节点启动失败的原因. 
 常见的原因:
 - libleveldb.so No such file or directory.
 ```
