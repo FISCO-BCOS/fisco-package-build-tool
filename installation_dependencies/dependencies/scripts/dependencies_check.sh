@@ -6,7 +6,7 @@ function request_sudo_permission()
     sudo echo -n " "
 
     if [ $? -ne 0 ]; then
-        { echo >&2 "ERROR - no sudo permission, please add youself in the sudoers"; exit 1; }
+        error_message "ERROR - no sudo permission, please add youself in the sudoers"
     fi
 }
 
@@ -15,7 +15,7 @@ function check_if_install()
 {
     type $1 >/dev/null 2>&1
     if [ $? -ne 0 ];then
-        { echo >&2 "ERROR - $1 is not installed."; exit 1; }
+        error_message "ERROR - $1 is not installed."
     fi
 }
 
@@ -30,7 +30,7 @@ function java_version_check()
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*".*/\1\2/p;')
 
     if [ -z "$JAVA_VER" ];then
-        { echo >&2 "ERROR - failed to get java version, version is "`java -version`; exit 1; }
+        error_message "ERROR - failed to get java version, version is "`java -version`
     fi    
 
     #Oracle JDK 1.8
@@ -44,10 +44,10 @@ function java_version_check()
             return
         fi
 
-        { echo >&2 "ERROR - java and keytool is not match, java is ${JAVA_PATH} , keytool is ${KEYTOOL_PATH}"; exit 1; }
+        error_message "ERROR - java and keytool is not match, java is ${JAVA_PATH} , keytool is ${KEYTOOL_PATH}"
     fi
 
-    { echo >&2 "ERROR - Oracle JDK 1.8 be requied, now JDK is "`java -version`; exit 1; }
+    error_message "ERROR - Oracle JDK 1.8 be requied, now JDK is "`java -version`
 } 
 
 #openssl 1.0.2 be requied.
@@ -59,7 +59,7 @@ function openssl_version_check()
     OPENSSL_VER=$(openssl version 2>&1 | sed -n ';s/.*OpenSSL \(.*\)\.\(.*\)\.\([0-9]*\).*/\1\2\3/p;')
 
     if [ -z "$OPENSSL_VER" ];then
-        { echo >&2 "ERROR - failed to get openssl version, version is "`openssl version`; exit 1; }
+        error_message "ERROR - failed to get openssl version, version is "`openssl version`
     fi
 
     #openssl 1.0.2
@@ -67,7 +67,7 @@ function openssl_version_check()
         return 
     fi
 
-    { echo >&2 "ERROR - OpenSSL 1.0.2 be requied , now OpenSSL version is "`openssl version`; exit 1; }
+    error_message "ERROR - OpenSSL 1.0.2 be requied , now OpenSSL version is "`openssl version`
 }
 
 # version check
