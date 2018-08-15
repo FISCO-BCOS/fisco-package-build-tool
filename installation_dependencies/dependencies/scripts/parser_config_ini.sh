@@ -303,6 +303,11 @@ function ini_param_check()
         error_message "ERROR - FISCO_BCOS_VERSION cannot find ,[common] fisco_bcos_version may not set ."
     fi
 
+    echo "$fisco_bcos_version" | egrep "^[[:space:]]*v1.3.([0-9]+)"
+    if [ $? -ne 0 ];then
+        error_message "ERROR - FISCO_BCOS_VERSION version format invalid, only v1.3.x is support ,[common] fisco_bcos_version may invalid ."
+    fi
+
     # env DOCKER_TOGGLE 
     local docker_toggle=${DOCKER_TOGGLE}
     if [ -z "${docker_toggle}" ];then
