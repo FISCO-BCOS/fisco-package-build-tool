@@ -13,8 +13,8 @@
 * **创世节点**：搭建一条新链时, 配置文件的第一台服务器上的第一个节点为创世节点, 创世节点是需要第一个启动的节点, 其他节点需要主动连接创世节点, 通过与创世节点的连接, 所有节点同步连接信息, 最终构建正常的网络。
 * **非创世节点**：除去创世节点的其它节点。
 
-## 1.4. 依赖  - [&radic;]    机器配置  
-
+## 1.3. 依赖  
+- 机器配置  
    参考FISCO BCOS[机器配置](https://github.com/FISCO-BCOS/FISCO-BCOS/tree/master/doc/manual#第一章-部署fisco-bcos环境)  
    ```
    使用的测试服务器： 
@@ -23,7 +23,7 @@
    Ubuntu 16.04 64位
    ```
   
-- [&radic;]    软件依赖  
+- 软件依赖  
 
 ```shell
 Oracle JDK[1.8]
@@ -33,7 +33,7 @@ Oracle JDK[1.8]
 - FISCO BCOS搭建过程中需要的其他依赖会自动安装, 用户不需要再手动安装.
 - CentOS/Ubuntu默认安装或者使用yum/apt安装的是openJDK, 并不符合使用要求, Oracle JDK 1.8 的安装链接[[ Oracle JDK 1.8 安装]](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/Oracle%20JAVA%201.8%20%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md).
 
-- [&radic;]    其他依赖  
+- 其他依赖  
   sudo权限, 当前执行的用户需要具有sudo权限
 
 ## 1.4 版本支持
@@ -106,14 +106,8 @@ ca_ext=0
 
 ; 扩容使用的一些参数
 [expand]
-; 分配CA证书的文件夹
-genesis_ca_dir=cert
-; 创世块文件
-genesis_file=genesis.json
-; 系统合约地址文件
-system_address_file=syaddress.txt
-; 连接节点信息文件
-bootstrapnodes_file=bootstrapnodes.json
+; 扩容依赖的文件的目录,具体使用参考扩容流程
+genesis_follow_dir=/follow/
 
 ; 端口配置, 一般不用做修改, 使用默认值即可, 但是要注意不要端口冲突.
 ; 每个节点需要占用三个端口:p2p port、rpc port、channel port, 对于单台服务器上的节点端口使用规则, 默认配置的端口开始, 依次增长。
@@ -169,10 +163,6 @@ c、判断配置文件中fisco_bcos_src_local配置的路径是否存在名为FI
 #### [expand] section
 扩容操作, 使用参考 ( [扩容流程](#expand_blockchain) )
 
-#### [ports] section  
-
-端口配置, 每台服务器上搭建节点使用的起始端口.
-
 #### [nodes] section
 ```
 需要部署FISCO BCOS服务器上的节点配置信息.
@@ -185,7 +175,28 @@ c、判断配置文件中fisco_bcos_src_local配置的路径是否存在名为FI
 ; agent      => 机构名称, 若是不关心机构信息, 值可以随意, 但是不可以为空.
 ```
 
-下面以在三台服务器上部署区块链为例： 
+#### [ports] section  
+```
+[ports]
+; p2p端口
+p2p_port=30303
+; rpc端口
+rpc_port=8545
+; channel端口
+channel_port=8821
+```
+fisco-bcos的每个节点需要使用3个端口,p2pport、rpcport、channelport,  [ports]配置的端口是服务器上面的第一个节点使用的端口,其他节点依次递增.
+```
+node0=127.0.0.1 0.0.0.0 4 agent
+````
+上面的配置说明要启动四个节点, 按照默认的配置：
+- 第1个节点的端口：p2p 30303、rpc 8545、channel 8821   
+- 第2个节点的端口：p2p 30304、rpc 8546、channel 8822  
+- 第3个节点的端口：p2p 30305、rpc 8547、channel 8823  
+- 第4个节点的端口：p2p 30306、rpc 8548、channel 8824 
+
+
+下面以在三台服务器上部署区块链为例构建一条新链： 
 ```
 服务器ip  ： ***REMOVED*** ***REMOVED*** ***REMOVED***  
 机构分别为： agent_0   agent_1    agent_2  
@@ -265,7 +276,6 @@ build/node0/
 
 - node.sh
 记录nodejs相关依赖的环境变量.
-
 - start.sh
 节点启动脚本, 使用方式：
 ```
@@ -273,7 +283,6 @@ start.sh       启动所有的节点
 或者
 start.sh IDX   启动指定的节点, IDX为节点的索引, 从0开始, 比如: start.sh 0表示启动第0个节点.
 ```
-
 - stop.sh
 节点停止脚本, 使用方式：
 ```
@@ -281,25 +290,21 @@ stop.sh       停止所有的节点
 或者
 stop.sh IDX   停止指定的节点, IDX为节点的索引, 从0开始, 比如: stop.sh 0表示停止第0个节点.
 ```
-
 - register.sh
 注册指定节点信息到节点管理合约, 扩容时使用
 ```
 register.sh IDX
 ```
-
 - unregister.sh
 将指定节点从节点管理合约中删除.
 ```
 unregister.sh IDX
 ```
-
 - node_manager.sh
 查看当前节点管理合约中的节点信息.
 ```
 ./node_manager.sh all
 ```
-
 [[web3sdk使用说明链接]](https://github.com/FISCO-BCOS/web3sdk)  
 [[web3lib、systemcontract、 tool目录作用参考用户手册]](https://github.com/FISCO-BCOS/FISCO-BCOS/tree/master/doc/manual)
 
@@ -375,19 +380,14 @@ send transaction success: 0x769e4ea7742b451e33cbb0d2a7d3126af8f277a52137624b3d4a
 ## 3.1 使用场景  
 对已经在运行的区块链, 可以提供其创世节点的相关文件, 创建出非创世节点, 使其可以连接到这条区块链。
 ## 3.2 获取扩容文件   
-- 从创世节点所在服务器上拷贝下面的的3个文件，放到物料包工具所在的机器, 这几个文件位于创世节点安装包的dependencies/follow目录：
-  * genesis.json 
-  * bootstrapnodes.json  
-  * syaddress.txt  
-- [&radic;]  也可以将创世节点的fisco-bcos文件放入物料包工具的/usr/local/bin目录.  
+- 从创世节点所在的服务器获取dependencies/follow/文件夹.
+该目录包含构建区块链时分配的根证书、机构证书、创世块文件、系统合约.
 
-- 从创世节点所在服务器上取出dependencies/cert目录, 该目录包含创建时分配的根证书、机构证书, 放到物料包工具所在的机器。
-
-假定将上述文件放入/fisco-bcos/目录.
+将follow放入/fisco-bcos/目录.
 
 ## 3.3. 配置
 
-配置需要扩容的节点的信息, 假定扩容的机器为: ***REMOVED***, 172.20.245.46 分别需要启动两个节点, 机构名称分别为agent_3、agent_4。
+扩容的机器为: ***REMOVED***, 172.20.245.46 分别需要启动两个节点, 机构名称分别为agent_3、agent_4, 修改节点信息配置.
 ```sh
 vim config.ini
 ```
@@ -396,14 +396,7 @@ vim config.ini
 ```
 ; 扩容使用的一些参数
 [expand]
-; 分配CA证书的文件夹
-genesis_ca_dir=/fisco-bcos/cert/
-; 创世块文件
-genesis_file=/fisco-bcos/genesis.json
-; 系统合约地址文件
-system_address_file=/fisco-bcos/syaddress.txt
-; 连接节点信息文件
-bootstrapnodes_file=/fisco-bcos/bootstrapnodes.json
+genesis_follow_dir=/fisco-bcos/follow/
 ```
 
 修改节点列表为扩容的节点信息.
@@ -612,7 +605,7 @@ docker/
 在build目录执行start.sh脚本  
 **注意:要先启动创世块节点所在的服务器上的节点!!!**
 ```
- ./start_all.sh 
+ ./start.sh 
 start node0 ...
 705b6c0e380029019a26e954e72da3748e29cec95a508bc1a8365abcfc36b86c
 start node1 ...
@@ -833,7 +826,7 @@ leveldb动态库缺失, 安装脚本里面默认使用 yum/apt 对依赖组件�
 [Ubuntu]sudo apt-get -y install libleveldb-dev
 
 ```  
-如果leveldb已经安装, 则可以尝试执行`sudo ldconfig`, 然后执行start_all.sh, 重新启动节点.
+如果leveldb已经安装, 则可以尝试执行`sudo ldconfig`, 然后执行start.sh, 重新启动节点.
 
 - FileError
 ```
