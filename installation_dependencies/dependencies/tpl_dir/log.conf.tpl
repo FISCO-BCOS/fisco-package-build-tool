@@ -18,7 +18,8 @@
     ENABLED                 =   false
 
 * FATAL:
-    ENABLED                 =   false
+    FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/fatal_log_%datetime{%Y%M%d%H}.log"
+    ENABLED                 =   true
 
 * ERROR:
     FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/error_log_%datetime{%Y%M%d%H}.log"
@@ -33,4 +34,5 @@
     ENABLED                 =   true
 
 * VERBOSE:
-    ENABLED                 =   false
+    FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/verbose_log_%datetime{%Y%M%d%H}.log"
+    ENABLED                 =   true
