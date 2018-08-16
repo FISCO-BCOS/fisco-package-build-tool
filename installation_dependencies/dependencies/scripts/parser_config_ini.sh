@@ -6,7 +6,7 @@ function parser_ini_init()
 {
     local myname="parser config ini"
     # Check for 'uname' and abort if it is not available.
-    uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
+    uname -v > /dev/null 2>&1 || { echo "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 
     case $(uname -s) in 
 
@@ -280,6 +280,8 @@ function valid_node()
     if [ $count -le 0 ];then
          error_message "ERROR - [nodes] count invalid, count => ${count} ."
     fi
+
+    echo "${p2pip}"
 }
 
 # check all env
@@ -288,87 +290,87 @@ function ini_param_check()
     # env FISCO_BCOS_GIT 
     local github_url=${FISCO_BCOS_GIT}
     if [ -z "${github_url}" ];then
-        error_message "ERROR - FISCO_BCOS_GIT cannot find ,[common] github_url may not set ."
+        error_message "ERROR - [common] github_url not set."
     fi
 
     # env FISCO_BCOS_LOCAL_PATH 
     local fisco_bcos_src_local=${FISCO_BCOS_LOCAL_PATH}
     if [ -z "${fisco_bcos_src_local}" ];then
-        error_message "ERROR - FISCO_BCOS_LOCAL_PATH cannot find ,[common] fisco_bcos_src_local may not set ."
+        error_message "ERROR - [common] fisco_bcos_src_local not set ."
     fi
 
     # env FISCO_BCOS_VERSION 
     local fisco_bcos_version=${FISCO_BCOS_VERSION}
     if [ -z "${fisco_bcos_version}" ];then
-        error_message "ERROR - FISCO_BCOS_VERSION cannot find ,[common] fisco_bcos_version may not set ."
+        error_message "ERROR - [common] fisco_bcos_version not set ."
     fi
 
     echo "$fisco_bcos_version" | egrep "^[[:space:]]*v1.3.([0-9]+)"
     if [ $? -ne 0 ];then
-        error_message "ERROR - FISCO_BCOS_VERSION version format invalid, only v1.3.x is support ,[common] fisco_bcos_version may invalid ."
+        error_message "ERROR - [common] fisco_bcos_version format invalid, only v1.3.x is support."
     fi
 
     # env DOCKER_TOGGLE 
     local docker_toggle=${DOCKER_TOGGLE}
     if [ -z "${docker_toggle}" ];then
-        error_message "ERROR - DOCKER_TOGGLE cannot find ,[docker] docker_toggle may not set ." 
+        error_message "ERROR - [docker] docker_toggle not set ." 
     fi
 
     # env DOCKER_REPOSITORY 
     local docker_repository=${DOCKER_REPOSITORY}
     if [ -z "${docker_repository}" ];then
-        error_message "ERROR - DOCKER_REPOSITORY cannot find ,[docker] docker_repository may not set ."
+        error_message "ERROR - [docker] docker_repository not set ."
     fi
 
     # env DOCKER_VERSION 
     local docker_version=${DOCKER_VERSION}
     if [ -z "${docker_version}" ];then
-        error_message "ERROR - DOCKER_VERSION cannot find ,[docker] docker_version may not set ."
+        error_message "ERROR - [docker] docker_version not set ."
     fi
 
     # env CA_EXT_MODE 
     local ca_ext=${CA_EXT_MODE}
     if [ -z "${ca_ext}" ];then
-        error_message "ERROR - CA_EXT_MODE cannot find ,[other] ca_ext may not set ."
+        error_message "ERROR - [other] ca_ext not set ."
     fi
 
     # env KEYSTORE_PWD
     local keystore_pwd=${KEYSTORE_PWD}
     if [ -z "${keystore_pwd}" ];then
-        error_message "ERROR - KEYSTORE_PWD cannot find ,[web3sdk] keystore_pwd may not set ."
+        error_message "ERROR - [web3sdk] keystore_pwd not set ."
     fi
 
     # env CLIENTCERT_PWD
     local clientcert_pwd=${CLIENTCERT_PWD}
     if [ -z "${clientcert_pwd}" ];then
-        error_message "ERROR - CLIENTCERT_PWD cannot find ,[web3sdk] clientcert_pwd may not set ."
+        error_message "ERROR - [web3sdk] clientcert_pwd not set ."
     fi
 
     # env P2P_PORT_NODE 
     local p2p_port=${P2P_PORT_NODE}
     if [ -z "${p2p_port}" ];then
-        error_message "ERROR - P2P_PORT_NODE cannot find ,[port] p2p_port may not set ."}
+        error_message "ERROR - [port] p2p_port not set ."}
     fi
     if [ ${p2p_port} -le 0 ] || [ ${p2p_port} -ge 65536 ];then
-        error_message "ERROR - P2P_PORT_NODE invalid ,[port] p2p_port invalid => ${P2P_PORT_NODE} ."
+        error_message "ERROR - [port] p2p_port invalid => ${P2P_PORT_NODE} ."
     fi
 
     # env P2P_PORT_NODE 
     local rpc_port=${RPC_PORT_NODE}
     if [ -z "${rpc_port}" ];then
-        error_message "ERROR - RPC_PORT_NODE cannot find ,[port] rpc_port may not set ."
+        error_message "ERROR - [port] rpc_port may not set ."
     fi
     if [ ${rpc_port} -le 0 ] || [ ${rpc_port} -ge 65536 ];then
-        error_message "ERROR - RPC_PORT_NODE invalid ,[ports] rpc_port invalid => ${RPC_PORT_NODE} ."
+        error_message "ERROR - [ports] rpc_port invalid => ${RPC_PORT_NODE} ."
     fi
 
     # env CHANNEL_PORT_NODE 
     local channel_port=${CHANNEL_PORT_NODE}
     if [ -z "${channel_port}" ];then
-        error_message "ERROR - CHANNEL_PORT_NODE cannot find ,[ports] channel_port may not set ."
+        error_message "ERROR - [ports] channel_port not set ."
     fi
     if [ ${channel_port} -le 0 ] || [ ${channel_port} -ge 65536 ];then
-        error_message "ERROR - CHANNEL_PORT_NODE invalid ,[ports] channel_port invalid => ${CHANNEL_PORT_NODE} ."
+        error_message "ERROR - [ports] channel_port invalid => ${CHANNEL_PORT_NODE} ."
     fi
 
     local node_count=${NODE_COUNT}
@@ -380,12 +382,18 @@ function ini_param_check()
         error_message "ERROR - node_count invalid ,[nodes] invalid ."
     fi
 
+    declare -A map=()
+
     local node_index=0
     while [ $node_index -lt $node_count ]
     do
-	local node_name=NODE_INFO_${node_index}
-	local node_info=`eval echo '$'"$node_name"` 
-        valid_node $"$node_info"
+        local node_name=NODE_INFO_${node_index}
+        local node_info=`eval echo '$'"$node_name"` 
+        local rel=valid_node $"$node_info"
+        if [ ! -z ${map["$rel"]} ];then
+            error_message "ERROR - server repeat , server is "$rel
+        fi
+        map["$rel"]="exist"
 
         env_set "NODE_INFO_"$node_index "${node_info}"
 
@@ -399,16 +407,13 @@ function parser_expand_ini()
     local file=$1
 
 # [expand]
-# genesis_ca_dir=cert
-# genesis_file=genesis.json
-# system_address_file=syaddress.txt
-# bootstrapnodes_file=bootstrapnodes.json
-
-# [expand]
+# genesis_follow_dir=/follow/
 
     local section="expand"
 
     local param="genesis_follow_dir"
+    local genesis_follow_dir=$(ini_get $file $section $param)
+
     env_set "EXPAND_GENESIS_FOLLOW_DIR" ${genesis_follow_dir}
 }
 
@@ -428,16 +433,16 @@ function expand_param_check()
 
     local genesis_file=$genesis_ca_dir/genesis.json
     if [ -z "${genesis_file}" ];then
-        error_message "ERROR - [expand] genesis.json is not exist , genesis.json is $genesis_file."
+        error_message "ERROR - [expand] genesis_follow_dir genesis.json is not exist , genesis.json is $genesis_file."
     fi
 
     local system_address_file=$genesis_ca_dir/syaddress.txt
     if [ -z "${system_address_file}" ];then
-        error_message "ERROR - syaddress.txt is not exist , syaddress.txt is ${system_address_file}."
+        error_message "ERROR - [expand] genesis_follow_dir syaddress.txt is not exist , syaddress.txt is ${system_address_file}."
     fi
 
     local bootstrapnodes_file=$genesis_ca_dir/bootstrapnodes.json
     if [ -z "${bootstrapnodes_file}" ];then
-        error_message "ERROR - bootstrapnodes.json is not exist ,bootstrapnodes.json is ${bootstrapnodes_file}."
+        error_message "ERROR - [expand] genesis_follow_dir bootstrapnodes.json is not exist ,bootstrapnodes.json is ${bootstrapnodes_file}."
     fi
 }
