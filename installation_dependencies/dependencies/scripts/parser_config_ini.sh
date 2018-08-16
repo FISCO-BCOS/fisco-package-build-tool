@@ -389,7 +389,7 @@ function ini_param_check()
     do
         local node_name=NODE_INFO_${node_index}
         local node_info=`eval echo '$'"$node_name"` 
-        local rel=valid_node $"$node_info"
+        local rel=$(valid_node $"$node_info")
         if [ ! -z ${map["$rel"]} ];then
             error_message "ERROR - server repeat , server is "$rel
         fi
