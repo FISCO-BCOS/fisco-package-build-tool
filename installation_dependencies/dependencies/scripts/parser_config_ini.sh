@@ -407,26 +407,9 @@ function parser_expand_ini()
 # [expand]
 
     local section="expand"
-   
-    local param="genesis_ca_dir"
-    local genesis_ca_dir=$(ini_get $file $section $param)
-    echo "===>>> genesis_ca_dir = "${genesis_ca_dir}
-    env_set "EXPAND_GENESIS_CA_DIR" ${genesis_ca_dir}
 
-    local param="genesis_file"
-    local genesis_file=$(ini_get $file $section $param)
-    echo "===>>> genesis_file = "${genesis_file}
-    env_set "EXPAND_GENESIS_FILE" ${genesis_file}
-
-    local param="system_address_file"
-    local system_address_file=$(ini_get $file $section $param)
-    echo "===>>> system_address_file = "${system_address_file}
-    env_set "EXPAND_SYSTEM_ADDRESS_FILE" ${system_address_file}
-
-    local param="bootstrapnodes_file"
-    local bootstrapnodes_file=$(ini_get $file $section $param)
-    echo "===>>> bootstrapnodes_file = "${bootstrapnodes_file}
-    env_set "EXPAND_BOOTSTRAPNODES_FILE" ${bootstrapnodes_file}
+    local param="genesis_follow_dir"
+    env_set "EXPAND_GENESIS_FOLLOW_DIR" ${genesis_follow_dir}
 }
 
 # check all env
@@ -434,39 +417,27 @@ function expand_param_check()
 {
     local section="expand"
    
-    local genesis_ca_dir=${EXPAND_GENESIS_CA_DIR}
-    if [ -z "${genesis_ca_dir}" ];then
-        error_message "ERROR - EXPAND_GENESIS_CA_DIR cannot find ,[expand] genesis_ca_dir may not set ."
+    local genesis_follow_dir=${EXPAND_GENESIS_FOLLOW_DIR}
+    if [ -z "${genesis_follow_dir}" ];then
+        error_message "ERROR - [expand] genesis_follow_dir not set ."
     fi
     
-    if [ ! -d "${genesis_ca_dir}" ];then
-        error_message "ERROR - genesis_ca_dir is not dir. genesis_ca_dir is "${genesis_ca_dir}
+    if [ ! -d "${genesis_follow_dir}" ];then
+        error_message "ERROR - [expand] genesis_follow_dir is not dir, genesis_ca_dir is "${genesis_ca_dir}
     fi
 
-    local genesis_file=${EXPAND_GENESIS_FILE}
+    local genesis_file=$genesis_ca_dir/genesis.json
     if [ -z "${genesis_file}" ];then
-        error_message "ERROR - EXPAND_GENESIS_FILE cannot find ,[expand] genesis_file may not set ."
-    fi
-    
-    if [ ! -f ${genesis_file} ];then
-        error_message "ERROR - genesis_file is not exist. genesis_file is "${genesis_file}
+        error_message "ERROR - [expand] genesis.json is not exist , genesis.json is $genesis_file."
     fi
 
-    local system_address_file=${EXPAND_SYSTEM_ADDRESS_FILE}
+    local system_address_file=$genesis_ca_dir/syaddress.txt
     if [ -z "${system_address_file}" ];then
-        error_message "ERROR - EXPAND_SYSTEM_ADDRESS_FILE cannot find ,[expand] system_address_file may not set ."
-    fi
-    
-    if [ ! -f ${system_address_file} ];then
-        error_message "ERROR - system_address_file is not exist. system_address_file is "${system_address_file}
+        error_message "ERROR - syaddress.txt is not exist , syaddress.txt is ${system_address_file}."
     fi
 
-    local bootstrapnodes_file=${EXPAND_BOOTSTRAPNODES_FILE}
+    local bootstrapnodes_file=$genesis_ca_dir/bootstrapnodes.json
     if [ -z "${bootstrapnodes_file}" ];then
-        error_message "ERROR - EXPAND_BOOTSTRAPNODES_FILE cannot find ,[expand] bootstrapnodes_file may not set ."
-    fi
-    
-    if [ ! -f ${bootstrapnodes_file} ];then
-        error_message "ERROR - bootstrapnodes_file is not exist. bootstrapnodes_file is "${system_address_file}
+        error_message "ERROR - bootstrapnodes.json is not exist ,bootstrapnodes.json is ${bootstrapnodes_file}."
     fi
 }

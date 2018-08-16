@@ -91,6 +91,11 @@ function copy_genesis_related_info()
     #copy genesis json file to node dir
     build_base_info_dir $current_node_path
 
+    #copy all ca info to genesis node
+    if [ $host_type -eq $TYPE_GENESIS_HOST ];then
+        cp -r $g_genesis_cert_dir_path  $current_node_path/dependencies/follow
+    fi
+
     #tar_tool $current_node_path
 }
 
@@ -666,11 +671,12 @@ function expand()
 
     # set g_status_process to PROCESS_EXPAND_NODE
     g_status_process=${PROCESS_EXPAND_NODE}
-    g_genesis_cert_dir_path=${EXPAND_GENESIS_CA_DIR}
 
-    local genesis_file=${EXPAND_GENESIS_FILE}
-    local system_address_file=${EXPAND_SYSTEM_ADDRESS_FILE} 
-    local bootstrapnodes_file=${EXPAND_BOOTSTRAPNODES_FILE}
+    g_genesis_cert_dir_path=${EXPAND_GENESIS_FOLLOW_DIR}/cert/
+
+    local genesis_file=${EXPAND_GENESIS_FOLLOW_DIR}/genesis.json
+    local system_address_file=${EXPAND_GENESIS_FOLLOW_DIR}/syaddress.txt 
+    local bootstrapnodes_file=${EXPAND_GENESIS_FOLLOW_DIR}/bootstrapnodes.json
 
     # build install package for every server
     for ((i=0; i<g_host_config_num; i++))
