@@ -125,12 +125,12 @@ function install()
         error_message "docker dictionary already exist, remove it first."
     fi
 
+    # check if docker install
+    check_if_install docker
+
     sudo docker pull $g_docker_repository:$g_docker_ver
     if [ $? -ne 0 ];then
-        echo "docker pull fisco-bcos failed."
-        echo "repository is "$g_docker_repository
-        echo "version is "$g_docker_ver
-        error_exit
+        error_message "docker pull failed , docker service not start or repository、version info error,repository : $g_docker_repository ,version : $g_docker_ver"
     fi
 
     if [ -z $nodecount ] ||[ $nodecount -le 0 ]; then
@@ -146,7 +146,7 @@ function install()
     do
 	    index=$i
         container_id=`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v "CONTAINER ID" | awk '{print $1}'`
-        echo "check if fisco-node$index"_"${rpcport[$index]} exist."
+        # echo "check if fisco-node$index"_"${rpcport[$index]} exist."
         if [ -z ${container_id} ];then
 	    i=$(($i+1))
             continue

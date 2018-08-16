@@ -58,7 +58,7 @@ function os_version_check()
     Linux)
 
         if [ ! -f "/etc/os-release" ];then
-             error_message "ERROR - Unsupported or unidentified Linux distro."
+             error_message "Unsupported or unidentified Linux distro."
         fi
 
         DISTRO_NAME=$(. /etc/os-release; echo $NAME)
@@ -85,7 +85,7 @@ function os_version_check()
                 ver=$(echo "$UBUNTU_VERSION" | awk -F . '{print $1$2}')
                 #Ubuntu 16.04 or Ubuntu 16.04+
                 if [ $ver -ne 1604 ];then
-                    error_message "ERROR - Unsupported Ubuntu Version. At least 16.04 is required."
+                    error_message "Unsupported Ubuntu Version. At least 16.04 is required."
                 fi
 
                 ;;
@@ -112,7 +112,7 @@ function os_version_check()
 
                 #CentOS 7.2 or CentOS 7.2+
                 if [ $ver -lt 72 ];then
-                    error_message "ERROR - Unsupported CentOS Version. At least 7.2 is required."
+                    error_message "Unsupported CentOS Version. At least 7.2 is required."
                 fi
                 ;;
     #------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ function os_version_check()
 
                 #Oracle Linux 7.4 or Oracle Linux 7.4+
                 if [ $ver -lt 74 ];then
-                    error_message "ERROR - Unsupported Oracle Linux, At least 7.4 Oracle Linux is required."
+                    error_message "Unsupported Oracle Linux, At least 7.4 Oracle Linux is required."
                 fi
 
                 ;;
@@ -144,7 +144,7 @@ function os_version_check()
     # Other Linux
     #------------------------------------------------------------------------------
             *)
-                error_message "ERROR - Unsupported Linux distribution: $DISTRO_NAME."
+                error_message "Unsupported Linux distribution: $DISTRO_NAME."
                 ;;
         esac # case $DISTRO_NAME
 
@@ -155,7 +155,7 @@ function os_version_check()
     #------------------------------------------------------------------------------
     *)
         #other
-        error_message "ERROR - Unsupported or unidentified operating system."
+        error_message "Unsupported or unidentified operating system."
         ;;
     esac
 }

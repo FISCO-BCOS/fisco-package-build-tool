@@ -67,7 +67,7 @@ function dependencies_install()
     Linux)
 
         if [ ! -f "/etc/os-release" ];then
-            error_message "ERROR - Unsupported or unidentified Linux distro."
+            error_message "Unsupported or unidentified Linux distro."
         fi
 
         DISTRO_NAME=$(. /etc/os-release; echo $NAME)
@@ -134,7 +134,7 @@ function dependencies_install()
     # Other Linux
     #------------------------------------------------------------------------------
             *)
-                error_message "ERROR - Unsupported Linux distribution: $DISTRO_NAME."
+                error_message "Unsupported Linux distribution: $DISTRO_NAME."
                 ;;
         esac # case $DISTRO_NAME
 
@@ -145,7 +145,7 @@ function dependencies_install()
     #------------------------------------------------------------------------------
     *)
         #other
-        error_message "ERROR - Unsupported or unidentified operating system."
+        error_message "Unsupported or unidentified operating system."
         ;;
     esac
 }
@@ -183,7 +183,7 @@ function simple_dependencies_install()
     Linux)
 
         if [ ! -f "/etc/os-release" ];then
-            error_message "ERROR - Unsupported or unidentified Linux distro."
+            error_message "Unsupported or unidentified Linux distro."
         fi
 
         DISTRO_NAME=$(. /etc/os-release; echo $NAME)
@@ -198,7 +198,7 @@ function simple_dependencies_install()
                     sudo apt-get -y install lsof
                     sudo apt-get -y install gettext
                     sudo apt-get -y install bc
-                    sudo apt-get -y install docker.io
+                    # sudo apt-get -y install docker.io
                 ;;
     #------------------------------------------------------------------------------
     # CentOS  # At least 7.2
@@ -208,7 +208,7 @@ function simple_dependencies_install()
                     sudo yum -y install bc
                     sudo yum -y install gettext
                     sudo yum -y install lsof
-                    sudo yum -y install docker
+                    # sudo yum -y install docker
 
                 ;;
     #------------------------------------------------------------------------------
@@ -219,14 +219,14 @@ function simple_dependencies_install()
                     sudo yum -y install bc
                     sudo yum -y install gettext
                     sudo yum -y install lsof
-                    sudo yum -y install docker
+                    # sudo yum -y install docker
 
                 ;;
     #------------------------------------------------------------------------------
     # Other Linux
     #------------------------------------------------------------------------------
             *)
-                error_message "ERROR - Unsupported Linux distribution: $DISTRO_NAME."
+                error_message "Unsupported Linux distribution: $DISTRO_NAME."
                 ;;
         esac # case $DISTRO_NAME
 
@@ -237,7 +237,7 @@ function simple_dependencies_install()
     #------------------------------------------------------------------------------
     *)
         #other
-        error_message "ERROR - Unsupported or unidentified operating system."
+        error_message "Unsupported or unidentified operating system."
         ;;
     esac
 }
