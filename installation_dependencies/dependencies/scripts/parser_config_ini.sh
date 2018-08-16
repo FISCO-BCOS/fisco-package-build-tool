@@ -375,11 +375,11 @@ function ini_param_check()
 
     local node_count=${NODE_COUNT}
     if [ -z "$node_count" ];then
-        error_message "ERROR - node_count null ,[nodes] invalid ."
+        error_message "ERROR - node_count null ,[nodes] empty ."
     fi
 
     if [ $node_count -le 0 ];then
-        error_message "ERROR - node_count invalid ,[nodes] invalid ."
+        error_message "ERROR - node_count invalid ,[nodes] empty ."
     fi
 
     declare -A map=()
@@ -389,10 +389,13 @@ function ini_param_check()
     do
         local node_name=NODE_INFO_${node_index}
         local node_info=`eval echo '$'"$node_name"` 
-        local rel=valid_node $"$node_info"        if [ ! -z ${map["$rel"]} ];then
-            error_message "ERROR - server repeat , server is "$rel
+        valid_node "$node_info"
+        local node=($node_info)
+        local ip=${node[0]}       
+        if [ ! -z ${map["$ip"]} ];then
+            error_message "ERROR - server repeat ,one server , server is "$ip
         fi
-        map["$rel"]="exist"
+        map["$ip"]="exist"
 
         env_set "NODE_INFO_"$node_index "${node_info}"
 
@@ -427,7 +430,7 @@ function expand_param_check()
     fi
     
     if [ ! -d "${genesis_follow_dir}" ];then
-        error_message "ERROR - [expand] genesis_follow_dir is not dir, genesis_ca_dir is "${genesis_ca_dir}
+        error_message "ERROR - [expand] genesis_follow_dir is not dir, genesis_ca_dir is "${genesis_follow_dir}
     fi
 
     local genesis_file=$genesis_ca_dir/genesis.json
