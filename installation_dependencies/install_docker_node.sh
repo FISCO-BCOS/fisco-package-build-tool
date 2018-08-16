@@ -12,7 +12,7 @@ source $DEPENENCIES_DIR/scripts/public_config.sh
 source $DEPENENCIES_DIR/scripts/dependencies_install.sh
 source $DEPENENCIES_DIR/scripts/dependencies_check.sh
 
-source $DEPENENCIES_FOLLOW_DIR/config.sh
+source $DEPENENCIES_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
 
 g_docker_repository=${docker_repository}
@@ -125,12 +125,12 @@ function install()
         error_message "docker dictionary already exist, remove it first."
     fi
 
+    # check if docker install
+    check_if_install docker
+
     sudo docker pull $g_docker_repository:$g_docker_ver
     if [ $? -ne 0 ];then
-        echo "docker pull fisco-bcos failed."
-        echo "repository is "$g_docker_repository
-        echo "version is "$g_docker_ver
-        error_exit
+        error_message "docker pull failed , docker service not start or repository、version info error,repository : $g_docker_repository ,version : $g_docker_ver"
     fi
 
     if [ -z $nodecount ] ||[ $nodecount -le 0 ]; then
@@ -146,7 +146,7 @@ function install()
     do
 	    index=$i
         container_id=`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v "CONTAINER ID" | awk '{print $1}'`
-        echo "check if fisco-node$index"_"${rpcport[$index]} exist."
+        # echo "check if fisco-node$index"_"${rpcport[$index]} exist."
         if [ -z ${container_id} ];then
 	    i=$(($i+1))
             continue
@@ -178,13 +178,14 @@ function install()
             cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
         fi
 
+
         cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk $dockerPWD/node${Idx[$index]}/ext/
         cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/ $dockerPWD/node${Idx[$index]}/ext/
         cp $DEPENENCIES_FOLLOW_DIR/genesis.json $dockerPWD/node${Idx[$index]}/ >/dev/null 2>&1
         cp $DEPENENCIES_FOLLOW_DIR/syaddress.txt $dockerPWD/node${Idx[$index]}/ext/conf/ >/dev/null 2>&1
         cp $DEPENENCIES_DIR/scripts/docker_init.sh $dockerPWD/node${Idx[$index]}/ext/script/ >/dev/null 2>&1
 
-        cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $dockerPWD/node${Idx[$index]}/
+        cp $DEPENENCIES_DIR/scripts/node_manager.sh $dockerPWD/node${Idx[$index]}/
         sudo chmod a+x $dockerPWD/node${Idx[$index]}/node_manager.sh
 
         cd $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/
