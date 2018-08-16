@@ -34,7 +34,7 @@ function dependencies_install()
     fi
 
     # Check for 'uname' and abort if it is not available.
-    uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
+    uname -v > /dev/null 2>&1 || { echo "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 
     case $(uname -s) in 
 
@@ -158,7 +158,7 @@ function simple_dependencies_install()
     fi
 
     # Check for 'uname' and abort if it is not available.
-    uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
+    uname -v > /dev/null 2>&1 || { echo "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 
     case $(uname -s) in 
 
