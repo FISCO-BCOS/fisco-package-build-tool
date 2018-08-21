@@ -49,8 +49,7 @@ function fisco_bcos_version_check()
     if [ "v$ver0" = "$REQUIRE_VERSION" ] || [ "V$ver0" = "$REQUIRE_VERSION" ];then
         return 0
     fi
-    FISCO_BCOS_PATH=`whereis fisco-bcos`
-    error_message_without_exit "Required version is $REQUIRE_VERSION, now $FISCO_BCOS_PATH version is $FISCO_VERSION"
+    error_message_without_exit "Required version is $REQUIRE_VERSION, now /usr/local/bin/fisco-bcos version is $FISCO_VERSION"
 
     return 1
 }
