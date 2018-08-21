@@ -30,7 +30,7 @@ function java_version_check()
     JAVA_VER=$(java -version 2>&1 | sed -n ';s/.* version "\(.*\)\.\(.*\)\..*".*/\1\2/p;')
 
     if [ -z "$JAVA_VER" ];then
-        error_message "failed to get java version, version is "`java -version`
+        error_message "failed to get java version, version is `java -version 2>&1 | grep java`"
     fi    
 
     #Oracle JDK 1.8
@@ -44,10 +44,11 @@ function java_version_check()
             return
         fi
 
-        error_message "java and keytool is not match, java is ${JAVA_PATH} , keytool is ${KEYTOOL_PATH}"
+        error_message "Oracle JDK 1.8 be requied, now JDK is `java -version 2>&1 | grep java`"
+        #error_message "java and keytool is not match, java is ${JAVA_PATH} , keytool is ${KEYTOOL_PATH}"
     fi
 
-    error_message "Oracle JDK 1.8 be requied, now JDK is "`java -version`
+   error_message "Oracle JDK 1.8 be requied, now JDK is `java -version 2>&1 | grep java`"
 } 
 
 #openssl 1.0.2 be requied.
