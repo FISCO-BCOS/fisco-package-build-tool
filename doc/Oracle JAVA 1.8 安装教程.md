@@ -31,7 +31,8 @@ $ source /etc/profile
 ```
 
 - 用户环境变量配置, 当前用户有效  
-将下面的内容添加到 ~/.bash_profile 文件的末尾。 若无法修改~/.bash_profile 文件，则将下面的内容添加入~/.bashrc 文件的末尾。
+
+将下面的内容添加到 ~/.bash_profile 文件的末尾。 若无法修改 ~/.bash_profile 文件，则将下面的内容添加到 ~/.bashrc 文件的末尾。
 ```
 vim ~/.bash_profile 
 或  vim ~/.bashrc
