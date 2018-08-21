@@ -44,7 +44,8 @@ function java_version_check()
             return
         fi
 
-        error_message "java and keytool is not match, java is ${JAVA_PATH} , keytool is ${KEYTOOL_PATH}"
+        error_message "Oracle JDK 1.8 be requied, now JDK is `java -version 2>&1 | grep java`"
+        #error_message "java and keytool is not match, java is ${JAVA_PATH} , keytool is ${KEYTOOL_PATH}"
     fi
 
     error_message "Oracle JDK 1.8 be requied, now JDK is "`java -version`
