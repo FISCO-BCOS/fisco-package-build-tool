@@ -12,58 +12,14 @@ source $DEPENENCIES_DIR/scripts/os_version_check.sh
 source $DEPENENCIES_DIR/scripts/dependencies_install.sh
 source $DEPENENCIES_DIR/scripts/dependencies_check.sh
 
-source $DEPENENCIES_FOLLOW_DIR/config.sh
+source $DEPENENCIES_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
-
-# build start_all.sh
-function generate_startallsh_func()
-{
-    startallsh="#!/bin/bash
-    cd node
-    i=0
-    while [ \$i -lt $nodecount ]
-    do
-        bash start_node\$i.sh
-        sleep 3
-        i=\$((\$i+1))
-    done
-
-    sleep 5
-
-    echo \"check all node status => \"
-
-    i=0
-    while [ \$i -lt $nodecount ]
-    do
-        bash check_node.sh \$i
-        i=\$((\$i+1))
-    done
-    "
-    echo "$startallsh"
-    return 0
-}
-
-# build stop_all.sh
-function generate_stopallsh_func()
-{
-    stoptallsh="#!/bin/bash
-    cd node
-    i=0
-    while [ \$i -lt $nodecount ]
-    do
-        bash stop_node\$i.sh
-        i=\$((\$i+1))
-    done
-    "
-    echo "$stoptallsh"
-    return 0
-}
 
 # build stop_node*.sh
 function generate_stopsh_func()
 {
     stopsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
     kill_cmd=\"kill -9 \${weth_pid}\"
     if [ ! -z \$weth_pid ];then
         echo \"stop node${Idx[$index]} ...\"
@@ -79,8 +35,7 @@ function generate_stopsh_func()
 function generate_checksh_func()
 {
     checknodesh="#!/bin/bash
-    node=nodedir\$1
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/nodedir\$1/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
     if [ ! -z \$weth_pid ];then
         echo \"node\$1 is running.\"
     else
@@ -93,12 +48,12 @@ function generate_checksh_func()
 function generate_startsh_func()
 {
     startsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
     if [ ! -z \$weth_pid ];then
         echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
     else
         echo \"start node${Idx[$index]} ...\"
-        nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/genesis.json  --config ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/log/log 2>&1 &
+        nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
     fi"
     echo "$startsh"
     return 0
@@ -271,33 +226,29 @@ function build_tools()
 function install_build()
 {
     echo "    Installing fisco-bcos environment start"
-    request_sudo_permission
-    ret=$?
-    if [ $ret -ne 0 ]
-    then
-        return -1
-    fi
 
+    #check sudo permission
+    request_sudo_permission
+    # operation system check
     os_version_check
+    # java version check
+    java_version_check
 
     sudo chown -R $(whoami) $installPWD
 
-    if [ -d $buildPWD ]
-    then
-        echo "you already install the fisco-bcos node in this directory!"
-        echo "if you wanna re install the fisco-bcos node, please remove the directory: $buildPWD"
-        echo "if you wanna install another fisco-bcos node(whether it is on the same host as before or not), you need to contact the administrator for a whole new intallation package!"
-        return 2
+    if [ -d $buildPWD ];then
+        error_message "build dictinary already exist, remove it first."
     fi
 
     if [ -z $nodecount ] ||[ $nodecount -le 0 ]; then
-        echo "there has no node on this server, count is "$nodecount
-        return
+        error_message "there has no node on this server, count is "$nodecount
     fi
 
     print_dash
 
+    #dependencies check
     dependencies_install
+    dependencies_check
 
     #mkdir node dir
     current_node_dir_base=${NODE_INSTALL_DIR}
@@ -307,32 +258,40 @@ function install_build()
     while [ $i -lt $nodecount ]
     do
         index=$i
-        current_node_dir=${current_node_dir_base}/nodedir${Idx[$index]}
+        current_node_dir=${current_node_dir_base}/node${Idx[$index]}
         mkdir -p $current_node_dir/
         mkdir -p $current_node_dir/log/
         mkdir -p $current_node_dir/keystore/
-        mkdir -p $current_node_dir/fisco-data/
+        mkdir -p $current_node_dir/data/
 
         if [ $i -eq 0 ];then
-            #copy web3sdk 
+            #copy web3sdk
             cp -r $DEPENENCIES_WEB3SDK_DIR ${buildPWD}
             sudo chmod a+x ${buildPWD}/web3sdk/bin/web3sdk
             cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* ${buildPWD}/web3sdk/conf/ >/dev/null 2>&1 #ca info copy
             if [ $g_is_genesis_host -eq 1 ];then
-                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json ${current_node_dir}/fisco-data/bootstrapnodes.json >/dev/null 2>&1
+                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json ${current_node_dir}/data/bootstrapnodes.json >/dev/null 2>&1
             else
-                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
+                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/data/ >/dev/null 2>&1
             fi
-        else    
-            cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
+        else
+            cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/data/ >/dev/null 2>&1
         fi
 
         #copy node ca
-        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* ${current_node_dir}/fisco-data/
-        # cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/fisco-data/ >/dev/null 2>&1
+        cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* ${current_node_dir}/data/
+        # cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/data/ >/dev/null 2>&1
 
-        nodeid=$(cat ${current_node_dir}/fisco-data/node.nodeid)
+        nodeid=$(cat ${current_node_dir}/data/node.nodeid)
         echo "node id is "$nodeid
+
+        #genesis.json
+        cp $DEPENENCIES_FOLLOW_DIR/genesis.json ${current_node_dir}
+        
+        # generate log.conf from tpl
+        export OUTPUT_LOG_FILE_PATH_TPL=${current_node_dir}/log
+        MYVARS='${OUTPUT_LOG_FILE_PATH_TPL}'
+        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/log.conf.tpl > ${current_node_dir}/log.conf
 
         export CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL=$(cat $DEPENENCIES_FOLLOW_DIR/syaddress.txt)
         export CONFIG_JSON_LISTENIP_TPL=${listenip[$index]}
@@ -342,43 +301,44 @@ function install_build()
         export CHANNEL_PORT_VALUE_TPL=${channelPort[$index]}
         export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${current_node_dir}/keys.info
         export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${current_node_dir}/keystore/
-        export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${current_node_dir}/fisco-data/
+        export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${current_node_dir}/data/
+        export CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL=${current_node_dir}/log.conf
 
-        MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}'
+        MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}'
         envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > ${current_node_dir}/config.json
 
-        # generate log.conf from tpl
-        export OUTPUT_LOG_FILE_PATH_TPL=${current_node_dir}/log
-        MYVARS='${OUTPUT_LOG_FILE_PATH_TPL}'
-        envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/log.conf.tpl > ${current_node_dir}/fisco-data/log.conf
-
         generate_startsh=`generate_startsh_func`
-        echo "${generate_startsh}" > ${current_node_dir_base}/start_node${Idx[$index]}.sh
+        echo "${generate_startsh}" > ${current_node_dir}/start.sh
         generate_stopsh=`generate_stopsh_func`
-        echo "${generate_stopsh}" > ${current_node_dir_base}/stop_node${Idx[$index]}.sh
-        #chmod +x ${current_node_dir_base}/fisco-bcos
-        chmod +x ${current_node_dir_base}/start_node${Idx[$index]}.sh
-        chmod +x ${current_node_dir_base}/stop_node${Idx[$index]}.sh
+        echo "${generate_stopsh}" > ${current_node_dir}/stop.sh
+        generate_checksh_func=`generate_checksh_func`
+        echo "${generate_checksh_func}" > ${current_node_dir}/check.sh
+
+        chmod +x ${current_node_dir}/start.sh
+        chmod +x ${current_node_dir}/stop.sh
+        chmod +x ${current_node_dir}/check.sh
 
         i=$(($i+1))
     done
 
-    generate_startallsh=`generate_startallsh_func`
-    echo "${generate_startallsh}" > $buildPWD/start_all.sh
-    sudo chmod a+x $buildPWD/start_all.sh
+    cp $DEPENENCIES_SCRIPTES_DIR/start.sh $buildPWD/
+    sudo chmod a+x $buildPWD/start.sh
 
-    generate_stopallsh=`generate_stopallsh_func`
-    echo "${generate_stopallsh}" > $buildPWD/stop_all.sh
-    sudo chmod a+x $buildPWD/stop_all.sh
+    cp $DEPENENCIES_SCRIPTES_DIR/stop.sh $buildPWD/
+    sudo chmod a+x $buildPWD/stop.sh
 
-    generate_checksh_func=`generate_checksh_func`
-    echo "${generate_checksh_func}" > ${current_node_dir_base}/check_node.sh
-    chmod +x ${current_node_dir_base}/check_node.sh
+    cp $DEPENENCIES_SCRIPTES_DIR/check.sh $buildPWD/
+    sudo chmod a+x $buildPWD/check.sh
 
-    cp $DEPENENCIES_FOLLOW_DIR/node_manager.sh $buildPWD/
+    cp $DEPENENCIES_SCRIPTES_DIR/register.sh $buildPWD/
+    sudo chmod a+x $buildPWD/register.sh
+
+    cp $DEPENENCIES_SCRIPTES_DIR/unregister.sh $buildPWD/
+    sudo chmod a+x $buildPWD/unregister.sh
+
+    cp $DEPENENCIES_SCRIPTES_DIR/node_manager.sh $buildPWD/
     sudo chmod a+x $buildPWD/node_manager.sh
-    #genesis.json
-    cp $DEPENENCIES_FOLLOW_DIR/genesis.json $current_node_dir_base
+
     #fisco-bcos
     cp $DEPENENCIES_FISCO_DIR/fisco-bcos $current_node_dir_base
     #chmod a+x fisco-bcos
@@ -417,9 +377,9 @@ function install_build()
     mkdir -p $buildPWD/web3lib/node_modules
     mkdir -p $buildPWD/tool/node_modules
     mkdir -p $buildPWD/systemcontract/node_modules
-    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/web3lib/node_modules/ 1>>/dev/null
-    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/tool/node_modules/ 1>>/dev/null
-    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/systemcontract/node_modules/ 1>>/dev/null
+    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/web3lib/node_modules/ >/dev/null 2>&1
+    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/tool/node_modules/ >/dev/null 2>&1
+    tar --strip-components 1 -xzvf $DEPENENCIES_NODEJS_DIR/node_m*tar.gz -C $buildPWD/systemcontract/node_modules/ >/dev/null 2>&1
 
     #config.js
     cp $installPWD/dependencies/tpl_dir/config.js.tpl $buildPWD/web3lib/config.js
@@ -433,24 +393,5 @@ function install_build()
     return 0
 }
 
-function info()
-{
-    echo "install Information:"
-    echo "****************************"
-    echo "If can not start the fisco-bcos process, check your genesis.json, config.sh config.json, syaddress.txt and genesis_node_info.json file."
-    echo "****************************"
-}
-
-case "$1" in
-    'install')
-        install_build
-        ;;
-    'info')
-        info
-        ;;
-    *)
-        echo "invalid option!"
-        echo "Usage: $0 {install|info}"
-        #exit 1
-esac
+install_build
 

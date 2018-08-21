@@ -49,8 +49,7 @@ function fisco_bcos_version_check()
     if [ "v$ver0" = "$REQUIRE_VERSION" ] || [ "V$ver0" = "$REQUIRE_VERSION" ];then
         return 0
     fi
-
-    error_message "Required version is $REQUIRE_VERSION, now fisco bcos version is $FISCO_VERSION" "false"
+    error_message_without_exit "Required version is $REQUIRE_VERSION, now /usr/local/bin/fisco-bcos version is $FISCO_VERSION"
 
     return 1
 }
@@ -60,15 +59,16 @@ function get_node_dir_name()
     local host_type_local=$1
     local public_ip_underline_local=$2
     local private_ip_underline_local=$3
+    local agency=$4
 
     if [ $host_type_local -eq $TYPE_TEMP_HOST ]
     then
         node_dir_name_local=$TEMP_NODE_NAME
     elif [ $host_type_local -eq $TYPE_GENESIS_HOST ]
     then
-        node_dir_name_local=$public_ip_underline_local"_with_"$private_ip_underline_local"_genesis_installation_package"
+        node_dir_name_local=$public_ip_underline_local"_"$agency"_genesis"
     else
-        node_dir_name_local=$public_ip_underline_local"_with_"$private_ip_underline_local"_installation_package"
+        node_dir_name_local=$public_ip_underline_local"_$agency"
     fi
     echo $node_dir_name_local
 }
@@ -77,21 +77,25 @@ function copy_genesis_related_info()
 {
     local public_ip=$1
     local private_ip=$2
-    #local node_num_per_host=$3
+    local agency=$3
     local host_type=$4
 
     public_ip_underline=$(replace_dot_with_underline $public_ip)
     private_ip_underline=$(replace_dot_with_underline $private_ip)
 
     #create node dir
-    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
+    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip $agency)
     current_node_path=$installation_build_dir/$node_dir_name
 
-    if [ $host_type -ne $TYPE_TEMP_HOST ]
-    then
-        #copy genesis json file to node dir
-        build_base_info_dir $current_node_path
+    #copy genesis json file to node dir
+    build_base_info_dir $current_node_path
+
+    #copy all ca info to genesis node
+    if [ $host_type -eq $TYPE_GENESIS_HOST ];then
+        cp -r $g_genesis_cert_dir_path  $current_node_path/dependencies/follow
     fi
+
+    #tar_tool $current_node_path
 }
 
 #build node for node of the server
@@ -186,7 +190,7 @@ function build_node_installation_package()
         alert_msg="$current_node_path is already exist, it means the installation package for ip($public_ip with $private_ip) have already build. "
     fi
 
-    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
+    node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip $agent_info)
     current_node_path=$installation_build_dir/$node_dir_name
 
     if [ -d $current_node_path ]
@@ -219,11 +223,8 @@ function build_node_installation_package()
             chmod +x $current_node_path/install_node.sh
         fi
 
-        # copy node_manager.sh
-        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
-
-        g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
-        mkdir -p ${g_genesis_node_action_container_dir_path}/
+        #g_genesis_node_action_container_dir_path=$current_node_path/node_action_info_dir
+        #mkdir -p ${g_genesis_node_action_container_dir_path}/
 
         g_genesis_cert_dir_path=$current_node_path/dependencies/cert
 
@@ -233,8 +234,7 @@ function build_node_installation_package()
         fi
     else 
         export IS_GENESIS_HOST_TPL=0
-        # copy node_manager.sh
-        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $current_node_path/dependencies/follow/
+       
         if [ ! -z "${DOCKER_TOGGLE}" ] && [ ${DOCKER_TOGGLE} -eq 1 ];then
             cp $INSTALLATION_DEPENENCIES_LIB_DIR/install_docker_node.sh $current_node_path/install_node.sh
             chmod +x $current_node_path/install_node.sh
@@ -310,10 +310,10 @@ function build_node_installation_package()
             cp $node_ca_path/node/node.json $current_node_action_info_file_path
 
             # copy all node action info files to the container dir which owned by genesis node
-            if [ ${g_status_process} -eq ${PROCESS_INITIALIZATION} ] || [ ${g_status_process} -eq ${PROCESS_EXPAND_NODE} ]
-            then
-                cp $current_node_action_info_file_path ${g_genesis_node_action_container_dir_path}
-            fi
+            #if [ ${g_status_process} -eq ${PROCESS_INITIALIZATION} ] || [ ${g_status_process} -eq ${PROCESS_EXPAND_NODE} ]
+            #then
+            #    cp $current_node_action_info_file_path ${g_genesis_node_action_container_dir_path}
+            #fi
         fi
 
         if [ $host_type -eq $TYPE_GENESIS_HOST ] && [ $node_index -eq 0 ]
@@ -353,7 +353,7 @@ function build_node_installation_package()
     export DOCKER_VERSION_TPL=${DOCKER_VERSION}
 
     MYVARS='${KEYSTORE_PWD}:${CLIENTCERT_PWD}:${IS_GENESIS_HOST_TPL}:${DOCKER_REPOSITORY_TPL}:${DOCKER_VERSION_TPL}:${NODE_NUM_TPL}:${GOD_ADDRESS_TPL}:${LISTEN_IP_TPL}:${RPC_PORT_TPL}:${CHANNEL_PORT_VALUE_TPL}:${P2P_PORT_TPL}:${NODE_DESC_TPL}:${AGENCY_INFO_TPL}:${IDX_TPL}'
-    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/follow/config.sh
+    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/config.sh.tpl > $installation_build_dir/$node_dir_name/dependencies/config.sh
     return 0
 }
 
@@ -411,9 +411,9 @@ function build_temp_node()
 #deploy system contract
 function deploy_system_contract_for_initialization()
 {
-    cd $installation_build_dir/$TEMP_NODE_NAME/build/node/
-    bash start_node0_godminer.sh
-    sleep 8
+    cd $installation_build_dir/$TEMP_NODE_NAME/build/
+    bash node0/start_godminer.sh
+    sleep 5
     # check if temp node is running
     check_port $CHANNEL_PORT_NODE
     if [ $? -eq 0 ];then
@@ -430,8 +430,9 @@ function deploy_system_contract_for_initialization()
         local public_ip=${sub_arr[0]}
         local private_ip=${sub_arr[1]}
         local node_num_per_host=${sub_arr[2]}
+        local agency_info=${sub_arr[3]}
         local host_type=$(get_host_type $i)
-        local node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip)
+        local node_dir_name=$(get_node_dir_name $host_type $public_ip $private_ip $agency_info)
         local current_node_path=$installation_build_dir/$node_dir_name
         local public_ip_underline=$(replace_dot_with_underline $public_ip)
         for ((j=0; j<$node_num_per_host; j++))
@@ -447,10 +448,10 @@ function deploy_system_contract_for_initialization()
     bash system_contract_tools.sh NodeAction all
 
     # export the genesis file
-    cd $installation_build_dir/$TEMP_NODE_NAME/build/node/
-    bash stop_node0.sh 1>/dev/null
+    cd $installation_build_dir/$TEMP_NODE_NAME/build/
+    bash node0/stop.sh 1>/dev/null
 
-    ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node/nodedir0/fisco-bcos.log 2>&1
+    ./fisco-bcos  --genesis $installation_build_dir/$TEMP_NODE_NAME/build/node0/genesis.json  --config $installation_build_dir/$TEMP_NODE_NAME/build/node0/config.json --export-genesis $TEMP_BUILD_DIR/genesis.json  >$installation_build_dir/$TEMP_NODE_NAME/build/node0/fisco-bcos.log 2>&1
 
     echo "    exporting genesis file : "
     $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/scripts/percent_num_progress_bar.sh 2 &
@@ -642,13 +643,16 @@ function build()
         local private_ip=${sub_arr[1]}
         local node_num_per_host=${sub_arr[2]}
         local build_host_type=$(get_host_type $i)
+        local agency_info=${sub_arr[3]}
 
-        copy_genesis_related_info $public_ip $private_ip $node_num_per_host $build_host_type
+        copy_genesis_related_info $public_ip $private_ip $agency_info $build_host_type
+
     done
 
     echo
     print_dash
 
+    echo " "
     echo "    Building end!"
     return 0
 }
@@ -666,11 +670,12 @@ function expand()
 
     # set g_status_process to PROCESS_EXPAND_NODE
     g_status_process=${PROCESS_EXPAND_NODE}
-    g_genesis_cert_dir_path=${EXPAND_GENESIS_CA_DIR}
 
-    local genesis_file=${EXPAND_GENESIS_FILE}
-    local system_address_file=${EXPAND_SYSTEM_ADDRESS_FILE} 
-    local bootstrapnodes_file=${EXPAND_BOOTSTRAPNODES_FILE}
+    g_genesis_cert_dir_path=${EXPAND_GENESIS_FOLLOW_DIR}/cert/
+
+    local genesis_file=${EXPAND_GENESIS_FOLLOW_DIR}/genesis.json
+    local system_address_file=${EXPAND_GENESIS_FOLLOW_DIR}/syaddress.txt 
+    local bootstrapnodes_file=${EXPAND_GENESIS_FOLLOW_DIR}/bootstrapnodes.json
 
     # build install package for every server
     for ((i=0; i<g_host_config_num; i++))
@@ -685,14 +690,12 @@ function expand()
 
         build_node_installation_package $public_ip $private_ip $node_num_per_host $build_host_type $agency_info
 
-        local node_dir_name_local=$(get_node_dir_name $build_host_type $public_ip $private_ip)
+        local node_dir_name_local=$(get_node_dir_name $build_host_type $public_ip $private_ip $agency_info)
         local current_node_path_local=$installation_build_dir/$node_dir_name_local
 
         local node_base_info_dir=$current_node_path_local/dependencies/follow/
         mkdir -p $node_base_info_dir/
 
-        # copy node_manager.sh
-        cp $INSTALLATION_DEPENENCIES_LIB_DIR/node_manager.sh -p $node_base_info_dir/
         # copy genesis.json
         cp ${genesis_file} $node_base_info_dir/
         # copy syaddress.txt
@@ -700,11 +703,13 @@ function expand()
         # copy bootstrapnodes.json
         cp ${bootstrapnodes_file} $node_base_info_dir/
 
+        #tar_tool $current_node_path_local
     done
 
     echo
     print_dash
 
+    echo " "
     echo "    Expanding end!"
     return 0
 }

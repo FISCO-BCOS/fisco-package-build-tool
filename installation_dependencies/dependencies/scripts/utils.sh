@@ -4,14 +4,24 @@
 function error_message()
 {
     local message=$1
-    local is_exit=$2
-    echo "ERROR - ${message}" >&2 
-
-    if [ -z "$is_exit" ] || [ "$is_exit" != "false" ];then
-        exit 1
-    fi
+#    echo "ERROR - ${message}" >&2 
+    echo "ERROR - ${message}"
+    exit 1
 }
 
+# print message to stderr , if need and will exit
+function error_message_without_exit()
+{
+    local message=$1
+#    echo "ERROR - ${message}" >&2 
+    echo "ERROR - ${message}"
+}
+
+#exit direct
+function error_exit()
+{
+    exit 1
+}
 
 #check if the port is used
 function check_port() 
@@ -102,4 +112,15 @@ function check_file_empty()
     fi
 
     return 0
+}
+
+#tar file or dictionary
+function tar_tool()
+{
+    local file=$1
+    if [ -f $current_node_path".tgz" ];then
+        echo $current_node_path".tgz already exist ~"
+    else
+        tar -zcf $current_node_path".tgz" $current_node_path
+    fi
 }

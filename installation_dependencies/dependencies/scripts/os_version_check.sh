@@ -36,7 +36,7 @@ function os_version_check()
     fi
 
     # Check for 'uname' and abort if it is not available.
-    uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
+    uname -v > /dev/null 2>&1 || { echo "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 
     case $(uname -s) in 
 
@@ -58,7 +58,7 @@ function os_version_check()
     Linux)
 
         if [ ! -f "/etc/os-release" ];then
-            { echo >&2 "ERROR - Unsupported or unidentified Linux distro."; exit 1; }
+             error_message "Unsupported or unidentified Linux distro."
         fi
 
         DISTRO_NAME=$(. /etc/os-release; echo $NAME)
@@ -85,7 +85,7 @@ function os_version_check()
                 ver=$(echo "$UBUNTU_VERSION" | awk -F . '{print $1$2}')
                 #Ubuntu 16.04 or Ubuntu 16.04+
                 if [ $ver -ne 1604 ];then
-                    { echo >&2 "ERROR - Unsupported Ubuntu Version. At least 16.04 is required."; exit 1; }
+                    error_message "Unsupported Ubuntu Version. At least 16.04 is required."
                 fi
 
                 ;;
@@ -104,7 +104,7 @@ function os_version_check()
                 fi
 
                 if [ -z "$CENTOS_VERSION" ];then
-                    { echo >&2 "unable to determine CentOS Version."; exit 1; }
+                    error_message "unable to determine CentOS Version."
                 fi
 
                 echo "CentOS Version => $CENTOS_VERSION"
@@ -112,7 +112,7 @@ function os_version_check()
 
                 #CentOS 7.2 or CentOS 7.2+
                 if [ $ver -lt 72 ];then
-                    { echo >&2 "ERROR - Unsupported CentOS Version. At least 7.2 is required."; exit 1; }
+                    error_message "Unsupported CentOS Version. At least 7.2 is required."
                 fi
                 ;;
     #------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ function os_version_check()
                 fi
 
                 if [ -z "$ORACLE_LINUX_VERSION" ];then
-                    { echo >&2 "unable to determine Oracle Linux version."; exit 1; }
+                    error_message "unable to determine Oracle Linux version."
                 fi
 
                 echo "Oracle Linux Version => $ORACLE_LINUX_VERSION"
@@ -136,7 +136,7 @@ function os_version_check()
 
                 #Oracle Linux 7.4 or Oracle Linux 7.4+
                 if [ $ver -lt 74 ];then
-                    { echo >&2 "ERROR - Unsupported Oracle Linux, At least 7.4 Oracle Linux is required."; exit 1; }
+                    error_message "Unsupported Oracle Linux, At least 7.4 Oracle Linux is required."
                 fi
 
                 ;;
@@ -144,7 +144,7 @@ function os_version_check()
     # Other Linux
     #------------------------------------------------------------------------------
             *)
-                { echo >&2 "ERROR - Unsupported Linux distribution: $DISTRO_NAME."; exit 1; }
+                error_message "Unsupported Linux distribution: $DISTRO_NAME."
                 ;;
         esac # case $DISTRO_NAME
 
@@ -155,7 +155,7 @@ function os_version_check()
     #------------------------------------------------------------------------------
     *)
         #other
-        { echo >&2 "ERROR - Unsupported or unidentified operating system."; exit 1; }
+        error_message "Unsupported or unidentified operating system."
         ;;
     esac
 }

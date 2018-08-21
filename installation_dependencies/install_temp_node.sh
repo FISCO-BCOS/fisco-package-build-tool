@@ -1,20 +1,5 @@
 #!/bin/bash
 
-IS_DEBUG=0
-function toggle_debug()
-{
-    IS_DEBUG=1
-    mkdir -p build/
-    #set -e
-    #exec 5>build/debug_output.txt
-    #exec 1>>build/debug_output.txt
-    #exec 2>>build/debug_output.txt
-    #BASH_XTRACEFD="5"
-    PS4='$LINENO: '
-    set -x
-}
-#toggle_debug
-
 #public config
 installPWD=$PWD
 source $installPWD/dependencies/scripts/utils.sh
@@ -22,7 +7,7 @@ source $installPWD/dependencies/scripts/public_config.sh
 source $installPWD/dependencies/scripts/dependencies_check.sh
 
 #check_param $1 $2
-source $DEPENENCIES_FOLLOW_DIR/config.sh
+source $installPWD/dependencies/config.sh
 
 #genesis.json generator
 function generate_genesisBlock()
@@ -31,26 +16,26 @@ function generate_genesisBlock()
     export GOD_ACCOUNT_ID_TPL=$2
 
     MYVARS='${TEMP_NODE_ID_TPL}:${GOD_ACCOUNT_ID_TPL}'
-    envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/temp_node_genesis.json.tpl > $buildPWD/node/genesis.json
+    envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/temp_node_genesis.json.tpl > $buildPWD/node0/genesis.json
     echo "generate_genesisBlock ,god => "${GOD_ACCOUNT_ID_TPL}
 }
 
-#stop_nodeX.sh generator
+#stop.sh generator
 function generate_stopsh()
 {
     stopsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
     kill_cmd=\"kill -9 \${weth_pid}\"
     eval \${kill_cmd}"
     echo "$stopsh"
 }
 
-#start_nodeX.sh generator
+#start.sh generator
 function generate_startgodsh()
 {
     startsh="#!/bin/bash
     ulimit -c unlimited
-    nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/genesis.json  --config ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json  --godminer ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/godminer.json > ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/log/log 2>&1 &"
+    nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  --godminer ${NODE_INSTALL_DIR}/node${Idx[$index]}/godminer.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
     echo "$startsh"
 }
 
@@ -59,7 +44,7 @@ function generate_startsh()
 {
     startsh="#!/bin/bash
     ulimit -c unlimited
-    nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/genesis.json  --config ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/config.json > ${NODE_INSTALL_DIR}/nodedir${Idx[$index]}/log/log 2>&1 &"
+    nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &"
     echo "$startsh"
 }
 
@@ -76,20 +61,25 @@ function install()
     current_web3sdk=${WEB3SDK_INSTALL_DIR}
     mkdir -p ${current_node_dir_base}
 
-    current_node_dir=${current_node_dir_base}/nodedir0/
+    current_node_dir=${current_node_dir_base}/node0/
     mkdir -p $current_node_dir/
     mkdir -p $current_node_dir/log/
     mkdir -p $current_node_dir/keystore/
-    mkdir -p $current_node_dir/fisco-data/
+    mkdir -p $current_node_dir/data/
         
-    cp $DEPENDENCIES_RLP_DIR/node_rlp_0/ca/node/* $current_node_dir/fisco-data/  #ca info copy
+    cp $DEPENDENCIES_RLP_DIR/node_rlp_0/ca/node/* $current_node_dir/data/  #ca info copy
     #copy web3sdk 
     cp -r $DEPENENCIES_WEB3SDK_DIR ${buildPWD}/
     cp $DEPENDENCIES_RLP_DIR/node_rlp_0/ca/sdk/* ${current_web3sdk}/conf/  #ca info copy
-    cp $DEPENDENCIES_RLP_DIR/bootstrapnodes.json $current_node_dir/fisco-data/ >/dev/null 2>&1
+    cp $DEPENDENCIES_RLP_DIR/bootstrapnodes.json $current_node_dir/data/ >/dev/null 2>&1
 
-    nodeid=$(cat ${current_node_dir}/fisco-data/node.nodeid)
+    nodeid=$(cat ${current_node_dir}/data/node.nodeid)
     echo "temp node id is "$nodeid
+
+    # generate log.conf from tpl
+    export OUTPUT_LOG_FILE_PATH_TPL=${current_node_dir}/log
+    MYVARS='${OUTPUT_LOG_FILE_PATH_TPL}'
+    envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/log.conf.tpl > ${current_node_dir}/log.conf
 
     export CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL=${DEFAULT_SYSTEM_CONTRACT_ADDRESS}
     export CONFIG_JSON_LISTENIP_TPL=${listenip[0]}
@@ -99,16 +89,12 @@ function install()
     export CHANNEL_PORT_VALUE_TPL=${channelPort[0]}
     export CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL=${current_node_dir}/keys.info
     export CONFIG_JSON_KEYSTORE_DIR_PATH_TPL=${current_node_dir}/keystore/
-    export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${current_node_dir}/fisco-data/
+    export CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL=${current_node_dir}/data/
+    export CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL=${current_node_dir}/log.conf
 
-    MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}'
+    MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}'
     envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > ${current_node_dir}/config.json
     
-    # generate log.conf from tpl
-    export OUTPUT_LOG_FILE_PATH_TPL=${current_node_dir}/log
-    MYVARS='${OUTPUT_LOG_FILE_PATH_TPL}'
-    envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/log.conf.tpl > ${current_node_dir}/fisco-data/log.conf
-
     # copy fisco-bcos
     cp $DEPENENCIES_FISCO_DIR/fisco-bcos $current_node_dir_base/
     chmod a+x $current_node_dir_base/fisco-bcos
@@ -118,23 +104,23 @@ function install()
    
     local god_addr=$(cat $current_node_dir_base/godInfo.txt | grep address | awk -F ':' '{print $2}' 2>/dev/null)
     if [ -z ${god_addr} ];then
-        error_messaage " fisco-bcos --newaccount opr faild." "false"
+        error_message " fisco-bcos --newaccount opr faild."
     fi
 
     cp $current_node_dir_base/godInfo.txt $buildPWD
     generate_genesisBlock ${nodeid} ${god_addr}
 
     generate_startsh=`generate_startsh`
-    echo "${generate_startsh}" > ${current_node_dir_base}/start_node${Idx[0]}.sh
+    echo "${generate_startsh}" > ${current_node_dir_base}/node${Idx[0]}/start.sh
 
     generate_startgodsh=`generate_startgodsh`
-    echo "${generate_startgodsh}" > ${current_node_dir_base}/start_node${Idx[0]}_godminer.sh
+    echo "${generate_startgodsh}" > ${current_node_dir_base}/node${Idx[0]}/start_godminer.sh
 
     generate_stopsh=`generate_stopsh`
-    echo "${generate_stopsh}" > ${current_node_dir_base}/stop_node${Idx[0]}.sh
-    chmod +x ${current_node_dir_base}/start_node${Idx[0]}_godminer.sh
-    chmod +x ${current_node_dir_base}/start_node${Idx[0]}.sh
-    chmod +x ${current_node_dir_base}/stop_node${Idx[0]}.sh
+    echo "${generate_stopsh}" > ${current_node_dir_base}/node${Idx[0]}/stop.sh
+    chmod +x ${current_node_dir_base}/node${Idx[0]}/start_godminer.sh
+    chmod +x ${current_node_dir_base}/node${Idx[0]}/start.sh
+    chmod +x ${current_node_dir_base}/node${Idx[0]}/stop.sh
 
     export WEB3SDK_CONFIG_IP=${listenip[0]}
     export WEB3SDK_CONFIG_PORT=${CHANNEL_PORT_VALUE_TPL}
@@ -145,16 +131,16 @@ function install()
     envsubst $MYVARS < $DEPENENCIES_DIR/tpl_dir/applicationContext.xml.tpl > ${current_web3sdk}/conf/applicationContext.xml
 
     cd ${current_node_dir_base}
-    bash start_node${Idx[0]}.sh
+    bash node${Idx[0]}/start.sh
 
-    echo "    Loading genesis file : "
-    $DEPENENCIES_DIR/scripts/percent_num_progress_bar.sh 8 &
-    sleep 8
+    echo "    Waiting for temp node starting ..."
+    # $DEPENENCIES_DIR/scripts/percent_num_progress_bar.sh 8 &
+    sleep 5
 
     # check if temp node is running
     check_port ${WEB3SDK_CONFIG_PORT}
     if [ $? -eq 0 ];then
-        error_messaage "channel port $WEB3SDK_CONFIG_PORT is not listening, temp node start not success."
+        error_message "channel port $WEB3SDK_CONFIG_PORT is not listening, temp node start not success."
     fi
 
     #deploy system contract
@@ -164,14 +150,14 @@ function install()
 
     #deploy system contract failed
     if [ ! -f ${current_web3sdk}/bin/output/SystemProxy.address ];then
-        bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        error_messaage "system contract address file is not exist, web3sdk deploy system contract not success."
+        bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
+        error_message "system contract address file is not exist, web3sdk deploy system contract not success."
     fi 
 
     syaddress=$(cat ${current_web3sdk}/bin/output/SystemProxy.address)
     if [ -z $syaddress ];then
-        bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
-        error_messaage "system contract address file is empty, web3sdk deploy system contract not success." 
+         bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
+        error_message "system contract address file is empty, web3sdk deploy system contract not success." 
     fi
     
     cp ${current_web3sdk}/bin/output/SystemProxy.address $buildPWD/syaddress.txt
@@ -204,7 +190,7 @@ function install()
     sed -i.bu "s/$DEFAULT_SYSTEM_CONTRACT_ADDRESS/$syaddress/g" ${current_node_dir}/config.json
 
     #sleep 6
-    bash ${current_node_dir_base}/stop_node${Idx[0]}.sh
+    bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
 
     cd $installPWD
     echo "    Installing temp node fisco-bcos success!"

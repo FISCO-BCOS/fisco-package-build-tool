@@ -158,7 +158,7 @@ switch (filename){
               console.log("agency="+node[1].toString());
               console.log("caHash="+node[2].toString());
               console.log("Idx="+node[3].toString());
-              console.log("blocknumber="+node[4].toString());
+              //console.log("blocknumber="+node[4].toString());
           }
           break;
       }
