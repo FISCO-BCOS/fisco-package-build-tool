@@ -31,9 +31,11 @@ $ source /etc/profile
 ```
 
 - 用户环境变量配置, 当前用户有效  
-将下面的内容添加入 ~/.bash_profile 文件的末尾.
+
+将下面的内容添加到 ~/.bash_profile 文件的末尾。 若无法修改 ~/.bash_profile 文件，则将下面的内容添加到 ~/.bashrc 文件的末尾。
 ```
-vim ~/.bash_profile
+vim ~/.bash_profile 
+或  vim ~/.bashrc
 ```
 ```
 export JAVA_HOME=/usr/local/jdk1.8.0_181  
@@ -42,8 +44,10 @@ export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 ```
 添加完毕之后执行:
 ```
-$ source ~/.bash_profile
+$ source ~/.bash_profile 
+若添加的内容到~/.bashrc文件，则执行 $ source ~/.bashrc 
 ```
+
 
 ## 4. 检查java版本  
 ```
