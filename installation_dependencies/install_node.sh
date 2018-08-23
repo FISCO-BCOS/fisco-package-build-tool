@@ -233,7 +233,7 @@ function install_build()
     # operation system check
     os_version_check
     # java version check
-    java_version_check
+    # java_version_check
 
     sudo chown -R $(whoami) $installPWD
 
@@ -249,7 +249,7 @@ function install_build()
 
     #dependencies check
     dependencies_install
-    install_dependencies_check
+    #  install_dependencies_check
     copy_so_file $DEPENENCIES_SO_DIR/ /usr/lib64
 
     #mkdir node dir
