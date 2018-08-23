@@ -777,7 +777,7 @@ FISCO BCOS中需要使用Oracle JDK 1.8(java 1.8)环境，在CentOS/Ubuntu中默
 ### [物料包环境checklist](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/%E7%89%A9%E6%96%99%E5%8C%85%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BACheckList.md)
 通常我们推荐使用物料包[FISCO BCOS物料包]搭建FISCO BCOS的环境，可以屏蔽搭建过程中的一些繁琐细节。
 
-物料包使用时，本身即有一些依赖, FISCO BCOS对网络、yum源等外部环境也存在依赖，为减少搭建过程中遇到的问题，建议在使用之前对整个搭建的环境进行检查，特别是生产环境的搭建，尤其推荐CheckList作为一个必备的流程。
+物料包使用时，本身存在一些依赖, 同时FISCO BCOS对网络、yum源等外部环境也存在依赖，为减少搭建过程中遇到的问题，建议在使用之前对整个搭建的环境进行检查，特别是生产环境的搭建，尤其推荐CheckList作为一个必备的流程。
 
 # <a name="FAQ" id="FAQ">FAQ</a>
 ## generate_installation_packages.sh build/expand 报错提示.
