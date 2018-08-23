@@ -9,11 +9,10 @@
     "wallet":"${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}",
     "keystoredir":"${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}",
     "datadir":"${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}",
-    "networkid":"${CONFIG_JSON_NETWORK_ID_TPL}",
-    "vm":"interpreter",
+    "networkid":"12345",
     "logverbosity":"4",
     "coverlog":"OFF",
     "eventlog":"ON",
     "statlog":"ON",
-    "logconf":"${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}/log.conf"
+    "logconf":"${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}"
 }
