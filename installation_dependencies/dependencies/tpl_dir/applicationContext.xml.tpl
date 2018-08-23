@@ -25,7 +25,7 @@
 	</bean>
 
 	<bean id="toolConf" class="org.bcos.contract.tools.ToolConf">
-		<property name="systemProxyAddress" value="${JTOOL_SYSTEM_CONTRACT_ADDR}" />
+		<property name="systemProxyAddress" value="${WEB3SDK_SYSTEM_CONTRACT_ADDR}" />
 		<property name="privKey" value="bcec428d5205abe0f0cc8a734083908d9eb8563e31f943d760786edf42ad67dd" />
 		<property name="account" value="0x776bd5cf9a88e9437dc783d6414bccc603015cf0" />
 		<property name="outPutpath" value="./output/" />
@@ -33,7 +33,7 @@
 	
 	<bean id="channelService" class="org.bcos.channel.client.Service">
 		<property name="orgID" value="WB" />
-		<property name="connectSeconds" value="10" />
+		<property name="connectSeconds" value="100" />
 		<property name="connectSleepPerMillis" value="10" />
 		<property name="allChannelConnections">
 			<map>
@@ -41,11 +41,11 @@
 					<bean class="org.bcos.channel.handler.ChannelConnections">
 						<property name="caCertPath" value="classpath:ca.crt" />
 						<property name="clientKeystorePath" value="classpath:client.keystore" />
-						<property name="keystorePassWord" value="123456" />
-						<property name="clientCertPassWord" value="123456" />
+						<property name="keystorePassWord" value="${KEYSTORE_PWD}" />
+						<property name="clientCertPassWord" value="${CLIENTCERT_PWD}" />
                         <property name="connectionsStr">
 							<list>
-								<value>node1@${JTOOL_CONFIG_IP}:${JTOOL_CONFIG_PORT}</value>  
+								<value>node1@${WEB3SDK_CONFIG_IP}:${WEB3SDK_CONFIG_PORT}</value>  
 							</list>
 						</property>
                     </bean>
