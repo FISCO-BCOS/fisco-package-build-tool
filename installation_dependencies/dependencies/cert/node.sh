@@ -40,13 +40,10 @@ else
         openssl x509  -text -in node.crt | sed -n '4p' | sed 's/ //g' | sed 's/.*(0x//g' | sed 's/)//g' |sed 's/[a-z]/\u&/g' | cat >node.serial
     fi
 
-    
-
     cp ca.crt agency.crt $node
     mv node.key node.csr node.crt node.param node.private node.pubkey node.nodeid node.serial  $node
 
     cd $node
-    
 
     nodeid=`cat node.nodeid | head`
     serial=`cat node.serial | head`
