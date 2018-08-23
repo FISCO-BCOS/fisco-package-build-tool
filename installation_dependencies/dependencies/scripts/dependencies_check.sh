@@ -103,7 +103,7 @@ function install_dependencies_check()
     # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
     os_version_check
     # java => Oracle JDK 1.8
-    java_version_check
+    # java_version_check
     # openssl => OpenSSL 1.0.2s
     openssl_version_check
  

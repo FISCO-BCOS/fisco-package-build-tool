@@ -11,6 +11,7 @@ source $DEPENENCIES_DIR/scripts/public_config.sh
 source $DEPENENCIES_DIR/scripts/os_version_check.sh
 source $DEPENENCIES_DIR/scripts/dependencies_install.sh
 source $DEPENENCIES_DIR/scripts/dependencies_check.sh
+source $DEPENENCIES_DIR/scripts/ext_so.sh
 
 source $DEPENENCIES_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
@@ -249,6 +250,7 @@ function install_build()
     #dependencies check
     dependencies_install
     install_dependencies_check
+    copy_so_file $DEPENENCIES_SO_DIR/ /usr/lib64
 
     #mkdir node dir
     current_node_dir_base=${NODE_INSTALL_DIR}
