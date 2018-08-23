@@ -2,24 +2,6 @@
 
 source ./openssl_conf.sh
 
-if [ "" = "`java -version 2>&1 | grep version`" ];
-then
-    echo " Please Install JDK 1.8"
-    exit;
-fi
-
-if [ "" = "`java -version 2>&1 | grep TM`" ];
-then
-    echo " Please Install Java(TM) 1.8"
-    exit;
-fi
-
-if [ "" = "`java -version 2>&1 | grep 1.8`" ];
-then
-    echo " Please Upgrade JDK To  1.8"
-    exit;
-fi
-
 agency=$1
 sdk=$2
 
@@ -41,7 +23,7 @@ else
     openssl genpkey -paramfile sdk.param -out sdk.key
     openssl pkey -in sdk.key -pubout -out sdk.pubkey
     openssl req -new -key sdk.key -config cert.cnf  -out sdk.csr -subj $OPENSSLSUBJECT
-    openssl x509 -req -in sdk.csr -CAkey agency.key -CA agency.crt -force_pubkey sdk.pubkey -out sdk.crt -CAcreateserial -extensions v3_req -extfile cert.cnf
+    openssl x509 -req -days 3650 -in sdk.csr -CAkey agency.key -CA agency.crt -force_pubkey sdk.pubkey -out sdk.crt -CAcreateserial -extensions v3_req -extfile cert.cnf
     openssl ec -in sdk.key -outform DER |tail -c +8 | head -c 32 | xxd -p -c 32 | cat >sdk.private
    
     cp ca.crt ca-agency.crt
@@ -51,9 +33,9 @@ else
 
     cd $sdk
     mv ca-agency.crt ca.crt
-    echo ${CA_PASSWD} > pwd.conf
+    echo ${CLIENTCERT_PWD} > pwd.conf
     openssl pkcs12 -export -name client -in sdk.crt -inkey sdk.key -out keystore.p12 -password file:pwd.conf 
-    keytool -importkeystore -destkeystore client.keystore -srckeystore keystore.p12 -srcstoretype pkcs12 -alias client -srcstorepass ${CA_PASSWD} -deststorepass ${CA_PASSWD}
+    keytool -importkeystore -destkeystore client.keystore -srckeystore keystore.p12 -srcstoretype pkcs12 -alias client -srcstorepass ${CLIENTCERT_PWD} -deststorepass ${KEYSTORE_PWD}
 
     echo "Build  $sdk Crt suc!!!"
 fi

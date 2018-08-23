@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #本脚本依靠一键脚本生成的start*.sh来监控服务，因此一键脚本的启动命令后续添加参数只能在尾部添加。
-# nohup ./fisco-bcos  --genesis ./genesis.json  --config /home/ubuntu/weth/nodedir0/config.json  > /home/ubuntu/weth/nodedir0/log/log 2>&1 &
+# nohup ./fisco-bcos  --genesis ./genesis.json  --config /home/ubuntu/weth/node0/config.json  > /home/ubuntu/weth/node0/log/log 2>&1 &
 
 alarm() {
         echo "$1"
