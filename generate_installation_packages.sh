@@ -30,13 +30,13 @@ function fisco_bcos_version_check()
     FISCO_VERSION=$(${TARGET_FISCO_BCOS_PATH} --version 2>&1 | egrep "FISCO-BCOS *version" | awk '{print $3}')
     # FISCO BCOS gm version not support
     if  echo "$FISCO_VERSION" | egrep "gm" ; then
-        error_message "FISCO BCOS gm version not support yet, now fisco-bcos is $FISCO_VERSION"
+        error_message "FISCO BCOS gm version not support yet, now ${TARGET_FISCO_BCOS_PATH} is $FISCO_VERSION"
     fi 
 
     # fisco bcos 1.3.0+
     ver=$(echo "$FISCO_VERSION" | awk -F . '{print $1$2}')
     if [ $ver -lt 13 ];then
-        error_message "At least FISCO-BCOS 1.3.0 is required, now fisco-bcos is $FISCO_VERSION"
+        error_message "At least FISCO-BCOS 1.3.0 is required, now ${TARGET_FISCO_BCOS_PATH} is $FISCO_VERSION"
     fi
 
     #do not need specified version
@@ -49,7 +49,7 @@ function fisco_bcos_version_check()
     if [ "v$ver0" = "$REQUIRE_VERSION" ] || [ "V$ver0" = "$REQUIRE_VERSION" ];then
         return 0
     fi
-    error_message_without_exit "Required version is $REQUIRE_VERSION, now /usr/local/bin/fisco-bcos version is $FISCO_VERSION"
+    error_message_without_exit "Required version is $REQUIRE_VERSION, now ${TARGET_FISCO_BCOS_PATH} version is $FISCO_VERSION"
 
     return 1
 }
