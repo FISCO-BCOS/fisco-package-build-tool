@@ -131,6 +131,23 @@ function dependencies_install()
 
                 ;;
     #------------------------------------------------------------------------------
+    # Red Hat Enterprise Linux Server # At least 7.4
+    #------------------------------------------------------------------------------
+            Red*) 
+                   
+                    sudo yum -y install lsof
+                    sudo yum -y install bc
+                    sudo yum -y install gettext
+                    sudo yum -y install cmake3
+                    sudo yum -y install git gcc-c++
+                    sudo yum -y install openssl openssl-devel
+                    sudo yum -y install leveldb-devel curl-devel 
+                    sudo yum -y install libmicrohttpd-devel gmp-devel 
+                    sudo yum -y install crudini
+                    sudo yum -y install libuuid-devel
+
+                ;;
+    #------------------------------------------------------------------------------
     # Other Linux
     #------------------------------------------------------------------------------
             *)
