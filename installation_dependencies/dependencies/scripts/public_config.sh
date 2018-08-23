@@ -20,6 +20,7 @@ DEPENENCIES_DIR=$installPWD/dependencies
 DEPENENCIES_WEB3SDK_DIR=$installPWD/dependencies/web3sdk
 DEPENENCIES_WEB3LIB_DIR=$installPWD/dependencies/web3lib
 DEPENENCIES_FOLLOW_DIR=$installPWD/dependencies/follow
+DEPENENCIES_SO_DIR=$installPWD/dependencies/so
 DEPENENCIES_SCRIPTES_DIR=$installPWD/dependencies/scripts
 DEPENENCIES_FISCO_DIR=$installPWD/dependencies/fisco-bcos
 DEPENENCIES_SC_DIR=$installPWD/dependencies/systemcontract
