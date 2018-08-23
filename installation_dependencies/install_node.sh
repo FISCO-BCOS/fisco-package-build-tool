@@ -248,7 +248,7 @@ function install_build()
 
     #dependencies check
     dependencies_install
-    dependencies_check
+    install_dependencies_check
 
     #mkdir node dir
     current_node_dir_base=${NODE_INSTALL_DIR}
