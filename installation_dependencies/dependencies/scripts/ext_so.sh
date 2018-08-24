@@ -16,4 +16,6 @@ function copy_so_file()
     if [ -f $dst/libmicrohttpd.so ] && [ -f $dst/libmicrohttpd.so.10 ];then
         sudo ln -s  $dst/libmicrohttpd.so.10  $dst/libmicrohttpd.so
     fi
+
+    sudo ldconfig
 }
