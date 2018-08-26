@@ -415,8 +415,9 @@ function deploy_system_contract_for_initialization()
     bash node0/start_godminer.sh
     sleep 5
     # check if temp node is running
-    check_port $CHANNEL_PORT_NODE
+    check_port $CHANNEL_PORT_NODE 60
     if [ $? -eq 0 ];then
+        bash node0/stop.sh 1>/dev/null
         error_message "channel port $CHANNEL_PORT_NODE is not listening, maybe temp node god mode start failed."
     fi
 
