@@ -110,7 +110,7 @@ function dependencies_install()
                     sudo yum -y install lsof
                     sudo yum -y install crudini
                     sudo yum -y install libuuid-devel
-                    sudo yum -y install  vim-common
+                    sudo yum -y install vim-common
 
                 ;;
     #------------------------------------------------------------------------------
@@ -239,6 +239,16 @@ function simple_dependencies_install()
                     # sudo yum -y install docker
 
                 ;;
+     #------------------------------------------------------------------------------
+    # Red Hat Enterprise Linux Server # At least 7.4
+    #------------------------------------------------------------------------------
+            Red*) 
+                   
+                    sudo yum -y install bc
+                    sudo yum -y install gettext
+                    sudo yum -y install lsof
+
+                ;; 
     #------------------------------------------------------------------------------
     # Other Linux
     #------------------------------------------------------------------------------
