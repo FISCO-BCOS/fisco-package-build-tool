@@ -30,7 +30,7 @@ function check_port()
     local times=$2
 
     if [ -z "$times" ] || [ $times -le 1 ];then
-        if sudo lsof -Pi :$port -sTCP:LISTEN -t ;then
+        if sudo lsof -Pi :$port -sTCP:LISTEN  ;then
             return 1
         else
             return 0
@@ -40,7 +40,7 @@ function check_port()
     local index=0
     while [ $index -lt $times ]
     do
-        if sudo lsof -Pi :$port -sTCP:LISTEN -t ;then
+        if sudo lsof -Pi :$port -sTCP:LISTEN  ;then
             return 1
         fi
         sleep 1
