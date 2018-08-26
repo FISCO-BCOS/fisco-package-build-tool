@@ -11,7 +11,6 @@ source $DEPENENCIES_DIR/scripts/public_config.sh
 source $DEPENENCIES_DIR/scripts/os_version_check.sh
 source $DEPENENCIES_DIR/scripts/dependencies_install.sh
 source $DEPENENCIES_DIR/scripts/dependencies_check.sh
-source $DEPENENCIES_DIR/scripts/ext_so.sh
 
 source $DEPENENCIES_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
@@ -233,7 +232,7 @@ function install_build()
     # operation system check
     os_version_check
     # java version check
-    # java_version_check
+    java_version_check
 
     sudo chown -R $(whoami) $installPWD
 
@@ -248,9 +247,7 @@ function install_build()
     print_dash
 
     #dependencies check
-    dependencies_install
-    #  install_dependencies_check
-    copy_so_file $DEPENENCIES_SO_DIR/ /usr/lib64
+    install_dependencies_check
 
     #mkdir node dir
     current_node_dir_base=${NODE_INSTALL_DIR}
