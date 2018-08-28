@@ -23,16 +23,31 @@ function error_exit()
     exit 1
 }
 
-#check if the port is used
+#check if the port is used: 1 in use , 0 not in use
 function check_port() 
 {
-    echo "    check port is "$1
-    if ! sudo lsof -i:$1 | egrep LISTEN
-    then
-        return 0
-    else
-        return 1
+    local port=$1
+    local times=$2
+
+    if [ -z "$times" ] || [ $times -le 1 ];then
+        if sudo lsof -Pi :$port -sTCP:LISTEN  ;then
+            return 1
+        else
+            return 0
+        fi
     fi
+
+    local index=0
+    while [ $index -lt $times ]
+    do
+        if sudo lsof -Pi :$port -sTCP:LISTEN  ;then
+            return 1
+        fi
+        sleep 1
+        index=$(($index+1))
+    done
+
+    return 0
 }
 
 function is_valid_ip()
