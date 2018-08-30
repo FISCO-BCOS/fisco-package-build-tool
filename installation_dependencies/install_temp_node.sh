@@ -138,8 +138,9 @@ function install()
     sleep 5
 
     # check if temp node is running
-    check_port ${WEB3SDK_CONFIG_PORT}
+    check_port ${WEB3SDK_CONFIG_PORT} 60
     if [ $? -eq 0 ];then
+        bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
         error_message "channel port $WEB3SDK_CONFIG_PORT is not listening, temp node start not success."
     fi
 
@@ -156,7 +157,7 @@ function install()
 
     syaddress=$(cat ${current_web3sdk}/bin/output/SystemProxy.address)
     if [ -z $syaddress ];then
-         bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
+        bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
         error_message "system contract address file is empty, web3sdk deploy system contract not success." 
     fi
     
