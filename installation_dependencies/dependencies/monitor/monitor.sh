@@ -10,12 +10,11 @@ alarm() {
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath
 (
-for startfile in `ls $dirpath/start_node*.sh`
+for configfile in `ls $dirpath/node*/config.json`
 do
-    line=`cat $startfile|grep "config"|grep -v "grep"|awk -F " " '{print $6}'`
-	config_ip=$(cat $line |grep -o '"listenip":".*"' | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+")
-	config_port=$(cat $line |grep -o '"rpcport":".*"' | grep -o "[0-9]\+")
-	configjs=$(ps aux | grep  "$line" |grep -v "grep"|awk -F " " '{print $15}')
+	config_ip=$(cat $configfile |grep -o '"listenip":".*"' | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+")
+	config_port=$(cat $configfile |grep -o '"rpcport":".*"' | grep -o "[0-9]\+")
+	configjs=$(ps aux | grep  "$configfile" |grep -v "grep"|awk -F " " '{print $15}')
 	[ -z "$configjs" ] && {
         alarm "ERROR! $config_ip:$config_port does not exist"
 		echo "start node $config_ip:$config_port"
@@ -29,7 +28,7 @@ do
 		alarm "ERROR! Cannot connect to $config_ip:$config_port" 
 		exit 1
 	}
-	configdir=$(dirname $line)
+	configdir=$(dirname $configfile)
 	height_file="$configdir.height"
 	prev_height=0
 	[ -f $height_file ] && prev_height=$(cat $height_file)
