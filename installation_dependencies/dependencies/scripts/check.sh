@@ -3,6 +3,9 @@
 # bash check.sh      =>    check all node 
 # bash check.sh IDX  =>    check the IDX node
 
+dirpath="$(cd "$(dirname "$0")" && pwd)"
+cd $dirpath
+
 index=$1;
 
 if [ -z $index ];then
