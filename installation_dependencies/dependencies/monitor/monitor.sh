@@ -3,7 +3,7 @@
 alarm() {
         alert_ip=`/sbin/ifconfig eth0 | grep inet | awk '{print $2}'`
         time=`date "+%Y-%m-%d %H:%M:%S"`
-        echo "$time $alert_ip $1"
+        echo "$alert_ip $1"
 }
 
 dirpath="$(cd "$(dirname "$0")" && pwd)"
@@ -39,7 +39,7 @@ do
                 echo $viewresult
                 view=$(echo $viewresult|awk -F'"' '{if($2=="id" && $4=="jsonrpc" && $8=="result") {print $10}}')
                 [[ -z "$view" && $i -eq 2 ]] &&  {
-                        alarm "ERROR! Cannot connect to $config_ip:$config_port $viewresult
+                        alarm "ERROR! Cannot connect to $config_ip:$config_port $viewresult"
                         exit 1
                 }
 
