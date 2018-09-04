@@ -15,7 +15,7 @@ if [ -z $index ];then
 	while [ $index -le $total ]
 	do
 		if [ -d node$index ];then
-			bash node$index/check.sh
+			bash node$index/check.sh $index
 		else	
 			break
 		fi
@@ -24,7 +24,7 @@ if [ -z $index ];then
 else
 	echo "check node$index status ... "
 	if [ -d node$index ];then
-		bash node$index/check.sh
+		bash node$index/check.sh $index
 	else
 		echo "node$index is not exist."
 	fi
