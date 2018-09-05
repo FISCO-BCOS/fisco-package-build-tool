@@ -78,46 +78,13 @@ $ vim config.ini
 配置文件config.ini
 ```
 [common]
-; 物料包拉取FISCO-BCOS源码的github地址, 用户一般不需要修改.
+; 物料包拉取FISCO-BCOS源码的github地址.
 github_url=https://github.com/FISCO-BCOS/FISCO-BCOS.git
-; 物料包拉取FISCO-BCOS源码之后, 会将源码保存在本地的目录, 保存的目录名称为FISCO-BCOS, 默认拉取的代码会放入物料包同级的目录.
+; 物料包拉取FISCO-BCOS源码之后, 会将源码保存在本地的目录, 保存的目录名称为FISCO-BCOS.
 fisco_bcos_src_local=../
-; 需要使用FISCO-BCOS的版本号, 使用物料包时需要将该值改为需要使用FISCO-BCOS的版本号.
+; 需要使用FISCO-BCOS的版本号, 使用物料包时需要将该值改为需要使用的版本号.
 ; 版本号可以是FISCO-BCOS已经发布的版本之一, 链接： https://github.com/FISCO-BCOS/FISCO-BCOS/releases
-fisco_bcos_version=v1.3.2
-
-[docker]
-; docker开关, 打开时构建的FISCO BCOS链节点为docker节点 . 0:关闭  1:打开
-docker_toggle=0
-; docker仓库地址.
-docker_repository=fiscoorg/fisco-octo
-; docker镜像版本号, 使用时修改为需要的版本号.
-docker_version=v1.3.1
-
-; 生成web3sdk证书时使用的keystore与clientcert的密码.
-; 也是生成的web3sdk配置文件applicationContext.xml中keystorePassWord与clientCertPassWord的值, 强烈建议用户修改这两个值.
-[web3sdk]
-keystore_pwd=123456
-clientcert_pwd=123456
-
-[other]
-; CA拓展模式, 目前不使用
-ca_ext=0
-
-; 扩容使用的一些参数
-[expand]
-; 扩容依赖的文件的目录,具体使用参考扩容流程
-genesis_follow_dir=/follow/
-
-; 端口配置, 一般不用做修改, 使用默认值即可, 但是要注意不要端口冲突.
-; 每个节点需要占用三个端口:p2p port、rpc port、channel port, 对于单台服务器上的节点端口使用规则, 默认配置的端口开始, 依次增长。
-[ports]
-; p2p端口
-p2p_port=30303
-; rpc端口
-rpc_port=8545
-; channel端口
-channel_port=8821
+fisco_bcos_version=v1.3.3
 
 ; 节点信息
 [nodes]
@@ -128,6 +95,37 @@ channel_port=8821
 ; num        => 在服务器上需要启动的节点的数目.
 ; agent      => 机构名称, 若是不关心机构信息, 值可以随意, 但是不可以为空.
 node0=127.0.0.1  0.0.0.0  4  agent
+
+;端口配置, 一般不用做修改, 使用默认值即可.
+[ports]
+; p2p端口
+p2p_port=30303
+; rpc端口
+rpc_port=8545
+; channel端口
+channel_port=8821
+
+; 扩容使用的一些参数
+[expand]
+genesis_follow_dir=/follow/
+
+[docker]
+; 当前是否构建docker节点的安装包. 0: 否    1：是
+docker_toggle=0
+; docker仓库地址.
+docker_repository=fiscoorg/fisco-octo
+; docker版本号.
+docker_version=v1.3.x-latest
+
+; 生成web3sdk证书时使用的keystore与clientcert的密码.
+; 也是生成的web3sdk配置文件applicationContext.xml中keystorePassWord与clientCertPassWord的值.
+[web3sdk]
+keystore_pwd=123456
+clientcert_pwd=123456
+
+[other]
+; CA拓展, 目前不需要关心
+ca_ext=0
 ``` 
 
 ### 2.2.1 <a name="configuration" id="configuration">配置详解</a>    
@@ -779,7 +777,7 @@ FISCO BCOS中需要使用Oracle JDK 1.8(java 1.8)环境，在CentOS/Ubuntu中默
 ### [物料包环境checklist](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/master/doc/%E7%89%A9%E6%96%99%E5%8C%85%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BACheckList.md)
 通常我们推荐使用物料包[FISCO BCOS物料包]搭建FISCO BCOS的环境，可以屏蔽搭建过程中的一些繁琐细节。
 
-物料包使用时，本身即有一些依赖, FISCO BCOS对网络、yum源等外部环境也存在依赖，为减少搭建过程中遇到的问题，建议在使用之前对整个搭建的环境进行检查，特别是生产环境的搭建，尤其推荐CheckList作为一个必备的流程。
+物料包使用时，本身存在一些依赖, 同时FISCO BCOS对网络、yum源等外部环境也存在依赖，为减少搭建过程中遇到的问题，建议在使用之前对整个搭建的环境进行检查，特别是生产环境的搭建，尤其推荐CheckList作为一个必备的流程。
 
 # <a name="FAQ" id="FAQ">FAQ</a>
 
