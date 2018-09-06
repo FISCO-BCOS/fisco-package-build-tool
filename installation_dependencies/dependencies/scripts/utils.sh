@@ -1,53 +1,51 @@
 #!/bin/bash
 
-#check ubuntu os or not
-function is_ubuntu_os()
+# print message to stderr , if need and will exit
+function error_message()
 {
-    if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-        return 1
-    else
-        return 0
-    fi
+    local message=$1
+#    echo "ERROR - ${message}" >&2 
+    echo "ERROR - ${message}"
+    exit 1
 }
 
-#check if $1 install
-function check_if_install()
+# print message to stderr , if need and will exit
+function error_message_without_exit()
 {
-    echo " ===>> $1 checking >>"
-    type $1 >/dev/null 2>&1
-    ret=$?
-    if [ $ret -eq 0  ];then
-        echo "       $1 installed."
-        return 1
-    else
-        echo "      XXXXXXX $1 not installed."
-        return 0
-    fi
+    local message=$1
+#    echo "ERROR - ${message}" >&2 
+    echo "ERROR - ${message}"
 }
 
-#check if the port is used
+#exit direct
+function error_exit()
+{
+    exit 1
+}
+
+#check if the port is used: 1 in use , 0 not in use
 function check_port() 
 {
-     echo "    check port is "$1
-     if ! sudo lsof -i:$1 | egrep LISTEN
-    then
-        return 0
-    else
-        return 1
-    fi
-}
+    local port=$1
+    local times=$2
 
-function request_sudo_permission() 
-{
-    echo "    checking permission..."
-    sudo echo -n " "
-
-    if [ $? -ne 0 ]
-    then
-        echo "no sudo permission, please add youself in the sudoers"
-        #exit
-        return 2
+    if [ -z "$times" ] || [ $times -le 1 ];then
+        if sudo lsof -Pi :$port -sTCP:LISTEN  ;then
+            return 1
+        else
+            return 0
+        fi
     fi
+
+    local index=0
+    while [ $index -lt $times ]
+    do
+        if sudo lsof -Pi :$port -sTCP:LISTEN  ;then
+            return 1
+        fi
+        sleep 1
+        index=$(($index+1))
+    done
 
     return 0
 }
@@ -104,30 +102,40 @@ spinner()
     echo
 }
 
-function build_crypto_mode_json_file()
+function replace_dot_with_underline()
 {
-    local current_host_rlp_dir=$1
-    local crypto_mode=$2
-    local key_center_url=""
-    if [ "$3" == "null" ]
+    echo $1 | sed -e "s/\./_/g"
+}
+
+#check if file exist
+function check_file_exist()
+{
+    local file_name=$1
+    if ! [ -f ${file_name} ]
     then
-        key_center_url=""
-    else
-        key_center_url="https://$3"
+        return 1
     fi
-    local current_node_rlp_dir=$4
-    local super_key=$5
+    return 0
+}
 
-    local crypto_mode_json_file_path=$current_host_rlp_dir/cryptomod.json
-    echo $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/tpl_dir/cryptomod.json.tpl
-    echo $current_host_rlp_dir/cryptomod.json
+#check if file empty
+function check_file_empty()
+{
+    local file_name=$1
+    if [ -s ${file_name} ];then
+        return 1
+    fi
 
-    export CRYPTO_MODE_TPL=$crypto_mode
-    export KEY_CENTER_URL_TPL=$key_center_url
-    export SUPER_KEY_TPL=${super_key}
-    MYVARS='${CRYPTO_MODE_TPL}:${KEY_CENTER_URL_TPL}:${SUPER_KEY_TPL}'
-    envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/tpl_dir/cryptomod.json.tpl > $current_host_rlp_dir/cryptomod.json
+    return 0
+}
 
-    cat $current_host_rlp_dir/cryptomod.json
-    echo "envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies/tpl_dir/cryptomod.json.tpl > $current_host_rlp_dir/cryptomod.json"
+#tar file or dictionary
+function tar_tool()
+{
+    local file=$1
+    if [ -f $current_node_path".tgz" ];then
+        echo $current_node_path".tgz already exist ~"
+    else
+        tar -zcf $current_node_path".tgz" $current_node_path
+    fi
 }
