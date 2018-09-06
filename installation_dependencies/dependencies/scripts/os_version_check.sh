@@ -116,6 +116,31 @@ function os_version_check()
                 fi
                 ;;
     #------------------------------------------------------------------------------
+    # Red Hat Enterprise Linux Server
+    #------------------------------------------------------------------------------
+            Red*) 
+                echo "Running $myname on Red Hat Enterprise Linux Server."
+                REDHAT_LINUX_VERSION=""
+                 if [ -f /etc/redhat-release ];then
+                    REDHAT_LINUX_VERSION=$(cat /etc/redhat-release)
+                elif [ -f /etc/system-release ];then
+                    REDHAT_LINUX_VERSION=$(cat /etc/system-release)
+                fi
+
+                if [ -z "$REDHAT_LINUX_VERSION" ];then
+                    error_message "unable to determine Red Hat Enterprise Linux Server."
+                fi
+
+                echo "Red Hat Enterprise Linux Server Version => $REDHAT_LINUX_VERSION"
+                ver=$(echo "$REDHAT_LINUX_VERSION" | awk '{print $7}' | awk -F . '{print $1$2}')
+
+                #Red Hat Enterprise Linux Server+
+                if [ $ver -lt 74 ];then
+                    error_message "Unsupported Red Hat Enterprise Linux Server Version, At least 7.4 Red Hat Enterprise Linux Server is required."
+                fi
+
+                ;;           
+    #------------------------------------------------------------------------------
     # Oracle Linux Server # At least 7.4
     #------------------------------------------------------------------------------
             Oracle*) 

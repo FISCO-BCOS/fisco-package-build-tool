@@ -247,8 +247,7 @@ function install_build()
     print_dash
 
     #dependencies check
-    dependencies_install
-    dependencies_check
+    install_dependencies_check
 
     #mkdir node dir
     current_node_dir_base=${NODE_INSTALL_DIR}
@@ -338,6 +337,12 @@ function install_build()
 
     cp $DEPENENCIES_SCRIPTES_DIR/node_manager.sh $buildPWD/
     sudo chmod a+x $buildPWD/node_manager.sh
+
+    cp $DEPENENCIES_MONITOR_DIR/rmlogs.sh $buildPWD/
+    sudo chmod a+x $buildPWD/rmlogs.sh
+
+    cp $DEPENENCIES_MONITOR_DIR/monitor.sh $buildPWD/
+    sudo chmod a+x $buildPWD/monitor.sh
 
     #fisco-bcos
     cp $DEPENENCIES_FISCO_DIR/fisco-bcos $current_node_dir_base

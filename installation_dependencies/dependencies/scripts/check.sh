@@ -3,6 +3,9 @@
 # bash check.sh      =>    check all node 
 # bash check.sh IDX  =>    check the IDX node
 
+dirpath="$(cd "$(dirname "$0")" && pwd)"
+cd $dirpath
+
 index=$1;
 
 if [ -z $index ];then
@@ -12,7 +15,7 @@ if [ -z $index ];then
 	while [ $index -le $total ]
 	do
 		if [ -d node$index ];then
-			bash node$index/check.sh
+			bash node$index/check.sh $index
 		else	
 			break
 		fi
@@ -21,7 +24,7 @@ if [ -z $index ];then
 else
 	echo "check node$index status ... "
 	if [ -d node$index ];then
-		bash node$index/check.sh
+		bash node$index/check.sh $index
 	else
 		echo "node$index is not exist."
 	fi
