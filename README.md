@@ -247,7 +247,7 @@ build
 ├── node.sh           #nodejs相关环境变量
 ├── register.sh       #注册节点入网脚本, 扩容使用
 ├── start.sh          #启动脚本
-├── stop.sh           #停止搅拌
+├── stop.sh           #停止脚本
 ├── systemcontract    #nodejs系统合约工具
 ├── tool              #nodejs工具
 ├── unregister.sh     #从节点管理合约删除某个节点
