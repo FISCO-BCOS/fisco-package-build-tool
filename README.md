@@ -768,13 +768,13 @@ agent_2\
 
 ## 三、物料包其他工具配置
 
-### [物料包JAVA配置](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/Oracle%20JAVA%201.8%20%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md)
+### [物料包JAVA配置](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/master/doc/Oracle%20JAVA%201.8%20%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md)
 FISCO BCOS中需要使用Oracle JDK 1.8(java 1.8)环境，在CentOS/Ubuntu中默认安装或者通过yum/apt安装的JDK均为openJDK，并不符合使用的要求，本文是一份简单的Oracle Java 1.8的安装教程。
 
-### [物料包web3sdk配置](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/web3sdk.md)
-物料包内置了配置好的web3sdk以及相关的环境，用户可以直接使用web3sdk。请注意，由于物料包已经生成好了链证书和机构证书，因此物料包中的web3sdk的证书配置与源码编译略流程有不同。
+### [物料包web3sdk配置](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/master/doc/web3sdk.md)
+物料包内置了配置好的web3sdk以及相关的环境，用户可以直接使用web3sdk。请注意，由于物料包已经生成好了链证书和机构证书，因此物料包中的web3sdk的证书配置与源码编译略有不同。
 
-### [物料包环境checklist](https://github.com/ywy2090/fisco-package-build-tool/blob/docker/doc/%E7%89%A9%E6%96%99%E5%8C%85%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BACheckList.md)
+### [物料包环境checklist](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/master/doc/%E7%89%A9%E6%96%99%E5%8C%85%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BACheckList.md)
 通常我们推荐使用物料包[FISCO BCOS物料包]搭建FISCO BCOS的环境，可以屏蔽搭建过程中的一些繁琐细节。
 
 物料包使用时，本身存在一些依赖, 同时FISCO BCOS对网络、yum源等外部环境也存在依赖，为减少搭建过程中遇到的问题，建议在使用之前对整个搭建的环境进行检查，特别是生产环境的搭建，尤其推荐CheckList作为一个必备的流程。
