@@ -19,7 +19,7 @@ if [ -z $index ];then
     index=$(($index+1))
     done
 else
-    echo "stop all node ... "
+    # echo "stop all node ... "
 	if [ -d node$index ];then
 		bash node$index/stop.sh
 	else
