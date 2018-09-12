@@ -7,5 +7,5 @@ do
         if [ ! -d $dirpath/$dir/log ];then
                 continue
         fi
-        find  $dirpath/$dir/log -mmin +180 -type f -name "*log*log*" | xargs rm -rf
+        find  $dirpath/$dir/log -mtime +24 -type f -name "*log*log*" | xargs rm -rf
 done
