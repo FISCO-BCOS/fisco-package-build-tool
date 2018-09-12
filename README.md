@@ -1,6 +1,6 @@
 ﻿
 [toc]
-<center> <h1>FISCO BCOS物料包工具使用指南</h1> </center>
+<center> <h1>FISCO BCOS物料包工具及docker部署使用指南</h1> </center>
 
 # 一. 介绍
 ## 1.1 功能简介        
@@ -91,10 +91,10 @@ fisco_bcos_version=v1.3.3
 ; 格式为 : nodeIDX=p2p_ip listen_ip num agent
 ; IDX为索引, 从0开始增加.
 ; p2p_ip     => 服务器上用于p2p通信的网段的ip.
-; listen_ip  => 服务器上的监听端口, 用来接收rpc、channel的链接请求, 建议默认值为"0.0.0.0".
+; listen_ip  => 服务器上的监听端口, p2p用来接收连接的监听ip. 注意：（腾讯云项目这个值建议填写为服务器的内网ip, 不能填写为0.0.0.0和127.0.0.1）
 ; num        => 在服务器上需要启动的节点的数目.
 ; agent      => 机构名称, 若是不关心机构信息, 值可以随意, 但是不可以为空.
-node0=127.0.0.1  0.0.0.0  4  agent
+node0=127.0.0.1  127.0.0.1  4  agent
 
 ;端口配置, 一般不用做修改, 使用默认值即可.
 [ports]
@@ -545,7 +545,7 @@ docker版本号, 使用默认值即可, 版本更新时, 本地可以自动更�
 ### 1.3 配置节点信息
 
 同样以在三台服务器上部署区块链为例：
-
+注意（腾讯云项目listen_ip字段建议填写为服务器的内网ip, 不能填写为0.0.0.0和127.0.0.1）  
 服务器ip  ： ***REMOVED*** ***REMOVED*** ***REMOVED***  
 机构分别为： agent_0   agent_1    agent_2  
 节点数目  ： 每台服务器搭建两个节点
@@ -553,9 +553,9 @@ docker版本号, 使用默认值即可, 版本更新时, 本地可以自动更�
 
 ```
 [nodes]
-node0=***REMOVED***  0.0.0.0  2  agent_0
-node1=***REMOVED***  0.0.0.0  2  agent_1
-node2=***REMOVED***  0.0.0.0  2  agent_2
+node0=***REMOVED***  ***REMOVED***  2  agent_0
+node1=***REMOVED***  ***REMOVED***  2  agent_1
+node2=***REMOVED***  ***REMOVED***  2  agent_2
 ```
 
 ### 1.4 构建安装包
