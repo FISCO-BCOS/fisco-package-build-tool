@@ -6,18 +6,28 @@ alarm() {
         echo "$alert_ip $1"
 }
 
+restart() {
+        stopfile=${1/start/stop}
+        $stopfile
+        sleep 3
+        $startfile
+}
+
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath
 (
 for configfile in `ls $dirpath/node*/config.json`
 do
+        startfile=$(dirname $configfile)/start.sh
         config_ip=$(cat $configfile |grep -o '"listenip":".*"' | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+")
         config_port=$(cat $configfile |grep -o '"rpcport":".*"' | grep -o "[0-9]\+")
         configjs=$(ps aux | grep  "$configfile" |grep -v "grep"|awk -F " " '{print $15}')
         [ -z "$configjs" ] && {
         alarm "ERROR! $config_ip:$config_port does not exist"
-        exit 1
+                restart $startfile
+        continue
     }
+
 
 for((i=0;i<3;i++))
 do 
@@ -26,7 +36,8 @@ do
                 height=$(echo $heightresult|awk -F'"' '{if($2=="id" && $4=="jsonrpc" && $8=="result") {print $10}}')
                 [[ -z "$height" && $i -eq 2 ]] &&  {
                         alarm "ERROR! Cannot connect to $config_ip:$config_port $heightresult"
-                        exit 1
+                        restart $startfile
+                        break
                 }
                 configdir=$(dirname $configfile)
                 height_file="$configdir.height"
@@ -40,7 +51,8 @@ do
                 view=$(echo $viewresult|awk -F'"' '{if($2=="id" && $4=="jsonrpc" && $8=="result") {print $10}}')
                 [[ -z "$view" && $i -eq 2 ]] &&  {
                         alarm "ERROR! Cannot connect to $config_ip:$config_port $viewresult"
-                        exit 1
+                        restart $startfile
+                        break
                 }
 
                 [[ -n "$height" && -n "$view" ]] && { 
@@ -57,7 +69,8 @@ done
 
         [  $heightvalue -eq  $prev_heightvalue ] && [ $viewvalue -eq  $prev_viewvalue ] && {
                 alarm "ERROR! $config_ip:$config_port is not working properly: height $height and view $view no change"
-                exit 1
+                restart $startfile
+                continue
         }
 
         echo $height > $height_file
