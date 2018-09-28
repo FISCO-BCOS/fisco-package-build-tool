@@ -49,6 +49,8 @@ function generate_startsh_func()
 {
     startsh="#!/bin/bash
     ulimit -c unlimited
+    dirpath=\"\$(cd \"\$(dirname \"\$0\")\" && pwd)\"
+    cd \$dirpath
     weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
     if [ ! -z \$weth_pid ];then
         echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
