@@ -113,7 +113,7 @@ genesis_follow_dir=/follow/
 ; 当前是否构建docker节点的安装包. 0: 否    1：是
 docker_toggle=0
 ; docker仓库地址.
-docker_repository=fiscoorg/fisco-octo
+docker_repository=fiscoorg/fisco-tencent-cloud
 ; docker版本号.
 docker_version=v1.3.x-latest
 
