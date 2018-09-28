@@ -600,7 +600,7 @@ docker/
 - unregisterIDX.sh 将IDX个节点从节点管理合约删除, 调用的是node_manager.sh脚本.
 
 ### 1.6 启动
-在build目录执行start.sh脚本  
+在docker目录执行start.sh脚本  
 **注意:要先启动创世块节点所在的服务器上的节点!!!**
 ```
  ./start.sh 
