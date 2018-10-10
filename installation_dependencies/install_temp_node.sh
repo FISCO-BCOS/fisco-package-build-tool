@@ -156,19 +156,23 @@ function install()
     fi 
 
     syaddress=$(cat ${current_web3sdk}/bin/output/SystemProxy.address)
-    if [ -z $syaddress ];then
+    if [ -z "$syaddress" ];then
         bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
         error_message "system contract address file is empty, web3sdk deploy system contract not success." 
     fi
-    
-    cp ${current_web3sdk}/bin/output/SystemProxy.address $buildPWD/syaddress.txt
 
     sleep 1
     
     #god miner config
     chmod a+x web3sdk
     #dos2unix web3sdk
-    blk=$(./web3sdk eth_blockNumber | grep BlockHeight | awk -F ':' '{print $2}' 2>/dev/null)
+    blk=$(./web3sdk eth_blockNumber | grep BlockHeight | awk -F ':' '{print $2}')
+
+    if [ -z "$blk" ];then
+        bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
+        error_message "web3sdk eth_blockNumber get null, web3sdk maybe not work well." 
+    fi
+
     echo "blk number is "$blk
     blk=$(($blk+1))
     blk=`printf "0x%02x\n" ${blk}`
@@ -192,6 +196,8 @@ function install()
 
     #sleep 6
     bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
+
+    cp ${current_web3sdk}/bin/output/SystemProxy.address $buildPWD/syaddress.txt
 
     cd $installPWD
     echo "    Installing temp node fisco-bcos success!"
