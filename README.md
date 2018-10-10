@@ -887,6 +887,8 @@ docker服务器启动失败，请检查docker配置、运行是否正常。
 ## generate_installation_packages.sh build/expand 直接退出。
 查看build/stderr.log内容, 查看错误信息。
 
+## start.sh 提示 ulimit: core file size: cannot modify limit: Operation not permitted
+无法通过脚本修改core文件大小限制, 不影响节点的启动。
 
 ## start.sh 显示nodeIDX is not running.  
 这个提示是说nodeIDX启动失败, 可以ps -aux | egrep fisco 查看是否正常启动. 可以执行`cat node/nodedirIDX/log/log`查看节点启动失败的原因。
