@@ -37,9 +37,9 @@
 
 ### V1.2.1 (2018-10-10)
 * Update:
-  1. 添加节点监控工具monitor.sh.
-  2. 添加日志清理工具rmlogs.sh.
-  3. 修改README.md中的链接路径.
-  4. 节点nodeIDX目录下的start.sh, check.sh, stop.sh只能在上级build目录执行的bug fix.
-  5. start.sh中添加ulimit -c unlimited, 打开生成core的开关.
-  6. 其他问题的纠正.
+1. 添加节点监控工具monitor.sh.
+2. 添加日志清理工具rmlogs.sh.
+3. 修改README.md中的链接路径.
+4. 节点nodeIDX目录下的start.sh, check.sh, stop.sh只能在上级build目录执行的bug fix.
+5. start.sh中添加ulimit -c unlimited, 打开生成core的开关.
+6. 其他问题的纠正.
