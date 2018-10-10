@@ -874,6 +874,10 @@ god账户配置失败，请从新尝试安装。
 
 系统合约部署失败，请从新下载物料包。
 ## docker 安装报错提示
+
+- ERROR - docker is not installed
+docker未安装, 用户需要自己安装docker程序, apt/yum install docker.
+
 - ERROR - docker dictionary already exist, remove it first.
  
 docker目录已存在，请移除当前docker节点安装包目录之后重试。
