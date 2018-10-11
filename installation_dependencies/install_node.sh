@@ -249,6 +249,8 @@ function install_build()
 
     print_dash
 
+    #
+    dependencies_install
     #dependencies check
     install_dependencies_check
 
