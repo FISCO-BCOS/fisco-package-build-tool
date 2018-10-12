@@ -8,3 +8,4 @@ if [ -d node$index ] && [ -f node$index/data/node.json ];then
 else
     echo "node$index/node.json is node exist."
 fi
+# update version 1.0.2

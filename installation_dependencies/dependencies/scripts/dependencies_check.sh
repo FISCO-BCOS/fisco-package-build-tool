@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #check user has sudo permission
+# update version 1.0.2
 function request_sudo_permission() 
 {
     sudo echo -n " "

@@ -8,5 +8,6 @@ cp $currentPWD/node/ext/conf/applicationContext.xml $currentPWD/web3sdk/conf/ >/
 cp $currentPWD/node/ext/conf/config.js $currentPWD/web3lib/ >/dev/null 2>&1
 #cp $currentPWD/node/ext/fisco-bcos/* /usr/bin/ >/dev/null 2>&1
 #chmod a+x /usr/bin/fisco-bcos
+# update version 1.0.2
 
 echo "system_address => "$(cat $currentPWD/node/ext/conf/syaddress.txt)

@@ -194,7 +194,7 @@ function install()
     #replace system contract address
     sed -i.bu "s/$DEFAULT_SYSTEM_CONTRACT_ADDRESS/$syaddress/g" ${current_node_dir}/config.json
 
-    #sleep 6
+    #sleep 6 
     bash ${current_node_dir_base}/node${Idx[0]}/stop.sh
 
     cp ${current_web3sdk}/bin/output/SystemProxy.address $buildPWD/syaddress.txt
