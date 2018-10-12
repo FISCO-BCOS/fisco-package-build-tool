@@ -1,7 +1,5 @@
 #!/bin/bash
 # arg1: java packege name
-
-
 # @function: output log with red color (error log)
 # @param: content: error message
 function LOG_ERROR()
