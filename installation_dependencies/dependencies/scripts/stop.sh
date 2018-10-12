@@ -2,7 +2,6 @@
 
 # bash stop.sh      =>    stop all node 
 # bash stop.sh IDX  =>    stop the IDX node
-# update version 1.0.2
 
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath
