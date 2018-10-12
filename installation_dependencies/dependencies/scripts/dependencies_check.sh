@@ -71,14 +71,14 @@ function openssl_version_check()
     error_message "OpenSSL 1.0.2 be requied , now OpenSSL version is "`openssl version`
 }
 
-# version check
-function dependencies_check()
+#build check
+function build_dependencies_check()
 {
     # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
     os_version_check
     # java => Oracle JDK 1.8
     java_version_check
-    # openssl => OpenSSL 1.0.2
+    # openssl => OpenSSL 1.0.2s
     openssl_version_check
 
     # git
@@ -93,6 +93,24 @@ function dependencies_check()
     check_if_install bc
     # crudini
     check_if_install crudini
+
+    # add more check here
+}
+
+# install_node check
+function install_dependencies_check()
+{
+    # operating system check => CentOS 7.2+ || Ubuntu 16.04 || Oracle Linux Server 7.4+
+    os_version_check
+    # java => Oracle JDK 1.8
+    java_version_check
+    # openssl => OpenSSL 1.0.2s
+    openssl_version_check
+ 
+    # envsubst
+    check_if_install envsubst
+    # bc
+    check_if_install bc
 
     # add more check here
 }

@@ -600,7 +600,7 @@ docker/
 - unregisterIDX.sh 将IDX个节点从节点管理合约删除, 调用的是node_manager.sh脚本.
 
 ### 1.6 启动
-在build目录执行start.sh脚本  
+在docker目录执行start.sh脚本  
 **注意:要先启动创世块节点所在的服务器上的节点!!!**
 ```
  ./start.sh 
@@ -774,6 +774,12 @@ FISCO BCOS中需要使用Oracle JDK 1.8(java 1.8)环境，在CentOS/Ubuntu中默
 ### [物料包web3sdk配置](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/master/doc/web3sdk.md)
 物料包内置了配置好的web3sdk以及相关的环境，用户可以直接使用web3sdk。请注意，由于物料包已经生成好了链证书和机构证书，因此物料包中的web3sdk的证书配置与源码编译略有不同。
 
+### [监控脚本monitor.sh的使用](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/dev/doc/monitor.md)
+monitor.sh可以用来监控节点是否正常启动, 以及整条链是否正常工作, 详情使用参考链接.
+
+### [日志清理脚本rmlogs.sh的使用](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/dev/doc/rmlogs.md)
+rmlogs.sh可以用来清理fisco-bcos产生的日志文件, 具体参考链接使用文档.
+
 ### [物料包环境checklist](https://github.com/FISCO-BCOS/fisco-package-build-tool/blob/master/doc/%E7%89%A9%E6%96%99%E5%8C%85%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BACheckList.md)
 通常我们推荐使用物料包[FISCO BCOS物料包]搭建FISCO BCOS的环境，可以屏蔽搭建过程中的一些繁琐细节。
 
@@ -874,6 +880,10 @@ god账户配置失败，请从新尝试安装。
 
 系统合约部署失败，请从新下载物料包。
 ## docker 安装报错提示
+
+- ERROR - docker is not installed
+docker未安装, 用户需要自己安装docker程序, apt/yum install docker.
+
 - ERROR - docker dictionary already exist, remove it first.
  
 docker目录已存在，请移除当前docker节点安装包目录之后重试。
@@ -887,6 +897,8 @@ docker服务器启动失败，请检查docker配置、运行是否正常。
 ## generate_installation_packages.sh build/expand 直接退出。
 查看build/stderr.log内容, 查看错误信息。
 
+## start.sh 提示 ulimit: core file size: cannot modify limit: Operation not permitted
+无法通过脚本修改core文件大小限制, 不影响节点的启动。
 
 ## start.sh 显示nodeIDX is not running.  
 这个提示是说nodeIDX启动失败, 可以ps -aux | egrep fisco 查看是否正常启动. 可以执行`cat node/nodedirIDX/log/log`查看节点启动失败的原因。
