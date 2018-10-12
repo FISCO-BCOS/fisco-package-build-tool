@@ -2,7 +2,6 @@
 
 #set -e
 # init function , install crudini
-# update version 1.0.2
 function parser_ini_init() 
 {
     local myname="parser config ini"

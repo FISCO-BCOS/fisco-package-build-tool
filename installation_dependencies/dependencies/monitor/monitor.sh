@@ -79,4 +79,3 @@ done
 done) | while read line; do
         echo [$(date '+%F %T')]"$line"
 done
-#update version 1.0.2

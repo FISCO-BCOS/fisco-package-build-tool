@@ -56,7 +56,6 @@ babel-node toolV3.js NodeAction register 节点目录/data/node.json
 
 并将所生成的sdk目录下所有文件拷贝到SDK端的证书目录下。
 
-# update version 1.0.2
 
 
 

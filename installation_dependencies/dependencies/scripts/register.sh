@@ -1,5 +1,4 @@
  #echo "start node$index ... "
- # update version 1.0.2
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath
  

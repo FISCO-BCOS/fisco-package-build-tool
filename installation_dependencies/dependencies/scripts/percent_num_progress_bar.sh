@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# update version 1.0.2
 spin() {
     sp='/-\|'
     printf ' '

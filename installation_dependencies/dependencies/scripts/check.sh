@@ -2,7 +2,6 @@
 
 # bash check.sh      =>    check all node 
 # bash check.sh IDX  =>    check the IDX node
-# update version 1.0.2
 
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath

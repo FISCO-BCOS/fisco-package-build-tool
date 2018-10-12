@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# update version 1.0.2
 TARGET_FISCO_BCOS_PATH=/usr/local/bin/fisco-bcos
 
 DEFAULT_SYSTEM_CONTRACT_ADDRESS="0x919868496524eedc26dbb81915fa1547a20f8998"
