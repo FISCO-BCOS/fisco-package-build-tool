@@ -2,10 +2,11 @@
 
 #set -e
 # init function , install crudini
+# update version 1.0.2
 function parser_ini_init() 
 {
     local myname="parser config ini"
-    # Check for 'uname' and abort if it is not available.
+    # Check for 'uname' and abort if it is not available
     uname -v > /dev/null 2>&1 || { echo "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 
     case $(uname -s) in 

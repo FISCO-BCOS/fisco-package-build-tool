@@ -2,6 +2,7 @@
 
 # bash start.sh      =>    start all node 
 # bash start.sh IDX  =>    start the IDX node
+# update version 1.0.2
 
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath

@@ -577,7 +577,7 @@ function initial()
 
     # dependensies install
     dependencies_install
-    # check if dependensies install success
+    # check if dependensies install success.
     build_dependencies_check
 
     #debug message

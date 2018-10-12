@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# update version 1.0.2
 COMMAND_SHOW_ALL_NODE='all'
 COMMAND_REGISTER_NODE='registerNode'
 COMMAND_DELETE_NODE='cancelNode'
@@ -39,3 +40,4 @@ case "$1" in
         echo "Usage: $0 NodeAction {$COMMAND_SHOW_ALL_NODE|$COMMAND_REGISTER_NODE|$COMMAND_DELETE_NODE}"
         #exit 1
 esac
+# update version 1.0.2

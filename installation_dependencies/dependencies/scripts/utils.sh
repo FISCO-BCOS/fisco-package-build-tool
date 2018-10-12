@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # print message to stderr , if need and will exit
+# update version 1.0.2
 function error_message()
 {
     local message=$1
