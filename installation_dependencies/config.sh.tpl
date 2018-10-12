@@ -17,7 +17,7 @@ crypto_mode="0"
 keystore_pwd=${KEYSTORE_PWD}
 clientcert_pwd=${CLIENTCERT_PWD}
 
-#fisco-bcos docker repository, default "docker.io/fiscoorg/fisco bcos"
+#fisco-bcos docker repository, default "docker.io/fiscoorg/fiscobcos"
 docker_repository=${DOCKER_REPOSITORY_TPL}
 #fisco-bcos docker version, default "latest"
 docker_version=${DOCKER_VERSION_TPL}

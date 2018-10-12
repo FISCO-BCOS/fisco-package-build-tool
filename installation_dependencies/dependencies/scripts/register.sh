@@ -1,4 +1,5 @@
  #echo "start node$index ... "
+ 
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath
  

@@ -1,4 +1,4 @@
-﻿[![image for the blockchain contest](https://github.com/FISCO-BCOS/FISCO-BCOS/blob/master/doc/imgs/application_contest.png "点击图片报名")](https://con.geekbang.org/)
+![image for the blockchain contest](https://github.com/FISCO-BCOS/FISCO-BCOS/blob/master/doc/imgs/application_contest.png "点击图片报名")](https://con.geekbang.org/)
 
 ## 技术文档
 
@@ -30,3 +30,4 @@
 ## 其它
 
 [FISCO BCOS github主页](https://github.com/FISCO-BCOS/)
+

@@ -172,7 +172,7 @@ function nodejs_env_check()
 
 function install_node()
 {
-    #install nodejs related in the subcategory , if the user already install nodejs , nothing has effect
+    #install nodejs related in the subcategory , if the user already install nodejs , nothing has effect.
     install_nodejs
     install_ethconsole
     install_babel
