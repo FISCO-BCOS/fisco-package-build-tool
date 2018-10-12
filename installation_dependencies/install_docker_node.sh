@@ -146,7 +146,7 @@ function install()
     do
 	    index=$i
         container_id=`sudo docker ps -a --filter name=fisco-node$index"_"${rpcport[$index]} | egrep -v "CONTAINER ID" | awk '{print $1}'`
-        # echo "check if fisco-node$index"_"${rpcport[$index]} exist"
+        # echo "check if fisco-node$index"_"${rpcport[$index]} exist."
         if [ -z ${container_id} ];then
 	    i=$(($i+1))
             continue
