@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #set -e
+# update version 1.0.2
 
 module_name="fisco-package-build-tool"
 

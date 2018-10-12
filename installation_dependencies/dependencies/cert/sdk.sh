@@ -4,7 +4,7 @@ source ./openssl_conf.sh
 
 agency=$1
 sdk=$2
-
+#opsenssl 1.0.2
 if [ -z "$agency" ];  then
     echo "Usage:sdk.sh   agency_name sdk_name "
 elif [ -z "$sdk" ];  then
@@ -18,7 +18,7 @@ elif [  -d "$agency/$sdk" ]; then
 else
     cd  $agency
     mkdir -p $sdk
-    
+  
     openssl ecparam -out sdk.param -name secp256k1
     openssl genpkey -paramfile sdk.param -out sdk.key
     openssl pkey -in sdk.key -pubout -out sdk.pubkey

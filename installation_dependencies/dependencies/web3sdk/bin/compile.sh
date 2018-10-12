@@ -1,7 +1,7 @@
 #!/bin/bash
 # arg1: java packege name
 
-
+# update version 1.0.2
 # @function: output log with red color (error log)
 # @param: content: error message
 function LOG_ERROR()

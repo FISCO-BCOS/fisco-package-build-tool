@@ -2,6 +2,7 @@
 
 module_name="install.sh"
 
+# update version 1.0.2
 # uname -v > /dev/null 2>&1 || { echo >&2 "ERROR - ${myname} use 'uname' to identify the platform."; exit 1; }
 # case $(uname -s) in 
 #   Darwin)
