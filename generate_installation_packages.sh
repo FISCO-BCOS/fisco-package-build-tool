@@ -493,9 +493,9 @@ function build_fisco_bcos()
     sudo mkdir -p build
     cd build
     if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-    sudo cmake -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
+        sudo cmake -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
     else
-    sudo cmake3 -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
+        sudo cmake3 -DEVMJIT=OFF -DTESTS=OFF -DMINIUPNPC=OFF .. 
     fi
 
     sudo make
@@ -578,7 +578,7 @@ function initial()
     # dependensies install
     dependencies_install
     # check if dependensies install success
-    dependencies_check
+    build_dependencies_check
 
     #debug message
     toggle_debug
