@@ -12,7 +12,7 @@
     "networkid":"12345",
     "logverbosity":"4",
     "coverlog":"OFF",
-    "eventlog":"ON",
+    "eventlog":"OFF",
     "statlog":"ON",
     "logconf":"${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}"
 }
