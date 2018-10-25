@@ -19,7 +19,7 @@ g_is_genesis_host=${is_genesis_host}
 function generate_stopsh_func()
 {
     stopsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
     kill_cmd=\"kill -9 \${weth_pid}\"
     if [ ! -z \$weth_pid ];then
         echo \"stop node${Idx[$index]} ...\"
@@ -35,7 +35,7 @@ function generate_stopsh_func()
 function generate_checksh_func()
 {
     checknodesh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
     if [ ! -z \$weth_pid ];then
         echo \"node\$1 is running.\"
     else
@@ -51,7 +51,7 @@ function generate_startsh_func()
     ulimit -c unlimited
     dirpath=\"\$(cd \"\$(dirname \"\$0\")\" && pwd)\"
     cd \$dirpath
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
     if [ ! -z \$weth_pid ];then
         echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
     else
