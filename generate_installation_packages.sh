@@ -660,9 +660,11 @@ function build()
 
 function expand()
 {
+    dir=$PWD
      # init opr
     initial
 
+    cd $dir
     # load expand special config
     parser_expand_ini config.ini
 
