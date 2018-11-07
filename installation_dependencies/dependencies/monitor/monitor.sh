@@ -21,7 +21,7 @@ do
         startfile=$(dirname $configfile)/start.sh
         config_ip=$(cat $configfile |grep -o '"listenip":".*"' | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+")
         config_port=$(cat $configfile |grep -o '"rpcport":".*"' | grep -o "[0-9]\+")
-        configjs=$(ps aux | grep  "$configfile" |grep -v "grep"|awk -F " " '{print $15}')
+        configjs=$(ps aux | grep  "$configfile" |grep "fisco-bcos"|grep -v "grep"|awk -F " " '{print $15}')
         [ -z "$configjs" ] && {
         alarm "ERROR! $config_ip:$config_port does not exist"
                 restart $startfile
@@ -69,7 +69,7 @@ done
 
         [  $heightvalue -eq  $prev_heightvalue ] && [ $viewvalue -eq  $prev_viewvalue ] && {
                 alarm "ERROR! $config_ip:$config_port is not working properly: height $height and view $view no change"
-                restart $startfile
+                # restart $startfile
                 continue
         }
 
