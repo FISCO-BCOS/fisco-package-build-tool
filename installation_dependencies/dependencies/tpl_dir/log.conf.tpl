@@ -2,7 +2,7 @@
     ENABLED                 =   true  
     TO_FILE                 =   true  
     TO_STANDARD_OUTPUT      =   false  
-    FORMAT                  =   "%level|%datetime{%Y-%M-%d %H:%m:%s:%g}|%fbase:%line|%msg"   
+    FORMAT                  =   "%level|%datetime{%Y-%M-%d %H:%m:%s:%g}|%msg"   
     FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/log_%datetime{%Y%M%d%H}.log"  
     MILLISECONDS_WIDTH      =   3  
     PERFORMANCE_TRACKING    =   false  
