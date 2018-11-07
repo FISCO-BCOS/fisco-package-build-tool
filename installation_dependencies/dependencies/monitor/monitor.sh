@@ -69,7 +69,7 @@ done
 
         [  $heightvalue -eq  $prev_heightvalue ] && [ $viewvalue -eq  $prev_viewvalue ] && {
                 alarm "ERROR! $config_ip:$config_port is not working properly: height $height and view $view no change"
-                restart $startfile
+                # restart $startfile
                 continue
         }
 
