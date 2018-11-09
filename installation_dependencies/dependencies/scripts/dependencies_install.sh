@@ -110,13 +110,30 @@ function dependencies_install()
                     sudo yum -y install lsof
                     sudo yum -y install crudini
                     sudo yum -y install libuuid-devel
-                    sudo yum -y install  vim-common
+                    sudo yum -y install vim-common
 
                 ;;
     #------------------------------------------------------------------------------
     # Oracle Linux Server # At least 7.4
     #------------------------------------------------------------------------------
             Oracle*) 
+                   
+                    sudo yum -y install lsof
+                    sudo yum -y install bc
+                    sudo yum -y install gettext
+                    sudo yum -y install cmake3
+                    sudo yum -y install git gcc-c++
+                    sudo yum -y install openssl openssl-devel
+                    sudo yum -y install leveldb-devel curl-devel 
+                    sudo yum -y install libmicrohttpd-devel gmp-devel 
+                    sudo yum -y install crudini
+                    sudo yum -y install libuuid-devel
+
+                ;;
+    #------------------------------------------------------------------------------
+    # Red Hat Enterprise Linux Server # At least 7.4
+    #------------------------------------------------------------------------------
+            Red*) 
                    
                     sudo yum -y install lsof
                     sudo yum -y install bc
@@ -222,6 +239,16 @@ function simple_dependencies_install()
                     # sudo yum -y install docker
 
                 ;;
+     #------------------------------------------------------------------------------
+    # Red Hat Enterprise Linux Server # At least 7.4
+    #------------------------------------------------------------------------------
+            Red*) 
+                   
+                    sudo yum -y install bc
+                    sudo yum -y install gettext
+                    sudo yum -y install lsof
+
+                ;; 
     #------------------------------------------------------------------------------
     # Other Linux
     #------------------------------------------------------------------------------
