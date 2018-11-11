@@ -123,6 +123,10 @@ function parser_ini()
 {
     local file=$1
 
+    if [ ! -f $file ];then
+        error_message "ERROR - build ini config is not exist ,config file is $file"
+    fi
+
 # [common]
 # github_url=https://github.com/FISCO-BCOS/FISCO-BCOS.git
 # fisco_bcos_src_local=../fisco_bcos_version
@@ -407,6 +411,10 @@ function ini_param_check()
 function parser_expand_ini()
 {
     local file=$1
+
+    if [ ! -f $file ];then
+        error_message "ERROR - expand ini config is not exist ,config file is $file"
+    fi
 
 # [expand]
 # genesis_follow_dir=/follow/
