@@ -115,11 +115,11 @@ function build_node_ca()
         error_message "node.nodeid is not exist, agency => $agency, node => $node"
     fi
 
-    mkdir -p $dst/$node
-    cp ${ext_dir}/ca.crt $dst/$node 2>/dev/null
-    cp ${ext_dir}/$agency/agency.crt $dst/$node 2>/dev/null
+    mkdir -p $dst/node
+    cp ${ext_dir}/ca.crt $dst/node 2>/dev/null
+    cp ${ext_dir}/$agency/agency.crt $dst/node 2>/dev/null
 
-    cp ${ext_dir}/$agency/$node/node* $dst/$node
+    cp ${ext_dir}/$agency/$node/node* $dst/node/
 
     return 0
 }
