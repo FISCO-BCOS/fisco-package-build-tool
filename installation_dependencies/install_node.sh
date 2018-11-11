@@ -19,7 +19,7 @@ g_is_genesis_host=${is_genesis_host}
 function generate_stopsh_func()
 {
     stopsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
     kill_cmd=\"kill -9 \${weth_pid}\"
     if [ ! -z \$weth_pid ];then
         echo \"stop node${Idx[$index]} ...\"
@@ -35,7 +35,7 @@ function generate_stopsh_func()
 function generate_checksh_func()
 {
     checknodesh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
     if [ ! -z \$weth_pid ];then
         echo \"node\$1 is running.\"
     else
@@ -48,12 +48,15 @@ function generate_checksh_func()
 function generate_startsh_func()
 {
     startsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep -v grep|awk '{print \$2}'\`
+    ulimit -c unlimited
+    dirpath=\"\$(cd \"\$(dirname \"\$0\")\" && pwd)\"
+    cd \$dirpath
+    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
     if [ ! -z \$weth_pid ];then
         echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
     else
         echo \"start node${Idx[$index]} ...\"
-        nohup ./fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
+        nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
     fi"
     echo "$startsh"
     return 0
@@ -246,9 +249,10 @@ function install_build()
 
     print_dash
 
-    #dependencies check
+    #
     dependencies_install
-    dependencies_check
+    #dependencies check
+    install_dependencies_check
 
     #mkdir node dir
     current_node_dir_base=${NODE_INSTALL_DIR}
@@ -338,6 +342,12 @@ function install_build()
 
     cp $DEPENENCIES_SCRIPTES_DIR/node_manager.sh $buildPWD/
     sudo chmod a+x $buildPWD/node_manager.sh
+
+    cp $DEPENENCIES_MONITOR_DIR/rmlogs.sh $buildPWD/
+    sudo chmod a+x $buildPWD/rmlogs.sh
+
+    cp $DEPENENCIES_MONITOR_DIR/monitor.sh $buildPWD/
+    sudo chmod a+x $buildPWD/monitor.sh
 
     #fisco-bcos
     cp $DEPENENCIES_FISCO_DIR/fisco-bcos $current_node_dir_base
