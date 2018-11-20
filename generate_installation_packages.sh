@@ -181,8 +181,8 @@ function build_bootstrapnodes()
         while [ $node_index -lt $node_num_per_host ]
         do 
             local p2p_port=$(($P2P_PORT_NODE+$node_index))
-            echo " build bootstrapnodes.json, p2p_ip is $p2p_ip, port is $p2p_port"
-            nodes_str="\{\"host\":\"${p2p_ip}\",\"p2pport\":\"${p2p_port}\"\}"$delim_str
+            # echo " build bootstrapnodes.json, p2p_ip is $p2p_ip, port is $p2p_port"
+            nodes_str=$nodes_str"{\"host\":\"${p2p_ip}\",\"p2pport\":\"${p2p_port}\"}"$delim_str
             delim_str=","
             node_index=$(($node_index+1))
         done
