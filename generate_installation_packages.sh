@@ -165,6 +165,32 @@ function create_node_ca()
     return 0
 }
 
+
+function build_bootstrapnodes()
+{
+    # generate bootstrapnodes.json for all node
+    local delim_str=""
+    local nodes_str=""
+    for ((i=0; i<g_host_config_num; i++))
+    do
+        declare sub_arr=(`eval echo '$'"NODE_INFO_${i}"`)
+        local p2p_ip=${sub_arr[0]}
+        local node_num_per_host=${sub_arr[2]}
+
+        local node_index=0
+        while [ $node_index -lt $node_num_per_host ]
+        do 
+            local p2p_port=$(($P2P_PORT_NODE+$node_index))
+            echo " build bootstrapnodes.json, p2p_ip is $p2p_ip, port is $p2p_port"
+            nodes_str="\{\"host\":\"${p2p_ip}\",\"p2pport\":\"${p2p_port}\"\}"$delim_str
+            delim_str=","
+            node_index=$(($node_index+1))
+        done
+    done
+
+    echo ${nodes_str}
+}
+
 #create install packag for every node of the server
 function build_node_installation_package()
 {
@@ -320,10 +346,9 @@ function build_node_installation_package()
         then
             g_genesis_node_info_path=$installation_build_dir/$node_dir_name/dependencies/rlp_dir/bootstrapnodes.json
 
-            export HOST_IP=$public_ip
-            export HOST_PORT=$p2p_port
-
-            MYVARS='${HOST_IP}:${HOST_PORT}'
+            nodes_str=$(build_bootstrapnodes)
+            export BOOTSTRAPNODES_P2P_NODES_LIST=$nodes_str
+            MYVARS='${BOOTSTRAPNODES_P2P_NODES_LIST}'
             envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/bootstrapnodes.json.tpl > $g_genesis_node_info_path
         fi
 
