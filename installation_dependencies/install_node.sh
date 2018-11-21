@@ -273,14 +273,15 @@ function install_build()
             cp -r $DEPENENCIES_WEB3SDK_DIR ${buildPWD}
             sudo chmod a+x ${buildPWD}/web3sdk/bin/web3sdk
             cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk/* ${buildPWD}/web3sdk/conf/ >/dev/null 2>&1 #ca info copy
-            if [ $g_is_genesis_host -eq 1 ];then
-                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json ${current_node_dir}/data/bootstrapnodes.json >/dev/null 2>&1
-            else
-                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/data/ >/dev/null 2>&1
-            fi
-        else
+            # if [ $g_is_genesis_host -eq 1 ];then
+            #    cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json ${current_node_dir}/data/bootstrapnodes.json >/dev/null 2>&1
+            # else
+            #    cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/data/ >/dev/null 2>&1
+            # fi
             cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/data/ >/dev/null 2>&1
         fi
+
+        cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json ${current_node_dir}/data/ >/dev/null 2>&1
 
         #copy node ca
         cp $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/node/* ${current_node_dir}/data/

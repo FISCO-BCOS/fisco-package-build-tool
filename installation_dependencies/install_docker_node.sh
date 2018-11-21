@@ -168,15 +168,17 @@ function install()
         mkdir -p $dockerPWD/node${Idx[$index]}/ext/conf
         mkdir -p $dockerPWD/node${Idx[$index]}/ext/script
 
-        if [ $i -eq 0 ];then
-            if [ $g_is_genesis_host -eq 1 ];then
-                cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/bootstrapnodes.json >/dev/null 2>&1
-            else
-                cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
-            fi
-        else    
-            cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
-        fi
+        # if [ $i -eq 0 ];then
+        #    if [ $g_is_genesis_host -eq 1 ];then
+        #        cp $DEPENDENCIES_TPL_DIR/empty_bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/bootstrapnodes.json >/dev/null 2>&1
+        #    else
+        #        cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
+        #   fi
+        # else    
+        #    cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
+        # fi
+
+        cp $DEPENENCIES_FOLLOW_DIR/bootstrapnodes.json $dockerPWD/node${Idx[$index]}/data/ >/dev/null 2>&1
 
 
         cp -r $DEPENDENCIES_RLP_DIR/node_rlp_${Idx[$index]}/ca/sdk $dockerPWD/node${Idx[$index]}/ext/
