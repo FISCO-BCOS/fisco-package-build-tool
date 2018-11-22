@@ -20,7 +20,7 @@ function generate_stopsh_func()
 {
     stopsh="#!/bin/bash
     weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    kill_cmd=\"kill -9 \${weth_pid}\"
+    kill_cmd=\"kill -2 \${weth_pid}\"
     if [ ! -z \$weth_pid ];then
         echo \"stop node${Idx[$index]} ...\"
         eval \${kill_cmd}
@@ -48,7 +48,7 @@ function generate_checksh_func()
 function generate_startsh_func()
 {
     startsh="#!/bin/bash
-    ulimit -c unlimited
+    ulimit -c unlimited 2> /dev/null
     dirpath=\"\$(cd \"\$(dirname \"\$0\")\" && pwd)\"
     cd \$dirpath
     weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
@@ -56,7 +56,10 @@ function generate_startsh_func()
         echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
     else
         echo \"start node${Idx[$index]} ...\"
-        nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  >> ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
+        if [ ! -d  ${NODE_INSTALL_DIR}/node${Idx[$index]}/log ];then
+            mkdir -p ${NODE_INSTALL_DIR}/node${Idx[$index]}/log
+        fi
+        nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
     fi"
     echo "$startsh"
     return 0
