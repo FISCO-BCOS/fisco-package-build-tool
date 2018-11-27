@@ -20,7 +20,11 @@ function generate_stopsh_func()
 {
     stopsh="#!/bin/bash
     weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    kill_cmd=\"kill -2 \${weth_pid}\"
+    if [[ \$1 == \"--force\" ]];then
+        kill_cmd=\"kill -9 \${weth_pid}\"
+    else
+        kill_cmd=\"kill -2 \${weth_pid}\"
+    fi
     if [ ! -z \$weth_pid ];then
         echo \"stop node${Idx[$index]} ...\"
         eval \${kill_cmd}
