@@ -36,6 +36,6 @@ case "$1" in
         redirect_request_to $1 $2
         ;;
     *)
-        echo "Usage: $0 NodeAction {$COMMAND_SHOW_ALL_NODE|$COMMAND_REGISTER_NODE|$COMMAND_DELETE_NODE}"
+        echo "Usage: $0 {$COMMAND_SHOW_ALL_NODE|$COMMAND_REGISTER_NODE|$COMMAND_DELETE_NODE}"
         #exit 1
 esac
