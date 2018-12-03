@@ -711,7 +711,7 @@ function expand()
     local bootstrapnodes_file=${EXPAND_GENESIS_FOLLOW_DIR}/bootstrapnodes.json
 
     # get all p2p connect nodes already exist.
-    old_nodes=$(cat node0/data/bootstrapnodes.json  | awk -F[ '{ print $2  }' | awk -F] '{ print $1  }')
+    old_nodes=$(cat ${bootstrapnodes_file}  | awk -F[ '{ print $2  }' | awk -F] '{ print $1  }')
     if [ -z ${old_nodes} ];then
         error_message ' invalid bootstrapnodes.json file, get null p2p nodes.'
     fi
