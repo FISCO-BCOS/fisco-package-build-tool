@@ -441,6 +441,11 @@ function expand_param_check()
         error_message "ERROR - [expand] ${genesis_follow_dir} is not exist dir."
     fi
 
+    cert_dir_path=${genesis_follow_dir}/cert/
+    if [ ! -d ${cert_dir_path} ];then
+        error_message "ERROR - [expand] ${cert_dir_path} is not exist dir."
+    fi
+
     local genesis_file=$genesis_follow_dir/genesis.json
     if [ ! -f "${genesis_file}" ];then
         error_message "ERROR - [expand] ${genesis_file} is not exist."
