@@ -1,1 +1,1 @@
-{"nodes":[{"host":"${HOST_IP}","p2pport":"${HOST_PORT}"}]}
+{"nodes":[${BOOTSTRAPNODES_P2P_NODES_LIST}]}
