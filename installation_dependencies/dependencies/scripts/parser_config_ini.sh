@@ -442,17 +442,17 @@ function expand_param_check()
     fi
 
     local genesis_file=$genesis_ca_dir/genesis.json
-    if [ -z "${genesis_file}" ];then
+    if [ ! -f "${genesis_file}" ];then
         error_message "ERROR - [expand] genesis_follow_dir genesis.json is not exist , genesis.json is $genesis_file."
     fi
 
     local system_address_file=$genesis_ca_dir/syaddress.txt
-    if [ -z "${system_address_file}" ];then
+    if [ ! -f "${system_address_file}" ];then
         error_message "ERROR - [expand] genesis_follow_dir syaddress.txt is not exist , syaddress.txt is ${system_address_file}."
     fi
 
     local bootstrapnodes_file=$genesis_ca_dir/bootstrapnodes.json
-    if [ -z "${bootstrapnodes_file}" ];then
+    if [ ! -f "${bootstrapnodes_file}" ];then
         error_message "ERROR - [expand] genesis_follow_dir bootstrapnodes.json is not exist ,bootstrapnodes.json is ${bootstrapnodes_file}."
     fi
 }
