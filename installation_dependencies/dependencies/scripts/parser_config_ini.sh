@@ -438,21 +438,26 @@ function expand_param_check()
     fi
     
     if [ ! -d "${genesis_follow_dir}" ];then
-        error_message "ERROR - [expand] genesis_follow_dir is not dir, genesis_ca_dir is "${genesis_follow_dir}
+        error_message "ERROR - [expand] ${genesis_follow_dir} is not exist dir."
     fi
 
-    local genesis_file=$genesis_ca_dir/genesis.json
-    if [ -z "${genesis_file}" ];then
-        error_message "ERROR - [expand] genesis_follow_dir genesis.json is not exist , genesis.json is $genesis_file."
+    cert_dir_path=${genesis_follow_dir}/cert/
+    if [ ! -d ${cert_dir_path} ];then
+        error_message "ERROR - [expand] ${cert_dir_path} is not exist dir."
     fi
 
-    local system_address_file=$genesis_ca_dir/syaddress.txt
-    if [ -z "${system_address_file}" ];then
-        error_message "ERROR - [expand] genesis_follow_dir syaddress.txt is not exist , syaddress.txt is ${system_address_file}."
+    local genesis_file=$genesis_follow_dir/genesis.json
+    if [ ! -f "${genesis_file}" ];then
+        error_message "ERROR - [expand] ${genesis_file} is not exist."
     fi
 
-    local bootstrapnodes_file=$genesis_ca_dir/bootstrapnodes.json
-    if [ -z "${bootstrapnodes_file}" ];then
-        error_message "ERROR - [expand] genesis_follow_dir bootstrapnodes.json is not exist ,bootstrapnodes.json is ${bootstrapnodes_file}."
+    local system_address_file=$genesis_follow_dir/syaddress.txt
+    if [ ! -f "${system_address_file}" ];then
+        error_message "ERROR - [expand] ${system_address_file} is not exist."
+    fi
+
+    local bootstrapnodes_file=$genesis_follow_dir/bootstrapnodes.json
+    if [ ! -f "${bootstrapnodes_file}" ];then
+        error_message "ERROR - [expand] ${bootstrapnodes_file} is not exist."
     fi
 }
