@@ -710,6 +710,15 @@ function expand()
     local system_address_file=${EXPAND_GENESIS_FOLLOW_DIR}/syaddress.txt 
     local bootstrapnodes_file=${EXPAND_GENESIS_FOLLOW_DIR}/bootstrapnodes.json
 
+    # get all p2p connect nodes already exist.
+    old_nodes=$(cat node0/data/bootstrapnodes.json  | awk -F[ '{ print $2  }' | awk -F] '{ print $1  }')
+    if [ -z ${old_nodes} ];then
+        error_message ' invalid bootstrapnodes.json file, get null p2p nodes.'
+    fi
+
+    # expand nodes p2p connect info.
+    expand_nodes=$(build_bootstrapnodes)
+
     # build install package for every server
     for ((i=0; i<g_host_config_num; i++))
     do
@@ -733,8 +742,10 @@ function expand()
         cp ${genesis_file} $node_base_info_dir/
         # copy syaddress.txt
         cp ${system_address_file} $node_base_info_dir/
-        # copy bootstrapnodes.json
-        cp ${bootstrapnodes_file} $node_base_info_dir/
+
+        export BOOTSTRAPNODES_P2P_NODES_LIST=$old_nodes$expand_nodes
+        MYVARS='${BOOTSTRAPNODES_P2P_NODES_LIST}'
+        envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/bootstrapnodes.json.tpl > $node_base_info_dir/bootstrapnodes.json
 
         #tar_tool $current_node_path_local
     done
