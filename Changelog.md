@@ -43,3 +43,9 @@
 4. 节点nodeIDX目录下的start.sh, check.sh, stop.sh只能在上级build目录执行的bug fix.
 5. start.sh中添加ulimit -c unlimited, 打开生成core的开关.
 6. 其他问题的纠正.
+
+### V1.2.2 (2018-12-03)
+* Update:
+1. 构建区块链时, 将所有的节点的p2p连接ip、port信息写入bootstrapnodes.json文件.  
+2. 扩容时, 将新添加的节点的链接信息写入bootstrapnodes.json文件.  
+3. 扩容时, 添加检查config.ini中genesis_follow_dir配置的文件夹是否存在, 同时添加$genesis_follow_dir/cert、$genesis_follow_dir/bootstapnodes.json、$genesis_follow_dir/genesis.json、$genesis_follow_dir/syaddress.txt是否存在.

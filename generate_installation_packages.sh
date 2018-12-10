@@ -115,11 +115,11 @@ function build_node_ca()
         error_message "node.nodeid is not exist, agency => $agency, node => $node"
     fi
 
+    mkdir -p $dst/node
     cp ${ext_dir}/ca.crt $dst/node 2>/dev/null
     cp ${ext_dir}/$agency/agency.crt $dst/node 2>/dev/null
 
-    mkdir -p $dst/node
-    cp ${ext_dir}/$agency/$node/node* $dst/node
+    cp ${ext_dir}/$agency/$node/node* $dst/node/
 
     return 0
 }
@@ -163,6 +163,37 @@ function create_node_ca()
     mv $agency/sdk $dst
 
     return 0
+}
+
+
+function build_bootstrapnodes()
+{
+    # generate bootstrapnodes.json for all node
+    local delim_str=""
+    local nodes_str=""
+    for ((i=0; i<g_host_config_num; i++))
+    do
+        declare sub_arr=(`eval echo '$'"NODE_INFO_${i}"`)
+        local p2p_ip=${sub_arr[0]}
+        local node_num_per_host=${sub_arr[2]}
+
+        local node_index=0
+        while [ $node_index -lt $node_num_per_host ]
+        do 
+            if [[ $i == $(($g_host_config_num-1)) && $node_index -eq $(($node_num_per_host-1)) ]]
+            then
+                delim_str=""
+            else
+                delim_str=","
+            fi
+            local p2p_port=$(($P2P_PORT_NODE+$node_index))
+            # echo " build bootstrapnodes.json, p2p_ip is $p2p_ip, port is $p2p_port"
+            nodes_str=$nodes_str"{\"host\":\"${p2p_ip}\",\"p2pport\":\"${p2p_port}\"}"$delim_str
+            node_index=$(($node_index+1))
+        done
+    done
+
+    echo ${nodes_str}
 }
 
 #create install packag for every node of the server
@@ -320,10 +351,9 @@ function build_node_installation_package()
         then
             g_genesis_node_info_path=$installation_build_dir/$node_dir_name/dependencies/rlp_dir/bootstrapnodes.json
 
-            export HOST_IP=$public_ip
-            export HOST_PORT=$p2p_port
-
-            MYVARS='${HOST_IP}:${HOST_PORT}'
+            nodes_str=$(build_bootstrapnodes)
+            export BOOTSTRAPNODES_P2P_NODES_LIST=$nodes_str
+            MYVARS='${BOOTSTRAPNODES_P2P_NODES_LIST}'
             envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/bootstrapnodes.json.tpl > $g_genesis_node_info_path
         fi
 
@@ -680,6 +710,15 @@ function expand()
     local system_address_file=${EXPAND_GENESIS_FOLLOW_DIR}/syaddress.txt 
     local bootstrapnodes_file=${EXPAND_GENESIS_FOLLOW_DIR}/bootstrapnodes.json
 
+    # get all p2p connect nodes already exist.
+    old_nodes=$(cat ${bootstrapnodes_file}  | awk -F[ '{ print $2  }' | awk -F] '{ print $1  }')
+    if [ -z ${old_nodes} ];then
+        error_message ' invalid bootstrapnodes.json file, get null p2p nodes.'
+    fi
+
+    # expand nodes p2p connect info.
+    expand_nodes=$(build_bootstrapnodes)
+
     # build install package for every server
     for ((i=0; i<g_host_config_num; i++))
     do
@@ -703,8 +742,10 @@ function expand()
         cp ${genesis_file} $node_base_info_dir/
         # copy syaddress.txt
         cp ${system_address_file} $node_base_info_dir/
-        # copy bootstrapnodes.json
-        cp ${bootstrapnodes_file} $node_base_info_dir/
+        # generate new bootstapnodes.json
+        export BOOTSTRAPNODES_P2P_NODES_LIST=$old_nodes$expand_nodes
+        MYVARS='${BOOTSTRAPNODES_P2P_NODES_LIST}'
+        envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/bootstrapnodes.json.tpl > $node_base_info_dir/bootstrapnodes.json
 
         #tar_tool $current_node_path_local
     done
