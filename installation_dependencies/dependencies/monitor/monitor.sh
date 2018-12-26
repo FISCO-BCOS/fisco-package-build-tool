@@ -55,7 +55,7 @@ function java_check()
 }
 
 # check java env first
-java_check
+# java_check
 
 # get total consensus count of this chain
 function get_total_consensus_node_count()
@@ -177,12 +177,22 @@ function check_all_node_work_properly()
         done
 }
 
+function get_header_error()
+{
+        msg=""
+        for i in "${!get_leader_err[@]}"
+        do
+                msg=$msg"[getLeader<1,$i>] "
+        done
+        echo "$msg"
+}
+
 function get_err_type()
 {
         ret=""
         case $1 in
         "0")ret="[NETWORK]]";;
-        "1")ret="[getLeader<X,X>]";;
+        "1")ret=$(get_header_error);;
         "2")ret="[ChangeViewWarning]";;
         "3")ret="[Closing]";;
         "4")ret="[tq.num > 512]";;
