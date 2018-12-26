@@ -9,7 +9,9 @@ BEGIN {
         err[0]++ ;
     }
     else if( $0 ~ /getLeader/ ) {
-        err[1]++ ;
+		err[1]++ ;
+		match($0,/<([0-9]+),([0-9]+)>/,node);
+		get_leader_err[node[2]]++
     }
     else if( $0 ~ /ChangeViewWarning/ ) {
         err[2]++ ;
@@ -124,6 +126,11 @@ END {
     # err message result
     for (k in err) {
         print "err["k"]="err[k]
+    }
+	
+	# getLeader error
+    for (k in get_leader_err) {
+        print "get_leader_err["k"]="get_leader_err[k]
     }
 
     # report blk result
