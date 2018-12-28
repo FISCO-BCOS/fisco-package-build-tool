@@ -1,15 +1,16 @@
+
 #!/bin/bash
 dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath
 
-# debug
 # 
 alarm() {
-        alert_ip=`/sbin/ifconfig eth0 | grep inet | awk '{print $2}'`
-        time=`date "+%Y-%m-%d %H:%M:%S"`
-		echo " [$alert_ip] [$time] $1"
+        alert_ip=$(/sbin/ifconfig eth0 2>/dev/null | grep inet | awk '{print $2}')
+        # time=`date "+%Y-%m-%d %H:%M:%S"`
+        echo -e "\033[31m [$alert_ip] $1 \033[0m"
 }
 
+# restart the node
 restart() {
         stopfile=${1/start/stop}
         $stopfile
@@ -17,25 +18,27 @@ restart() {
         $startfile
 }
 
-# info
+# echo message with time
 info() {
         time=`date "+%Y-%m-%d %H:%M:%S"`
         echo "[$time] $1"
 }
 
-
+error() {
+        echo -e "\033[31m $1 \033[0m" 
+}
 
 #check if $1 is install
 function check_if_install()
 {
     type $1 >/dev/null 2>&1
     if [ $? -ne 0 ];then
-        alarm "ERROR: $1 is not installed."
+        error "ERROR: $1 is not installed."
         exit 1
     fi
 }
 
-# OracleJDK 1.8 + or OpenJDK 1.9 +
+# OracleJDK 1.8+ is need
 function java_check()
 {
     check_if_install java
@@ -43,19 +46,16 @@ function java_check()
     #JAVA version
     JAVA_VER=$(java -version 2>&1 | head -n 1 | awk -F '"' '{print $2}' | awk -F . '{print $1$2}')
     if  java -version 2>&1 | egrep TM >/dev/null 2>&1; then
-    #openjdk
         if [[ ${JAVA_VER} -lt 18 ]];then
-            alarm " OracleJDK need 1.8 or above, now OracleJDK is - ${JAVA_VER}. "
+            error " ERROR: OracleJDK need 1.8 or above, now OracleJDK is - ${JAVA_VER}. "
             exit 1
         fi
     else
-        alarm " OracleJDK 1.8 or above need, now JDK is - ${JAVA_VER}. "
+        #OpenJDK
+        error " ERROR: OracleJDK 1.8 or above need, now JDK is - ${JAVA_VER}. "
         exit 1
     fi 
 }
-
-# check java env first
-# java_check
 
 # get total consensus count of this chain
 function get_total_consensus_node_count()
@@ -177,27 +177,27 @@ function check_all_node_work_properly()
         done
 }
 
-function get_header_error()
+function get_header_error_node_list()
 {
-        msg=""
+        nodes=""
         for i in "${!get_leader_err[@]}"
         do
-                msg=$msg"[getLeader<1,$i>] "
+                nodes=$nodes"$i "
         done
-        echo "$msg"
+        echo "[$nodes]"
 }
 
 function get_err_type()
 {
         ret=""
         case $1 in
-        "0")ret="[NETWORK]]";;
-        "1")ret=$(get_header_error);;
+        "0")ret="[NETWORK]";;
+        "1")ret="[getLeader] nodes"$(get_header_error_node_list);;
         "2")ret="[ChangeViewWarning]";;
         "3")ret="[Closing]";;
-        "4")ret="[tq.num > 512]";;
-        "5")ret="[block exec too slow]";;
-        "6")ret="[commit too slow]";;
+        "4")ret="[TransactionQueue will OverFlow]";;
+        "5")ret="[Block Exec Slow]";;
+        "6")ret="[Block Commit Slow]";;
         *) ret="[UNKNOWN]";;
         esac
 
@@ -227,7 +227,7 @@ function do_log_analyze_statistics_result()
 {
         node_count=$(get_total_consensus_node_count)
         if [[ -z "$node_count" || $node_count -eq 0 ]];then
-                alarm $(basename $1)" get consensus count of this chain failed, maybe web3sdk not work well."
+                error "ERROR! "$(basename $1)" get consensus count of this chain failed, maybe web3sdk not work well."
                 exit 1
         fi
 
@@ -258,7 +258,7 @@ function do_log_analyze_statistics_result()
                 done
 
                 if [[ ! -z "$err_msg" ]];then
-                        alarm " [$1]-[$2] # total sealed blk count is $total_blk, node count is ${node_count}, ${err_msg}"
+                        alarm " ERROR! sealed blk not evenly distributed, period [$1]-[$2]# total sealed blk is $total_blk, nodes has ${node_count}, ${err_msg}"
                 fi
         fi
 }
@@ -275,10 +275,8 @@ function dispose_log_error_result()
         done
 
         if [[ ! -z "$err_msg" ]];then
-                info " [$1] dispose_log_error_result =>  "
-                alarm "${err_msg}"
-        else 
-                info " [$1] dispose_log_error_result empty."
+                # info " [$1] dispose_log_error_result =>  "
+                alarm " ERROR! [$1] ${err_msg}"
         fi  
 }
 
@@ -289,11 +287,6 @@ function show_log_analyze_result()
         #blk and transaction count
         echo "  ==> blk count is $blk_count"
         echo "  ==> transaction count is ${transaction_count}"
-        #if [[ $blk_count -eq 0 ]];then
-        #        echo "          ==> tps is 0."
-        #else
-        #        echo "          ==> tps is "$(awk -v transaction_count=$transaction_count -v blk_count=$blk_count 'BEGIN{printf "%.2f",transaction_count/blk_count}')
-        #fi
 
         # err message result
         echo "  ==>> error message"
@@ -468,12 +461,11 @@ test() { # as multi-line comments
                 if [[ $seal_time -lt $seal_min_time ]];then
                         seal_min_time=$seal_time
                 fi
-
                 #echo "          blk is $i, pbft_time is ${pbft_time}, seal_time is ${seal_time}"
         done
 
         # echo "          # blk_count is ${blk_count}, pbft_max_time is ${pbft_max_time}(ms), pbft_min_time is ${pbft_min_time}(ms), seal_max_time is ${seal_max_time}(ms), seal_min_time is ${seal_min_time}(ms)"
-        echo "          # blk_count is ${blk_count}"
+        # echo "          # blk_count is ${blk_count}"
         echo "          # pbft_max_time is ${pbft_max_time}(ms), pbft_min_time is ${pbft_min_time}(ms)"
         echo "          # seal_max_time is ${seal_max_time}(ms), seal_min_time is ${seal_min_time}(ms)"
         echo "          # pbft prepare count is ${#pbft_pre[*]}"
@@ -495,8 +487,7 @@ function do_log_analyze_by_duration_time()
         nodedir=$1
         start_time=$2
         end_time=$3
-        info "start_time is $start_time #$(date -d @$start_time +"%Y-%m-%d %H:%M:%S")"
-        info "end_time is $end_time #$(date -d @$end_time +"%Y-%m-%d %H:%M:%S")"
+        info " start #$(date -d @$start_time +"%Y-%m-%d %H:%M:%S") end #$(date -d @$end_time +"%Y-%m-%d %H:%M:%S") "
 
         # date -d @1361542596 +"%Y-%m-%d %H:%M:%S"
         start_log="log_"$(date -d @${start_time} +"%Y%m%d%H")".log"
@@ -530,7 +521,7 @@ function do_log_analyze_by_time_point()
 
         min_time=$(date -d @${time_point} +"%Y-%m-%d %H:%M")
 
-        info " #log parser, $(date -d @$time_point +"%Y-%m-%d %H:%M:%S")"
+        info " # log parser min, $(date -d @$time_point +"%Y-%m-%d %H:%M")"
 
         eval $(sed -n "/$min_time/p" $nodedir/log/$log_file 2>/dev/null | awk -f monitor.awk)
         
@@ -580,13 +571,13 @@ start_time=$(($end_time-duration*60))
 function help()
 {
         echo "Usage : bash monitor.sh "
-        echo "          -m : monitor, statistics.  default : monitor ."
-        echo "          -f : log file to be analyzed. "
-        echo "          -d : log analyze time range. default : 10(min), it should not bigger than 60(min)."
+        echo "          -m monitor | statistics. working mode, default : monitor ."
+        echo "          -f log_file : specified log file. "
+        echo "          -d min_time : time range. default : 60(min), it should not longer than 60(min)."
         echo "          -h : help. "
         echo "          example : "
         echo "                   bash  monitor.sh"
-        echo "                   bash  monitor.sh -m statistics"
+        echo "                   bash  monitor.sh -m statistics -d 60"
         echo "                   bash  monitor.sh -m statistics -f node0/log/log_2018120514.log "
         exit 0
 }
@@ -594,7 +585,10 @@ function help()
 while getopts "m:f:d:h" option;do
     case $option in
     m) mode=$OPTARG;;
-    f) log_file=$OPTARG;;
+    f)  
+        log_file=$OPTARG; 
+        [ ! -f $log_file ] && { echo " $log_file not exist. "; exit 1; } 
+        ;;
     d)
         if [[ $OPTARG -gt 0 && $OPTARG -le 60 ]];then
                 duration=$OPTARG
