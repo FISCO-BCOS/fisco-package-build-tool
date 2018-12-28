@@ -128,7 +128,7 @@ END {
         print "err["k"]="err[k]
     }
 	
-	# getLeader error
+    # getLeader error
     for (k in get_leader_err) {
         print "get_leader_err["k"]="get_leader_err[k]
     }
