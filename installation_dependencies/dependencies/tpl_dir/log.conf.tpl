@@ -31,8 +31,8 @@
 
 * INFO:
     FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/info_log_%datetime{%Y%M%d%H}.log"
-    ENABLED                 =   true
+    ENABLED                 =   false
 
 * VERBOSE:
     FILENAME                =   "${OUTPUT_LOG_FILE_PATH_TPL}/verbose_log_%datetime{%Y%M%d%H}.log"
-    ENABLED                 =   true
+    ENABLED                 =   false
