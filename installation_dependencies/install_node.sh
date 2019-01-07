@@ -368,7 +368,8 @@ function install_build()
     print_install_result "fisco-solc"
 
     # fisco-solc
-    sudo cp $DEPENENCIES_DIR/solc/fisco-solc /usr/local/bin/
+    wget https://github.com/FISCO-BCOS/solidity/releases/download/release-1.3/fisco-solc-centos
+    sudo mv ./fisco-solc-centos /usr/local/bin/fisco-solc
     sudo chmod a+x /usr/local/bin/fisco-solc
 
     #web3sdk config
