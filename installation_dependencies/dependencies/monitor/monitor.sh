@@ -184,7 +184,7 @@ function get_header_error_node_list()
         do
                 nodes=$nodes"$i "
         done
-        echo "[$nodes]"
+        echo "[ $nodes]"
 }
 
 function get_err_type()
@@ -263,15 +263,42 @@ function do_log_analyze_statistics_result()
         fi
 }
 
+# [NETWORK] error report threshold
+NETWORK_ERR_REPORT_THRESHOLD=3
+# [VIEWCHANGE] error report threshold
+VIEWCHANGE_ERR_REPORT_THRESHOLD=3
+# [getLeader] error report threshold
+GETLEADER_ERR_REPORT_THRESHOLD=3
 # dispose log error
 function dispose_log_error_result()
 {
         err_msg=""
         index=0
-        for i in "${!err[@]}"
+        #for i in "${s!err[@]}"
+        #do
+        #        err_msg=$err_msg" | $index、error"$(get_err_type $i)", count=${err[$i]} "
+        #        ((index+=1))
+        #done
+
+		for i in "${!err[@]}"
         do
-                err_msg=$err_msg" | $index、error"$(get_err_type $i)", count=${err[$i]} "
-                ((index+=1))
+				ret=""
+				count=${err[$i]}
+				case $i in
+					"0") [ $count -ge ${NETWORK_ERR_REPORT_THRESHOLD} ] && { ret="[NETWORK]"; };;
+					"1") [ $count -ge ${GETLEADER_ERR_REPORT_THRESHOLD} ] && { ret="[getLeader] nodes"$(get_header_error_node_list); };;
+					"2") [ $count -ge ${VIEWCHANGE_ERR_REPORT_THRESHOLD} ] && { ret="[ChangeViewWarning]"; };;
+					"3")ret="[Closing]";;
+					"4")ret="[TransactionQueue will OverFlow]";;
+					"5")ret="[Block Exec Slow]";;
+					"6")ret="[Block Commit Slow]";;
+					*) ret="[UNKNOWN]";;
+				esac
+
+				if [[ ! -z "$ret" ]];then
+					err_msg=$err_msg" | $index、error${ret}, count=${count} "
+					((index+=1))
+				fi
         done
 
         if [[ ! -z "$err_msg" ]];then
