@@ -1,5 +1,3 @@
-[![image for the blockchain contest](https://github.com/FISCO-BCOS/FISCO-BCOS/blob/master/doc/imgs/application_contest.png "点击图片报名")](https://con.geekbang.org/)
-
 ## 技术文档
 
 访问[FISCO BCOS物料包工具使用指南](https://fisco-bcos-documentation.readthedocs.io/zh_CN/latest/docs/tools/index.html)，内容包括：
