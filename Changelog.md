@@ -49,3 +49,14 @@
 1. 构建区块链时, 将所有的节点的p2p连接ip、port信息写入bootstrapnodes.json文件.  
 2. 扩容时, 将新添加的节点的链接信息写入bootstrapnodes.json文件.  
 3. 扩容时, 添加检查config.ini中genesis_follow_dir配置的文件夹是否存在, 同时添加$genesis_follow_dir/cert、$genesis_follow_dir/bootstapnodes.json、$genesis_follow_dir/genesis.json、$genesis_follow_dir/syaddress.txt是否存在.
+
+### V1.2.3 (2019-01-08)  
+* Fix:  
+1. 扩容生成的bootstrapnodes.json文件格式错误bug修正.  
+
+* Update:
+1. 更新监控脚本monitor.sh的功能.
+2. 同步FISCO-BCOS/systemcontract目录修改: 删除FileInfoManager.sol FileServerManager.sol文件; compile.js文件中删除FileInfoManager.sol FileServerManager.sol ConsensusControl.sol ContractA.sol Authority.sol的编译; deploy.js中删除对FileInfoManager.sol FileServerManager.sol的部署;
+3. monitor.js适配FISCO 1.3.7新接口.  
+4. tool.js将十六进制显示修改为十进制.  
+5. config.ini版本号修改为v1.3.7.
