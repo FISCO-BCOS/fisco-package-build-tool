@@ -356,6 +356,9 @@ function install_build()
 
     cp $DEPENENCIES_MONITOR_DIR/monitor.sh $buildPWD/
     sudo chmod a+x $buildPWD/monitor.sh
+	
+	cp $DEPENENCIES_MONITOR_DIR/monitor.awk $buildPWD/
+    sudo chmod a+x $buildPWD/monitor.awk
 
     #fisco-bcos
     cp $DEPENENCIES_FISCO_DIR/fisco-bcos $current_node_dir_base
