@@ -40,13 +40,7 @@ function docompile(filename){
     await docompile("CAAction");
     await docompile("NodeAction");
     await docompile("ConfigAction");
-    await docompile("FileInfoManager");
-    await docompile("FileServerManager");
     await docompile("ContractAbiMgr");
     await docompile("ConsensusControlMgr");
-    await docompile("ConsensusControl");
-    await docompile("Authority");
-    await docompile("ContractA");
-    await docompile("ConsensusControlAction");
 
 })();

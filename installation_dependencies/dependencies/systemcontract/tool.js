@@ -75,8 +75,13 @@ switch (filename){
         var key=options[4];
         var instance=getAction("ConfigAction");
         var value=instance.get(key,  initializer);
-        console.log(key+"="+value[0].toString()+","+value[1].toString());
 
+        if (value[0].length == 0)
+          console.log(key+"=Default");
+        else if (key == "CAVerify")
+          console.log("config :"+key+"="+value[0]);
+        else
+          console.log(key+"="+parseInt(value[0], 16));
         break;
       }
       case "set":
@@ -86,15 +91,21 @@ switch (filename){
           break;
         }
         var key=options[4];
-        var value=options[5];
+        var value;
+        if (key == "CAVerify")
+          value=options[5];
+        else
+          value=parseInt(options[5]).toString(16);
         
         var instance=getAction("ConfigAction");
 
         var func = "set(string,string)";
         var params = [key,value];
         var receipt = web3sync.sendRawTransaction(config.account, config.privKey, instance.address, func, params);
-
-        console.log("config :"+key+","+value);
+        if (key == "CAVerify")
+          console.log("config :"+key+","+value);
+        else
+          console.log("config :"+key+","+parseInt(value,16));
        
         break;
       }
