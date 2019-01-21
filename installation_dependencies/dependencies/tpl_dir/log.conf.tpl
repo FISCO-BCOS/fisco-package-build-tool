@@ -16,7 +16,7 @@
 * ERROR:  
     ENABLED                 =   true
     TO_FILE                 =   true     
-    TO_STANDARD_OUTPUT      =   ture 
+    TO_STANDARD_OUTPUT      =   true 
 	
 * WARNING: 
      ENABLED                =   true
