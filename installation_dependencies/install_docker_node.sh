@@ -48,8 +48,8 @@ function generate_unregistersh_func()
 function generate_startsh_func()
 {
     startsh="#!/bin/bash
-    fisco-bcos   --genesis /fisco-bcos/node/genesis.json --config /fisco-bcos/node/config.json 2>&1 
-    echo \"waiting...\"
+    fisco-bcos   --genesis /fisco-bcos/node/genesis.json --config /fisco-bcos/node/config.json 1>&2    
+	echo \"waiting...\"
     sleep 5
     "
     echo "$startsh"
