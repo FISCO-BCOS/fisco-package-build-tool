@@ -9,4 +9,4 @@ cp $currentPWD/node/ext/conf/config.js $currentPWD/web3lib/ >/dev/null 2>&1
 #cp $currentPWD/node/ext/fisco-bcos/* /usr/bin/ >/dev/null 2>&1
 #chmod a+x /usr/bin/fisco-bcos
 
-echo "system_address => "$(cat $currentPWD/node/ext/conf/syaddress.txt)
+#echo "system_address => "$(cat $currentPWD/node/ext/conf/syaddress.txt)
