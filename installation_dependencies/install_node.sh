@@ -15,60 +15,6 @@ source $DEPENENCIES_DIR/scripts/dependencies_check.sh
 source $DEPENENCIES_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
 
-# build stop_node*.sh
-function generate_stopsh_func()
-{
-    stopsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    if [[ \$1 == \"--force\" ]];then
-        kill_cmd=\"kill -9 \${weth_pid}\"
-    else
-        kill_cmd=\"kill -2 \${weth_pid}\"
-    fi
-    if [ ! -z \$weth_pid ];then
-        echo \"stop node${Idx[$index]} ...\"
-        eval \${kill_cmd}
-    else
-        echo \"node${Idx[$index]} is not running.\"
-    fi"
-    echo "$stopsh"
-    return 0
-}
-
-# build check_node*.sh
-function generate_checksh_func()
-{
-    checknodesh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    if [ ! -z \$weth_pid ];then
-        echo \"node\$1 is running.\"
-    else
-        echo \"node\$1 is not running.\"
-    fi"
-    echo "$checknodesh"
-}
-
-# build start_node*.sh
-function generate_startsh_func()
-{
-    startsh="#!/bin/bash
-    ulimit -c unlimited 2> /dev/null
-    dirpath=\"\$(cd \"\$(dirname \"\$0\")\" && pwd)\"
-    cd \$dirpath
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    if [ ! -z \$weth_pid ];then
-        echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
-    else
-        echo \"start node${Idx[$index]} ...\"
-        if [ ! -d  ${NODE_INSTALL_DIR}/node${Idx[$index]}/log ];then
-            mkdir -p ${NODE_INSTALL_DIR}/node${Idx[$index]}/log
-        fi
-        nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
-    fi"
-    echo "$startsh"
-    return 0
-}
-
 # nodejs environment variable setting
 function build_node_sh()
 {
@@ -319,12 +265,9 @@ function install_build()
         MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}'
         envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > ${current_node_dir}/config.json
 
-        generate_startsh=`generate_startsh_func`
-        echo "${generate_startsh}" > ${current_node_dir}/start.sh
-        generate_stopsh=`generate_stopsh_func`
-        echo "${generate_stopsh}" > ${current_node_dir}/stop.sh
-        generate_checksh_func=`generate_checksh_func`
-        echo "${generate_checksh_func}" > ${current_node_dir}/check.sh
+        cp $DEPENENCIES_SCRIPTES_DIR/node_start.sh ${current_node_dir}/start.sh
+        cp $DEPENENCIES_SCRIPTES_DIR/node_stop.sh ${current_node_dir}/stop.sh
+        cp $DEPENENCIES_SCRIPTES_DIR/node_check.sh ${current_node_dir}/check.sh
 
         chmod +x ${current_node_dir}/start.sh
         chmod +x ${current_node_dir}/stop.sh
