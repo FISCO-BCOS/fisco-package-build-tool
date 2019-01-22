@@ -743,7 +743,7 @@ function expand()
         # copy syaddress.txt
         cp ${system_address_file} $node_base_info_dir/
         # generate new bootstapnodes.json
-        export BOOTSTRAPNODES_P2P_NODES_LIST=$old_nodes$expand_nodes
+        export BOOTSTRAPNODES_P2P_NODES_LIST=$old_nodes","$expand_nodes
         MYVARS='${BOOTSTRAPNODES_P2P_NODES_LIST}'
         envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/bootstrapnodes.json.tpl > $node_base_info_dir/bootstrapnodes.json
 
