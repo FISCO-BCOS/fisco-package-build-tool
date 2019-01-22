@@ -23,7 +23,7 @@ else
     if [ -d node$index ];then
         bash node$index/start.sh
         sleep 3
-        bash node{$index}/check.sh
+        bash node$index/check.sh
     else
         echo "node$index is not exist."
     fi
