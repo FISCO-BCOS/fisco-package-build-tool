@@ -9,18 +9,11 @@ cd $dirpath
 index=$1;
 
 if [ -z $index ];then
-	total=999
-	index=0
 	echo "check all node status ... "
-	while [ $index -le $total ]
-	do
-		if [ -d node$index ];then
-			bash node$index/check.sh $index
-		else	
-			break
-		fi
-		index=$(($index+1))
-	done
+	for checkfile in `ls $dirpath/node*/check.sh`
+    do
+        bash $checkfile
+    done
 else
 	echo "check node$index status ... "
 	if [ -d node$index ];then
