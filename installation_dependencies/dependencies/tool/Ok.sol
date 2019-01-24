@@ -29,6 +29,9 @@ contract Ok{
         return to.balance;
     }
     function trans(uint num){
+        if (from.balance < num || to.balance + num < to.balance)
+            return; // Deny overflow
+
     	from.balance=from.balance-num;
     	to.balance+=num;
     
