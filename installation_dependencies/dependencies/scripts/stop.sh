@@ -7,19 +7,11 @@ dirpath="$(cd "$(dirname "$0")" && pwd)"
 cd $dirpath
 
 index=$1;
-
 if [ -z $index ];then
-    total=999
-    index=0
     echo "stop all node ... "
-    while [ $index -le $total ]
+    for stopfile in `ls $dirpath/node*/stop.sh`
     do
-    if [ -d node$index ];then
-        bash node$index/stop.sh
-    else	
-        break
-    fi
-    index=$(($index+1))
+        bash $stopfile
     done
 else
     # echo "stop all node ... "
