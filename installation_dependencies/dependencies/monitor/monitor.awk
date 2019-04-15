@@ -16,7 +16,7 @@ BEGIN {
     else if( $0 ~ /ChangeViewWarning/ ) {
         err[2]++ ;
     }
-    else if( $0 ~ /WARNING.*Closing/ ) {
+    else if( $0 ~ /WARNING.*Session::Drop.*Closing/ && $0 !~ /Peer was already connected/) {
         err[3]++ ;
     }
     else if ( $0 ~ /Generating seal/ ) {
