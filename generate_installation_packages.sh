@@ -761,7 +761,7 @@ function clone_and_build_fisco()
         error_message "${fisco} not exsit, maybe compile failed."
     else
         #check fisco version
-        fisco_bcos_version_check ${version} "true"
+        fisco_bcos_version_check ${version} ${fisco} "true"
     fi
 }
 
