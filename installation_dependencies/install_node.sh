@@ -18,60 +18,6 @@ source $DEPENENCIES_DIR/scripts/dependencies_check.sh
 source $DEPENENCIES_DIR/config.sh
 g_is_genesis_host=${is_genesis_host}
 
-# build stop_node*.sh
-function generate_stopsh_func()
-{
-    stopsh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    if [[ \$1 == \"--force\" ]];then
-        kill_cmd=\"kill -9 \${weth_pid}\"
-    else
-        kill_cmd=\"kill -2 \${weth_pid}\"
-    fi
-    if [ ! -z \$weth_pid ];then
-        echo \"stop node${Idx[$index]} ...\"
-        eval \${kill_cmd}
-    else
-        echo \"node${Idx[$index]} is not running.\"
-    fi"
-    echo "$stopsh"
-    return 0
-}
-
-# build check_node*.sh
-function generate_checksh_func()
-{
-    checknodesh="#!/bin/bash
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    if [ ! -z \$weth_pid ];then
-        echo \"node\$1 is running.\"
-    else
-        echo \"node\$1 is not running.\"
-    fi"
-    echo "$checknodesh"
-}
-
-# build start_node*.sh
-function generate_startsh_func()
-{
-    startsh="#!/bin/bash
-    ulimit -c unlimited 2> /dev/null
-    dirpath=\"\$(cd \"\$(dirname \"\$0\")\" && pwd)\"
-    cd \$dirpath
-    weth_pid=\`ps aux|grep \"${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json\"|grep \"fisco-bcos\"|grep -v grep|awk '{print \$2}'\`
-    if [ ! -z \$weth_pid ];then
-        echo \"node${Idx[$index]} is running, pid is \$weth_pid.\"
-    else
-        echo \"start node${Idx[$index]} ...\"
-        if [ ! -d  ${NODE_INSTALL_DIR}/node${Idx[$index]}/log ];then
-            mkdir -p ${NODE_INSTALL_DIR}/node${Idx[$index]}/log
-        fi
-        nohup ../fisco-bcos  --genesis ${NODE_INSTALL_DIR}/node${Idx[$index]}/genesis.json  --config ${NODE_INSTALL_DIR}/node${Idx[$index]}/config.json  > ${NODE_INSTALL_DIR}/node${Idx[$index]}/log/log 2>&1 &
-    fi"
-    echo "$startsh"
-    return 0
-}
-
 # nodejs environment variable setting
 function build_node_sh()
 {
