@@ -1,5 +1,6 @@
 #!/bin/bash
-
+dirpath="$(cd "$(dirname "$0")" && pwd)"
+cd $dirpath
 # set -e
 
 # 
@@ -24,32 +25,44 @@ source $installPWD/installation_dependencies/dependencies/scripts/parser_config_
 #fisco-bcos version check, At least 1.3.0 is required
 function fisco_bcos_version_check()
 {
-    REQUIRE_VERSION=$1;
+    local version=$1;
+    local fisco_path=$2
+    local exit_flag=$3
+    
     # config fisco-bcos version check
 
-    FISCO_VERSION=$(${TARGET_FISCO_BCOS_PATH} --version 2>&1 | egrep "FISCO-BCOS *version" | awk '{print $3}')
-    # FISCO BCOS gm version not support
-    if  echo "$FISCO_VERSION" | egrep "gm" ; then
-        error_message "FISCO BCOS gm version not support yet, now ${TARGET_FISCO_BCOS_PATH} is $FISCO_VERSION"
-    fi 
-
-    # fisco bcos 1.3.0+
-    ver=$(echo "$FISCO_VERSION" | awk -F . '{print $1$2}')
-    if [ $ver -lt 13 ];then
-        error_message "At least FISCO-BCOS 1.3.0 is required, now ${TARGET_FISCO_BCOS_PATH} is $FISCO_VERSION"
+    if [ ! -f ${fisco_path} ];then
+        error_message " fisco-bcos not exist, fisco path is ${fisco_path}"
     fi
 
-    #do not need specified version
-    if [ -z "$REQUIRE_VERSION" ];then
+    FISCO_VERSION=$(${fisco_path} --version 2>&1 | egrep "FISCO-BCOS *version" | awk '{print $3}')
+    # FISCO BCOS gm version not support
+    if  echo "$FISCO_VERSION" | egrep "gm" ; then
+        error_message "FISCO BCOS gm version not support yet, now ${fisco_path} is ${FISCO_VERSION}"
+    fi 
+
+        # fisco bcos 1.3.0+
+    ver=$(echo "$FISCO_VERSION" | awk -F . '{print $1$2}')
+    if [ $ver -lt 13 ];then
+        error_message "At least FISCO-BCOS 1.3.0 is required, now ${fisco_path} is ${FISCO_VERSION}"
+    fi
+
+    # do not need specified version
+    if [ -z "$version" ];then
         return 0
     fi
 
     # version compare
-    ver0=$(echo "$FISCO_VERSION" | awk -F . '{print $1"."$2"."$3}')
-    if [ "v$ver0" = "$REQUIRE_VERSION" ] || [ "V$ver0" = "$REQUIRE_VERSION" ];then
+    v=$(echo "$FISCO_VERSION" | awk -F . '{print $1"."$2"."$3}')
+    if [ "v$v" = "$version" ] || [ "V$v" = "$version" ];then
         return 0
     fi
-    error_message_without_exit "Required version is $REQUIRE_VERSION, now ${TARGET_FISCO_BCOS_PATH} version is $FISCO_VERSION"
+
+    if [ "true" == "${exit_flag}" ];then
+        error_message "Required version is $version, now ${fisco_path} version is $v"
+    else
+        echo "Required version is $version, now ${fisco_path} version is $v"
+    fi
 
     return 1
 }
@@ -94,8 +107,6 @@ function copy_genesis_related_info()
     if [ $host_type -eq $TYPE_GENESIS_HOST ];then
         cp -r $g_genesis_cert_dir_path  $current_node_path/dependencies/follow
     fi
-
-    #tar_tool $current_node_path
 }
 
 #build node for node of the server
@@ -236,7 +247,7 @@ function build_node_installation_package()
     mkdir -p $current_node_path/dependencies/follow/
     mkdir -p $current_node_path/dependencies/rlp_dir/
 
-    cp $TARGET_FISCO_BCOS_PATH $current_node_path/dependencies/fisco-bcos/
+    cp $fisco_path $current_node_path/dependencies/fisco-bcos/
     cp -r $INSTALLATION_DEPENENCIES_LIB_DIR/dependencies $current_node_path/
 
     if [ $host_type -eq $TYPE_TEMP_HOST ]
@@ -533,53 +544,6 @@ function build_fisco_bcos()
     sudo make install
 }
 
-#clone and download fisco-bcos
-function clone_and_build_fisco()
-{
-    require_version=${FISCO_BCOS_VERSION}
-
-    #fisco-bcos already exist
-    if [ -f ${TARGET_FISCO_BCOS_PATH} ]; then
-        #check TARGET_FISCO_BCOS_PATH version
-        fisco_bcos_version_check ${require_version}
-        if [ $? -eq 0 ];then
-            return 0
-        fi
-    fi
-
-    github_path="https://github.com/FISCO-BCOS/FISCO-BCOS.git"
-    fisco_local_path=$FISCO_BCOS_LOCAL_PATH
-    if [ -z ${fisco_local_path} ];then
-        fisco_local_path=$installPWD/../  #Parent Directory
-    fi    
-
-    cd $fisco_local_path
-    git clone $github_path FISCO-BCOS
-    if [ ! -d FISCO-BCOS ];then
-        error_message "git clone FISCO-BCOS failed."
-    fi
-
-    cd FISCO-BCOS
-    git pull origin
-    git checkout ${require_version}
-    if [ $? -ne 0 ];then
-        error_message "git checkout ${require_version} failed, maybe ${require_version} not exist."
-    fi
-
-    build_fisco_bcos
-
-    # maybe compile failed
-    if [ ! -f ${TARGET_FISCO_BCOS_PATH} ]; then
-        error_message "${TARGET_FISCO_BCOS_PATH} not exsit, maybe compile failed."
-    else
-        #check TARGET_FISCO_BCOS_PATH version
-        fisco_bcos_version_check ${require_version}
-        if [ $? -ne 0 ];then
-            error_message ""
-        fi
-    fi
-}
-
 function version()
 {
     VERSION=$(cat release_note.txt 2>/dev/null)
@@ -619,8 +583,7 @@ function initial()
     # config.ini param check
     ini_param_check
 
-    #clone from github for fisco-bcos source and check if need compile fisco-bcos
-    clone_and_build_fisco
+    init_fisco
 
     print_dash
 
@@ -746,8 +709,6 @@ function expand()
         export BOOTSTRAPNODES_P2P_NODES_LIST=$old_nodes","$expand_nodes
         MYVARS='${BOOTSTRAPNODES_P2P_NODES_LIST}'
         envsubst $MYVARS < $INSTALLATION_DEPENENCIES_LIB_DIR/bootstrapnodes.json.tpl > $node_base_info_dir/bootstrapnodes.json
-
-        #tar_tool $current_node_path_local
     done
 
     echo
@@ -758,18 +719,139 @@ function expand()
     return 0
 }
 
-case "$1" in
-    'expand')
-        expand
-        ;;
-    'build')
-        build
-        ;;
-    'version')
-        version
-        ;;
-    *)
-        echo "invalid option!"
-        echo "Usage: $0 {build|expand|version}"
-        #exit 1
-esac
+#clone and download fisco-bcos
+function clone_and_build_fisco()
+{
+    #require_version=${FISCO_BCOS_VERSION}
+    local version=$1
+    local fisco=$2
+
+    #fisco-bcos already exist
+    if [ -f ${fisco} ]; then
+        #check fisco version
+        fisco_bcos_version_check ${version} ${fisco}
+        if [ $? -eq 0 ];then
+            return 0
+        fi
+    fi
+
+    github_path="https://github.com/FISCO-BCOS/FISCO-BCOS.git"
+    fisco_local_path=$FISCO_BCOS_LOCAL_PATH
+    if [ -z ${fisco_local_path} ];then
+        fisco_local_path=$installPWD/../  #Parent Directory
+    fi    
+
+    cd $fisco_local_path
+    git clone $github_path FISCO-BCOS
+    if [ ! -d FISCO-BCOS ];then
+        error_message "git clone FISCO-BCOS failed."
+    fi
+
+    cd FISCO-BCOS
+    git pull origin
+    git checkout ${version}
+    if [ $? -ne 0 ];then
+        error_message "git checkout ${version} failed, maybe ${version} not exist."
+    fi
+
+    build_fisco_bcos
+
+    # maybe compile failed
+    if [ ! -f ${fisco} ]; then
+        error_message "${fisco} not exsit, maybe compile failed."
+    else
+        #check fisco version
+        fisco_bcos_version_check ${version} "true"
+    fi
+}
+
+function download_fisco()
+{
+    # https://codeload.github.com/FISCO-BCOS/FISCO-BCOS/tar.gz/v1.3.8
+    local version=$1
+    local package_name="fisco-bcos.tar.gz"
+    local dst="build/${package_name}"
+    #https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v1.3.8/fisco-bcos.tar.gz
+    curl -L "https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/${version}/fisco-bcos.tar.gz" -o ${dst}
+
+    tar -zxf ${dst} -C build
+    if [ ! -f build/fisco-bcos ];then
+        error_message " download fisco-bcos $version failed."
+    fi
+
+    fisco_path=$dirpath'/build/fisco-bcos'
+
+    fisco_bcos_version_check ${version} ${fisco_path} "true"
+}
+
+fisco_path='/usr/local/bin/fisco-bcos'
+specified_path="false"
+download="false"
+clone_and_build="true"
+build_opr="false"
+expand_opr="false"
+
+function init_fisco()
+{
+    local version=${FISCO_BCOS_VERSION}
+
+    if [ "true" == ${specified_path} ];then
+        # fisco-bcos specified path
+        fisco_bcos_version_check ${version} ${fisco_path} "true"
+    elif [ "true" == ${download} ];then
+        # download fisco from github
+        download_fisco ${version}
+    else
+        # clone FISCO-BCOS source and build fisco-bcos
+        clone_and_build_fisco ${version} ${fisco_path}
+    fi
+}
+
+function help() 
+{
+    echo "Usage:"
+    echo "Optional:"
+    echo "    -p  <path>          The fisco-bcos path. "
+    echo "    -d                  Download the specified fisco-bcos version from github. "
+    echo "    -c                  Clone and build fisco-bcos if /usr/local/bin/fisco-bcos is not exist or not the specified version. "
+    echo "    -b/build            Build opration. "            
+    echo "    -e/expand           Expand operation. "
+    echo "    -v                  Version info. "
+    echo "    -h                  Help."
+    echo "Example:"
+    echo "    bash generate_installation_packages.sh build "
+    echo "    bash generate_installation_packages.sh -p ../../fisco-bcos "
+    echo "    bash generate_installation_packages.sh -d -e "
+    exit 0
+}
+
+while getopts "p:dcbevh" option;do
+    case $option in
+    p) specified_path="true"; fisco_path=$OPTARG;;
+    d) download="true";;
+    c) clone_and_build="true";;
+    b) build_opr="true";;
+    e) expand_opr="true";;
+    v) version;;
+    h) help;;
+    esac
+done
+
+if [ "expand" == "$1" ];then
+    expand_opr="true";
+elif [ "build" == "$1" ];then
+    build_opr="true";
+elif [ "version" == "$1" ];then
+    version;
+fi
+
+if [ "true" == ${build_opr} ];then
+    build
+elif [ "true" == ${expand_opr} ];then
+    expand
+else
+    help
+fi
+
+
+
