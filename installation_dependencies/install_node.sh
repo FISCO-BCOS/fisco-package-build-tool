@@ -1,5 +1,8 @@
 #!/bin/bash
 
+dirpath="$(cd "$(dirname "$0")" && pwd)"
+cd $dirpath
+
 #set -x
 #set -e
 
@@ -319,12 +322,9 @@ function install_build()
         MYVARS='${CHANNEL_PORT_VALUE_TPL}:${CONFIG_JSON_SYSTEM_CONTRACT_ADDRESS_TPL}:${CONFIG_JSON_LISTENIP_TPL}:${CRYPTO_MODE_TPL}:${CONFIG_JSON_RPC_PORT_TPL}:${CONFIG_JSON_P2P_PORT_TPL}:${CONFIG_JSON_KEYS_INFO_FILE_PATH_TPL}:${CONFIG_JSON_KEYSTORE_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_DATA_DIR_PATH_TPL}:${CONFIG_JSON_FISCO_LOGCONF_DIR_PATH_TPL}'
         envsubst $MYVARS < ${DEPENDENCIES_TPL_DIR}/config.json.tpl > ${current_node_dir}/config.json
 
-        generate_startsh=`generate_startsh_func`
-        echo "${generate_startsh}" > ${current_node_dir}/start.sh
-        generate_stopsh=`generate_stopsh_func`
-        echo "${generate_stopsh}" > ${current_node_dir}/stop.sh
-        generate_checksh_func=`generate_checksh_func`
-        echo "${generate_checksh_func}" > ${current_node_dir}/check.sh
+        cp $DEPENENCIES_SCRIPTES_DIR/node_start.sh ${current_node_dir}/start.sh
+        cp $DEPENENCIES_SCRIPTES_DIR/node_stop.sh ${current_node_dir}/stop.sh
+        cp $DEPENENCIES_SCRIPTES_DIR/node_check.sh ${current_node_dir}/check.sh
 
         chmod +x ${current_node_dir}/start.sh
         chmod +x ${current_node_dir}/stop.sh
