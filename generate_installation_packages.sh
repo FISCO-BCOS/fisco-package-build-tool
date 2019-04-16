@@ -820,7 +820,8 @@ function help()
     echo "    -h                  Help."
     echo "Example:"
     echo "    bash generate_installation_packages.sh build "
-    echo "    bash generate_installation_packages.sh -p ../../fisco-bcos "
+    echo "    bash generate_installation_packages.sh expand "
+    echo "    bash generate_installation_packages.sh -b -p ../../fisco-bcos "
     echo "    bash generate_installation_packages.sh -d -e "
     exit 0
 }
