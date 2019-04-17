@@ -761,7 +761,7 @@ function clone_and_build_fisco()
         error_message "${fisco} not exsit, maybe compile failed."
     else
         #check fisco version
-        fisco_bcos_version_check ${version} "true"
+        fisco_bcos_version_check ${version} ${fisco} "true"
     fi
 }
 
@@ -820,7 +820,8 @@ function help()
     echo "    -h                  Help."
     echo "Example:"
     echo "    bash generate_installation_packages.sh build "
-    echo "    bash generate_installation_packages.sh -p ../../fisco-bcos "
+    echo "    bash generate_installation_packages.sh expand "
+    echo "    bash generate_installation_packages.sh -b -p ../../fisco-bcos "
     echo "    bash generate_installation_packages.sh -d -e "
     exit 0
 }
