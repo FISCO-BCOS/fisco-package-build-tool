@@ -1,4 +1,4 @@
-### V1.0.0 (2018-03-27)  
+### v1.0.0 (2018-03-27)  
 
 1. 物料包生成工具初始递交。  
 2. 添加fisco-solc的安装, 安装目录为/user/local/bin/。  
@@ -6,18 +6,18 @@
 4. 添加README.me文件。   
 5. 将nodejs安装改为本地安装, 不再通过yum进行。 
 
-### V1.1.0 (2018-05-29)  
+### v1.1.0 (2018-05-29)  
 * Update:  
 1. 适配新的连接管理机制.  
 2. 文档更新.  
 3. 新的连接管理导致的证书管理机制修改, 每个节点证书在构建安装包过程中生成.  
 
-### V1.1.1 (2018-07-09)
+### v1.1.1 (2018-07-09)
 * Update
 1. 适配FISCO-BCOS v1.3.1版本。
 2. 构建过程中, 生成god账号过程使用fisco-bcos --newaccount命令, 不再使用nodejs命令, 加快生成速度。
 
-### V1.2.0 (2018-07-04) 
+### v1.2.0 (2018-07-04) 
 * Update:
 1. 支持构建docker环境的搭建. 
 2. 增强容错性, 出错的情况下直接退出. 
@@ -35,7 +35,7 @@
 12. nodejs的依赖、fisco-solc改为内置, 不再下载.  
 13. 调整目录结构.
 
-### V1.2.1 (2018-10-10)
+### v1.2.1 (2018-10-10)
 * Update:
 1. 添加节点监控工具monitor.sh.
 2. 添加日志清理工具rmlogs.sh.
@@ -44,13 +44,13 @@
 5. start.sh中添加ulimit -c unlimited, 打开生成core的开关.
 6. 其他问题的纠正.
 
-### V1.2.2 (2018-12-03)
+### v1.2.2 (2018-12-03)
 * Update:
 1. 构建区块链时, 将所有的节点的p2p连接ip、port信息写入bootstrapnodes.json文件.  
 2. 扩容时, 将新添加的节点的链接信息写入bootstrapnodes.json文件.  
 3. 扩容时, 添加检查config.ini中genesis_follow_dir配置的文件夹是否存在, 同时添加$genesis_follow_dir/cert、$genesis_follow_dir/bootstapnodes.json、$genesis_follow_dir/genesis.json、$genesis_follow_dir/syaddress.txt是否存在.
 
-### V1.2.3 (2019-01-08)  
+### v1.2.3 (2019-01-08)  
 * Fix:  
 1. 扩容生成的bootstrapnodes.json文件格式错误bug修正.  
 
@@ -60,3 +60,9 @@
 3. monitor.js适配FISCO 1.3.7新接口.  
 4. tool.js将十六进制显示修改为十进制.  
 5. config.ini版本号修改为v1.3.7.
+
+### v1.2.4 (2019-04-17)  
+* Update:
+1. 更新config.ini中fisco-bcos默认版本号为1.3.8.
+2. build/expand时支持通过-p参数指定使用的fisco-bcos路径,或者通过-d参数从GitHub下载对应fisco-bcos版本.
+3. stop.sh脚本添加超时重试机制.
