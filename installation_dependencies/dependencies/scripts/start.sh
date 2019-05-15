@@ -9,18 +9,10 @@ cd $dirpath
 index=$1;
 
 if [ -z $index ];then
-    total=999
-    index=0
     echo "start all node ... "
-    while [ $index -le $total ]
+    for startfile in `ls $dirpath/node*/start.sh`
     do
-        if [ -d node$index ];then
-            bash node$index/start.sh
-        else	
-            break
-        fi
-	sleep 3
-        index=$(($index+1))
+        bash $startfile
     done
 
     sleep 3
@@ -31,8 +23,9 @@ else
     if [ -d node$index ];then
         bash node$index/start.sh
         sleep 3
-        bash check.sh $index
+        bash node$index/check.sh
     else
         echo "node$index is not exist."
     fi
 fi
+
