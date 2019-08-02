@@ -21,7 +21,7 @@ do
 		echo "start node $config_ip:$config_port"
         exit 1
     }
-	#curl "http://***REMOVED***:8545" -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":67}'
+	#curl "http://127.0.0.1:8545" -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":67}'
 	#{"id":67,"jsonrpc":"2.0","result":"0x183ed"}
 	heightresult=$(curl -s "http://$config_ip:$config_port" -X POST --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":67}')
 	height=$(echo $heightresult|awk -F'"' '{print $10}')
