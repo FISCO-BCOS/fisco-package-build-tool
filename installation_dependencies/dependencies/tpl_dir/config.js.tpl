@@ -1,7 +1,7 @@
 
 
 
-//var proxy="http://***REMOVED***:8545";
+//var proxy="http://127.0.0.1:8545";
 var proxy="http://ip:port";
 
 var encryptType = 0;// 0:ECDSA 1:sm2Withsm3
