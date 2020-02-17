@@ -23,8 +23,6 @@
 ![](https://github.com/FISCO-BCOS/web3sdk/raw/master/doc/FISCO-BCOS.jpeg)
 
 
-诚邀广大安全专家共同关注区块链安全。如果有安全风险，欢迎各位踊跃提交漏洞至[微众SRC](https://security.webank.com)。
-
 ## 其它
 
 [FISCO BCOS github主页](https://github.com/FISCO-BCOS/)
